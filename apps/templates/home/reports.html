@@ -1,0 +1,991 @@
+{% if session.get('lang', 'en') == 'ar' %}
+     {% extends "layouts/base-m-rtl.html" %}
+   {% else %}
+     {% extends "layouts/base-m.html" %}
+   {% endif %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    التقارير والتحليلات
+  {% else %}
+    Reports & Analytics
+  {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #344767;
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+        color: #7b809a;
+        margin: 4px 0 0 0;
+    }
+
+    .btn-export {
+        background: linear-gradient(135deg, #49a3f1 0%, #1A73E8 100%);
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-export:hover {
+        background: linear-gradient(135deg, #1A73E8 0%, #4F7DF3 100%);
+        color: #fff;
+    }
+
+    .filter-card {
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .filter-icon {
+        color: #7b809a;
+    }
+
+    .filter-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 8px 32px 8px 12px;
+        font-size: 14px;
+        color: #344767;
+        background: #fff;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237b809a' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    [dir="rtl"] .filter-select {
+        padding: 8px 12px 8px 32px;
+        background-position: left 12px center;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #4F7DF3;
+    }
+
+    .stat-card-mini {
+        border-radius: 12px;
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+        border: 1px solid #f0f2f5;
+    }
+
+    .stat-label-mini {
+        font-size: 13px;
+        color: #7b809a;
+        margin: 0 0 8px 0;
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .stat-value-mini {
+        font-size: 28px;
+        font-weight: 700;
+        color: #344767;
+        margin: 0;
+    }
+
+    .stat-change-mini {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4CAF50;
+    }
+
+    .content-card {
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        padding: 24px;
+        height: 100%;
+    }
+
+    .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #344767;
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-title i {
+        font-size: 18px;
+        color: #7b809a;
+    }
+
+    /* Sector Bar Items */
+    .sector-item {
+        margin-bottom: 16px;
+    }
+
+    .sector-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .sector-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+
+    .sector-name {
+        font-size: 13px;
+        color: #344767;
+    }
+
+    .sector-value {
+        font-size: 13px;
+        color: #7b809a;
+    }
+
+    .sector-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .sector-fill {
+        height: 100%;
+        border-radius: 4px;
+    }
+
+    .sector-fill.blue { background: #4F7DF3; }
+    .sector-fill.green { background: #4CAF50; }
+    .sector-fill.teal { background: #26A69A; }
+    .sector-fill.orange { background: #FF9800; }
+    .sector-fill.pink { background: #EC407A; }
+    .sector-fill.purple { background: #7E57C2; }
+
+    /* Score Bar Items */
+    .score-item {
+        margin-bottom: 14px;
+    }
+
+    .score-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .score-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
+
+    .score-name {
+        font-size: 13px;
+        color: #344767;
+    }
+
+    .score-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4F7DF3;
+    }
+
+    .score-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .score-fill {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #66BB6A, #43A047);
+    }
+
+    .score-fill.orange {
+        background: linear-gradient(90deg, #FFA726, #FB8C00);
+    }
+
+    .score-fill.red {
+        background: linear-gradient(90deg, #EF5350, #E53935);
+    }
+
+    /* Partners Table */
+    .partners-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .partners-table th {
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #7b809a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    [dir="rtl"] .partners-table th {
+        text-align: right;
+    }
+
+    .partners-table td {
+        padding: 12px;
+        font-size: 14px;
+        color: #344767;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .partners-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .partners-table .num-approved {
+        color: #4F7DF3;
+        font-weight: 600;
+    }
+
+    .partners-table .num-pending {
+        color: #FF9800;
+        font-weight: 600;
+    }
+
+    /* Time Chart */
+    .time-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+
+    .time-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .time-label {
+        font-size: 13px;
+        color: #7b809a;
+        min-width: 60px;
+    }
+
+    .time-bar-container {
+        flex: 1;
+        height: 10px;
+        border-radius: 5px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .time-bar {
+        height: 100%;
+        border-radius: 5px;
+        background: linear-gradient(90deg, #66BB6A, #43A047);
+    }
+
+    .time-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #344767;
+        min-width: 30px;
+        text-align: right;
+    }
+
+    [dir="rtl"] .time-value {
+        text-align: left;
+    }
+
+    .time-change {
+        font-size: 12px;
+        color: #4CAF50;
+        min-width: 30px;
+    }
+
+    .insight-box {
+        background: rgba(79, 125, 243, 0.08);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 16px;
+    }
+
+    .insight-text {
+        font-size: 13px;
+        color: #1565C0;
+        margin: 0;
+    }
+
+    /* Export Options */
+    .export-card {
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        padding: 20px 24px;
+        margin-top: 24px;
+    }
+
+    .export-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #344767;
+        margin: 0 0 16px 0;
+    }
+
+    .export-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-export-option {
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        color: #344767;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-export-option:hover {
+        border-color: #4F7DF3;
+        color: #4F7DF3;
+        background: rgba(79, 125, 243, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                {% if session.get('lang', 'en') == 'ar' %}
+                    التقارير والتحليلات
+                {% else %}
+                    Reports & Analytics
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">
+                {% if session.get('lang', 'en') == 'ar' %}
+                    رؤى الأداء وتحليل البيانات
+                {% else %}
+                    Performance insights and data analysis
+                {% endif %}
+            </p>
+        </div>
+        <button class="btn-export">
+            <i class="material-icons" style="font-size: 18px;">download</i>
+            {% if session.get('lang', 'en') == 'ar' %}
+                تصدير التقرير
+            {% else %}
+                Export Report
+            {% endif %}
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-card">
+        <i class="material-icons filter-icon">filter_list</i>
+        <select class="filter-select">
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    هذا الربع
+                {% else %}
+                    This Quarter
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    هذا الشهر
+                {% else %}
+                    This Month
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    هذا العام
+                {% else %}
+                    This Year
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    كل الوقت
+                {% else %}
+                    All Time
+                {% endif %}
+            </option>
+        </select>
+        <select class="filter-select">
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    جميع القطاعات
+                {% else %}
+                    All Sectors
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    تجزئة - أغذية
+                {% else %}
+                    Retail - Food
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    خدمات - تقنية المعلومات
+                {% else %}
+                    Services - IT
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    الأعمال الزراعية
+                {% else %}
+                    Agribusiness
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    تجزئة - أزياء
+                {% else %}
+                    Retail - Fashion
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    تجارة - بناء
+                {% else %}
+                    Trade - Construction
+                {% endif %}
+            </option>
+            <option>
+                {% if session.get('lang', 'en') == 'ar' %}
+                    إنتاج غذائي
+                {% else %}
+                    Food Production
+                {% endif %}
+            </option>
+        </select>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-lg-0 mb-3">
+            <div class="stat-card-mini">
+                <p class="stat-label-mini">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        إجمالي المشاريع
+                    {% else %}
+                        Total SMEs
+                    {% endif %}
+                </p>
+                <div class="stat-row">
+                    <p class="stat-value-mini">6</p>
+                    <span class="stat-change-mini">+12%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-lg-0 mb-3">
+            <div class="stat-card-mini">
+                <p class="stat-label-mini">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        متوسط الدرجة
+                    {% else %}
+                        Average Score
+                    {% endif %}
+                </p>
+                <div class="stat-row">
+                    <p class="stat-value-mini">72</p>
+                    <span class="stat-change-mini">+8%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-lg-0 mb-3">
+            <div class="stat-card-mini">
+                <p class="stat-label-mini">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مُقدَّم
+                    {% else %}
+                        Submitted
+                    {% endif %}
+                </p>
+                <div class="stat-row">
+                    <p class="stat-value-mini">3</p>
+                    <span class="stat-change-mini">+50%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-lg-0 mb-3">
+            <div class="stat-card-mini">
+                <p class="stat-label-mini">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مُموَّل
+                    {% else %}
+                        Funded
+                    {% endif %}
+                </p>
+                <div class="stat-row">
+                    <p class="stat-value-mini">1</p>
+                    <span class="stat-change-mini">+100%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-lg-0 mb-4">
+            <div class="content-card">
+                <h6 class="card-title">
+                    <i class="material-icons">pie_chart</i>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        المشاريع حسب القطاع
+                    {% else %}
+                        SMEs by Sector
+                    {% endif %}
+                </h6>
+
+                <div class="sector-item">
+                    <div class="sector-header">
+                        <span class="sector-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تجزئة - أغذية
+                            {% else %}
+                                Retail - Food
+                            {% endif %}
+                        </span>
+                        <span class="sector-value">1 (17%)</span>
+                    </div>
+                    <div class="sector-bar">
+                        <div class="sector-fill blue" style="width: 17%;"></div>
+                    </div>
+                </div>
+
+                <div class="sector-item">
+                    <div class="sector-header">
+                        <span class="sector-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                خدمات - تقنية المعلومات
+                            {% else %}
+                                Services - IT
+                            {% endif %}
+                        </span>
+                        <span class="sector-value">1 (17%)</span>
+                    </div>
+                    <div class="sector-bar">
+                        <div class="sector-fill green" style="width: 17%;"></div>
+                    </div>
+                </div>
+
+                <div class="sector-item">
+                    <div class="sector-header">
+                        <span class="sector-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                الأعمال الزراعية
+                            {% else %}
+                                Agribusiness
+                            {% endif %}
+                        </span>
+                        <span class="sector-value">1 (17%)</span>
+                    </div>
+                    <div class="sector-bar">
+                        <div class="sector-fill teal" style="width: 17%;"></div>
+                    </div>
+                </div>
+
+                <div class="sector-item">
+                    <div class="sector-header">
+                        <span class="sector-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تجزئة - أزياء
+                            {% else %}
+                                Retail - Fashion
+                            {% endif %}
+                        </span>
+                        <span class="sector-value">1 (17%)</span>
+                    </div>
+                    <div class="sector-bar">
+                        <div class="sector-fill orange" style="width: 17%;"></div>
+                    </div>
+                </div>
+
+                <div class="sector-item">
+                    <div class="sector-header">
+                        <span class="sector-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تجارة - بناء
+                            {% else %}
+                                Trade - Construction
+                            {% endif %}
+                        </span>
+                        <span class="sector-value">1 (17%)</span>
+                    </div>
+                    <div class="sector-bar">
+                        <div class="sector-fill pink" style="width: 17%;"></div>
+                    </div>
+                </div>
+
+                <div class="sector-item">
+                    <div class="sector-header">
+                        <span class="sector-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إنتاج غذائي
+                            {% else %}
+                                Food Production
+                            {% endif %}
+                        </span>
+                        <span class="sector-value">1 (17%)</span>
+                    </div>
+                    <div class="sector-bar">
+                        <div class="sector-fill teal" style="width: 17%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="content-card">
+                <h6 class="card-title">
+                    <i class="material-icons">bar_chart</i>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        متوسط الدرجة حسب القطاع
+                    {% else %}
+                        Average Score by Sector
+                    {% endif %}
+                </h6>
+
+                <div class="score-item">
+                    <div class="score-header">
+                        <span class="score-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إنتاج غذائي
+                            {% else %}
+                                Food Production
+                            {% endif %}
+                        </span>
+                        <span class="score-value">91/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: 91%;"></div>
+                    </div>
+                </div>
+
+                <div class="score-item">
+                    <div class="score-header">
+                        <span class="score-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                خدمات - تقنية المعلومات
+                            {% else %}
+                                Services - IT
+                            {% endif %}
+                        </span>
+                        <span class="score-value">85/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <div class="score-item">
+                    <div class="score-header">
+                        <span class="score-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تجارة - بناء
+                            {% else %}
+                                Trade - Construction
+                            {% endif %}
+                        </span>
+                        <span class="score-value">78/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: 78%;"></div>
+                    </div>
+                </div>
+
+                <div class="score-item">
+                    <div class="score-header">
+                        <span class="score-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تجزئة - أغذية
+                            {% else %}
+                                Retail - Food
+                            {% endif %}
+                        </span>
+                        <span class="score-value">72/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill orange" style="width: 72%;"></div>
+                    </div>
+                </div>
+
+                <div class="score-item">
+                    <div class="score-header">
+                        <span class="score-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                الأعمال الزراعية
+                            {% else %}
+                                Agribusiness
+                            {% endif %}
+                        </span>
+                        <span class="score-value">58/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill orange" style="width: 58%;"></div>
+                    </div>
+                </div>
+
+                <div class="score-item">
+                    <div class="score-header">
+                        <span class="score-name">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تجزئة - أزياء
+                            {% else %}
+                                Retail - Fashion
+                            {% endif %}
+                        </span>
+                        <span class="score-value">45/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-fill red" style="width: 45%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-lg-0 mb-4">
+            <div class="content-card">
+                <h6 class="card-title">
+                    <i class="material-icons">trending_up</i>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        المشاريع المُقدَّمة للشركاء
+                    {% else %}
+                        SMEs Submitted to Partners
+                    {% endif %}
+                </h6>
+
+                <table class="partners-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    الشريك
+                                {% else %}
+                                    Partner
+                                {% endif %}
+                            </th>
+                            <th>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مُقدَّم
+                                {% else %}
+                                    Submitted
+                                {% endif %}
+                            </th>
+                            <th>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    موافق عليه
+                                {% else %}
+                                    Approved
+                                {% endif %}
+                            </th>
+                            <th>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    معلق
+                                {% else %}
+                                    Pending
+                                {% endif %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MFI Alpha</td>
+                            <td>3</td>
+                            <td class="num-approved">2</td>
+                            <td class="num-pending">1</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    بنك C
+                                {% else %}
+                                    Bank C
+                                {% endif %}
+                            </td>
+                            <td>1</td>
+                            <td class="num-approved">1</td>
+                            <td class="num-pending">0</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    برنامج المانحين B
+                                {% else %}
+                                    Donor Program B
+                                {% endif %}
+                            </td>
+                            <td>2</td>
+                            <td class="num-approved">1</td>
+                            <td class="num-pending">1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="content-card">
+                <h6 class="card-title">
+                    <i class="material-icons">show_chart</i>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        تحسن الدرجات عبر الزمن
+                    {% else %}
+                        Score Improvement Over Time
+                    {% endif %}
+                </h6>
+
+                <div class="time-item">
+                    <span class="time-label">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            سبتمبر 2024
+                        {% else %}
+                            Sep 2024
+                        {% endif %}
+                    </span>
+                    <div class="time-bar-container">
+                        <div class="time-bar" style="width: 62%;"></div>
+                    </div>
+                    <span class="time-value">62</span>
+                    <span class="time-change"></span>
+                </div>
+
+                <div class="time-item">
+                    <span class="time-label">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            أكتوبر 2024
+                        {% else %}
+                            Oct 2024
+                        {% endif %}
+                    </span>
+                    <div class="time-bar-container">
+                        <div class="time-bar" style="width: 65%;"></div>
+                    </div>
+                    <span class="time-value">65</span>
+                    <span class="time-change">+3</span>
+                </div>
+
+                <div class="time-item">
+                    <span class="time-label">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            نوفمبر 2024
+                        {% else %}
+                            Nov 2024
+                        {% endif %}
+                    </span>
+                    <div class="time-bar-container">
+                        <div class="time-bar" style="width: 68%;"></div>
+                    </div>
+                    <span class="time-value">68</span>
+                    <span class="time-change">+3</span>
+                </div>
+
+                <div class="time-item">
+                    <span class="time-label">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            ديسمبر 2024
+                        {% else %}
+                            Dec 2024
+                        {% endif %}
+                    </span>
+                    <div class="time-bar-container">
+                        <div class="time-bar" style="width: 71%;"></div>
+                    </div>
+                    <span class="time-value">71</span>
+                    <span class="time-change">+3</span>
+                </div>
+
+                <div class="insight-box">
+                    <p class="insight-text">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            تحسن متوسط الدرجة بـ 9 نقاط خلال الربع الماضي من خلال برامج بناء القدرات المستهدفة.
+                        {% else %}
+                            Average score has improved by 9 points over the past quarter through targeted capacity building programs.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="export-card">
+        <h6 class="export-title">
+            {% if session.get('lang', 'en') == 'ar' %}
+                خيارات التصدير
+            {% else %}
+                Export Options
+            {% endif %}
+        </h6>
+        <div class="export-buttons">
+            <button class="btn-export-option">
+                {% if session.get('lang', 'en') == 'ar' %}
+                    تصدير كـ PDF
+                {% else %}
+                    Export as PDF
+                {% endif %}
+            </button>
+            <button class="btn-export-option">
+                {% if session.get('lang', 'en') == 'ar' %}
+                    تصدير كـ Excel
+                {% else %}
+                    Export as Excel
+                {% endif %}
+            </button>
+            <button class="btn-export-option">
+                {% if session.get('lang', 'en') == 'ar' %}
+                    تصدير كـ CSV
+                {% else %}
+                    Export as CSV
+                {% endif %}
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

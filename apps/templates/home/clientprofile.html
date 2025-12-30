@@ -1,0 +1,1950 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 
+  {% if session.get('lang', 'en') == 'ar' %}
+    الملف الشخصي للعميل
+  {% else %}
+    Client's Profile 
+  {% endif %}
+{% endblock %} 
+
+{% block stylesheets %}
+<style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #4F7DF3 0%, #1A73E8 100%);
+  --primary-color: #4F7DF3;
+  --primary-dark: #1A73E8;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --info-color: #17c1e8;
+  --surface-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* Page Layout */
+.profile-page-container {
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #F0F4FF 0%, #FFFFFF 100%);
+  min-height: 100vh;
+}
+
+/* Progress Bar Enhanced */
+.progress-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.progress-percentage {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.progress-bar-container {
+  height: 10px;
+  background: #E2E8F0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease, background 0.3s ease;
+}
+
+.progress-bar-fill.success { background: var(--success-color); }
+.progress-bar-fill.info { background: var(--info-color); }
+.progress-bar-fill.warning { background: var(--warning-color); }
+.progress-bar-fill.danger { background: var(--danger-color); }
+
+/* Unsaved Changes Indicator */
+.unsaved-indicator {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1050;
+  background: var(--warning-color);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideIn 0.3s ease;
+}
+
+html[dir="rtl"] .unsaved-indicator {
+  right: auto;
+  left: 20px;
+}
+
+.unsaved-indicator.show {
+  display: flex;
+}
+
+.unsaved-indicator i {
+  font-size: 20px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Section Cards */
+.profile-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-card-header {
+  background: var(--primary-gradient);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-card-header h5 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-card-header h5 i {
+  font-size: 24px;
+}
+
+.profile-card-body {
+  padding: 1.5rem;
+}
+
+/* Section Title Inside Card */
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(79, 125, 243, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title i {
+  font-size: 20px;
+}
+
+/* Avatar Section */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+}
+
+.avatar-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.avatar-image {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.3s ease;
+}
+
+.avatar-wrapper:hover .avatar-image {
+  transform: scale(1.05);
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  background: var(--primary-gradient);
+  border: 3px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.avatar-edit-btn:hover {
+  transform: scale(1.1);
+}
+
+.avatar-edit-btn i {
+  color: white;
+  font-size: 18px;
+}
+
+.avatar-edit-btn input {
+  display: none;
+}
+
+/* Form Controls */
+.form-group-modern {
+  margin-bottom: 1.25rem;
+}
+
+.form-label-modern {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.form-control-modern {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.form-control-modern:hover {
+  border-color: #CBD5E1;
+}
+
+.form-control-modern:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15);
+}
+
+.form-control-modern::placeholder {
+  color: var(--text-secondary);
+}
+
+select.form-control-modern {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+html[dir="rtl"] select.form-control-modern {
+  background-position: left 1rem center;
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+}
+
+/* Add Item Card */
+.add-item-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.add-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.add-item-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.add-item-title i {
+  color: var(--primary-color);
+}
+
+.btn-add-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(79, 125, 243, 0.3);
+}
+
+.btn-add-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 125, 243, 0.4);
+}
+
+.btn-add-item i {
+  font-size: 18px;
+}
+
+.add-item-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Table Styles */
+.data-table-container {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.data-table-header {
+  background: var(--surface-color);
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.data-table-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.data-table-title i {
+  color: var(--primary-color);
+}
+
+.data-table-count {
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+}
+
+.data-table {
+  width: 100%;
+  margin: 0;
+}
+
+.data-table thead {
+  background: #F1F5F9;
+}
+
+.data-table th {
+  padding: 0.875rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border: none;
+}
+
+.data-table td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(79, 125, 243, 0.04);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.btn-delete-row {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #FECACA;
+  background: #FEF2F2;
+  color: var(--danger-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-row:hover {
+  background: var(--danger-color);
+  border-color: var(--danger-color);
+  color: white;
+  transform: scale(1.1);
+}
+
+.empty-table-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.empty-table-icon {
+  font-size: 48px;
+  color: #CBD5E1;
+  margin-bottom: 1rem;
+}
+
+.empty-table-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.empty-table-hint {
+  font-size: 0.8125rem;
+  color: #94A3B8;
+}
+
+/* Toggle Switch Enhanced */
+.toggle-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+}
+
+.toggle-switch-wrapper {
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+
+.toggle-content {
+  flex: 1;
+}
+
+.toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.toggle-hint {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.toggle-fields {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color);
+  display: none;
+}
+
+.toggle-fields.show {
+  display: block;
+}
+
+/* Custom Toggle Switch */
+.custom-toggle {
+  position: relative;
+  width: 52px;
+  height: 28px;
+}
+
+.custom-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #CBD5E1;
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
+.custom-toggle input:checked + .toggle-slider {
+  background: var(--primary-gradient);
+}
+
+.custom-toggle input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* Badge Styles */
+.badge-modern {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.badge-success {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.badge-info {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.badge-warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+/* Action Buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.btn-modern {
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary-modern {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.btn-primary-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45);
+}
+
+.btn-secondary-modern {
+  background: white;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-color);
+}
+
+.btn-secondary-modern:hover {
+  background: var(--surface-color);
+  color: var(--text-primary);
+}
+
+/* Auto-save indicator */
+.auto-save-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.auto-save-status.saving {
+  color: var(--warning-color);
+}
+
+.auto-save-status.saved {
+  color: var(--success-color);
+}
+
+.auto-save-status i {
+  font-size: 16px;
+}
+
+/* Loading Spinner */
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #E2E8F0;
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page-container {
+    padding: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn-modern {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* RTL Support */
+html[dir="rtl"] .section-title,
+html[dir="rtl"] .add-item-title,
+html[dir="rtl"] .data-table-title,
+html[dir="rtl"] .toggle-section,
+html[dir="rtl"] .btn-modern {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .form-actions {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .avatar-edit-btn {
+  right: auto;
+  left: 5px;
+}
+
+/* Animation for new rows */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.data-table tbody tr {
+  animation: fadeInUp 0.3s ease;
+}
+
+/* Choices.js Override */
+.choices__inner {
+  border: 1.5px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.5rem 0.75rem !important;
+  min-height: 44px !important;
+  background: white !important;
+}
+
+.choices__inner:hover {
+  border-color: #CBD5E1 !important;
+}
+
+.choices.is-focused .choices__inner {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15) !important;
+}
+
+.choices__list--dropdown {
+  border-radius: var(--radius-md) !important;
+  border: 1.5px solid var(--border-color) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1060;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+html[dir="rtl"] .toast-notification {
+  right: auto;
+  left: 20px;
+}
+
+.toast-notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-notification.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.toast-notification.error {
+  border-left: 4px solid var(--danger-color);
+}
+
+html[dir="rtl"] .toast-notification.success {
+  border-left: none;
+  border-right: 4px solid var(--success-color);
+}
+
+html[dir="rtl"] .toast-notification.error {
+  border-left: none;
+  border-right: 4px solid var(--danger-color);
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-icon.success {
+  background: #D1FAE5;
+  color: var(--success-color);
+}
+
+.toast-icon.error {
+  background: #FEE2E2;
+  color: var(--danger-color);
+}
+
+.toast-message {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="profile-page-container">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
+
+        <!-- Unsaved Changes Indicator -->
+        <div class="unsaved-indicator" id="unsaved-indicator">
+          <i class="material-icons">warning</i>
+          <span>{% if session.get('lang', 'en') == 'ar' %}لديك تغييرات غير محفوظة{% else %}You have unsaved changes{% endif %}</span>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast-notification" id="toast-notification">
+          <div class="toast-icon" id="toast-icon">
+            <i class="material-icons" id="toast-icon-symbol">check</i>
+          </div>
+          <span class="toast-message" id="toast-message"></span>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">
+              {% if session.get('lang', 'en') == 'ar' %}تقدم الملف الشخصي{% else %}Profile Completion{% endif %}
+            </span>
+            <span class="progress-percentage">{{ data_comp[0].completion }}%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill {% if data_comp[0].completion == 100 %}success{% elif data_comp[0].completion >= 50 %}info{% else %}danger{% endif %}"
+                 style="width: {{ data_comp[0].completion }}%;"></div>
+          </div>
+        </div>
+
+        <!-- Main Form - Now with auto-save capability -->
+        <form id="client-profile-form" method="POST" action="/clientprofile/{{ bplan_id }}" enctype="multipart/form-data">
+
+          <!-- Hidden field to store form state -->
+          <input type="hidden" id="form-action" name="action" value="">
+
+          <!-- Client Information Card -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <h5>
+                <i class="material-icons">person</i>
+                {% if session.get('lang', 'en') == 'ar' %}الملف الشخصي للعميل{% else %}Client Profile{% endif %}
+              </h5>
+            </div>
+
+            <div class="profile-card-body">
+              <div class="row">
+                <!-- Avatar Column -->
+                <div class="col-lg-3 col-md-4">
+                  <div class="avatar-section">
+                    <div class="avatar-wrapper">
+                      <img id="selectedAvatar" src="/static/uploads/{{ data_ci[0].client_avatar }}"
+                           class="avatar-image" alt="Profile Avatar" />
+                      <label class="avatar-edit-btn">
+                        <i class="material-icons">camera_alt</i>
+                        <input type="file" name="fileAvatar" id="fileAvatar" accept="image/*"
+                               onchange="displaySelectedImage(event, 'selectedAvatar'); markUnsaved();" />
+                      </label>
+                    </div>
+                    <p class="text-muted text-center" style="font-size: 0.8125rem;">
+                      {% if session.get('lang', 'en') == 'ar' %}انقر للتغيير{% else %}Click to change{% endif %}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Info Column -->
+                <div class="col-lg-9 col-md-8">
+                  <h6 class="section-title">
+                    <i class="material-icons">badge</i>
+                    {% if session.get('lang', 'en') == 'ar' %}المعلومات الشخصية{% else %}Personal Information{% endif %}
+                  </h6>
+
+                  <div class="grid-2">
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}الاسم الكامل{% else %}Full Name{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="text" name="full_name"
+                             value="{{ data_ci[0].full_name }}"
+                             placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل الاسم الكامل{% else %}Enter full name{% endif %}"
+                             onchange="markUnsaved()" autocomplete="off"/>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}الجنس{% else %}Gender{% endif %}
+                      </label>
+                      <select class="form-control-modern" name="choice_gender" id="choice_gender" onchange="markUnsaved()">
+                        <option value="Male" {% if data_ci[0].gender == "Male" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}ذكر{% else %}Male{% endif %}
+                        </option>
+                        <option value="Female" {% if data_ci[0].gender == "Female" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}أنثى{% else %}Female{% endif %}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}الحالة الاجتماعية{% else %}Marital Status{% endif %}
+                      </label>
+                      <select class="form-control-modern" name="choice_status" id="choice_status"
+                              onchange="checkMaritalStatus(); markUnsaved()">
+                        <option value="Single" {% if data_ci[0].marital_status == "Single" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}أعزب{% else %}Single{% endif %}
+                        </option>
+                        <option value="Married" {% if data_ci[0].marital_status == "Married" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}متزوج{% else %}Married{% endif %}
+                        </option>
+                        <option value="Separated" {% if data_ci[0].marital_status == "Separated" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}منفصل{% else %}Separated{% endif %}
+                        </option>
+                        <option value="Widowed" {% if data_ci[0].marital_status == "Widowed" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}أرمل{% else %}Widowed{% endif %}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group-modern" id="children-group" style="{% if data_ci[0].marital_status == 'Single' %}display:none;{% endif %}">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}عدد الأطفال{% else %}Number of Children{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="number" name="number_of_children"
+                             id="number_of_children" value="{{ data_ci[0].number_of_children or 0 }}"
+                             min="0" onchange="markUnsaved()" autocomplete="off"/>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}الجنسية{% else %}Nationality{% endif %}
+                      </label>
+                      <select class="form-control-modern" name="choice_nationality" id="choice_nationality" onchange="markUnsaved()">
+                        {% for row in lst_nationalities %}
+                        <option value="{{ row.nationality }}" {% if row.nationality == data_ci[0].nationality %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}{{ row.nationality_ar }}{% else %}{{ row.nationality }}{% endif %}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}تاريخ الميلاد{% else %}Date of Birth{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="date" name="date_of_birth"
+                             value="{{ data_ci[0].dob.strftime('%Y-%m-%d') }}" onchange="markUnsaved()"/>
+                    </div>
+                  </div>
+
+                  <h6 class="section-title mt-4">
+                    <i class="material-icons">school</i>
+                    {% if session.get('lang', 'en') == 'ar' %}التعليم والخبرة{% else %}Education & Experience{% endif %}
+                  </h6>
+
+                  <div class="grid-3">
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}المستوى التعليمي{% else %}Education Level{% endif %}
+                      </label>
+                      <select class="form-control-modern" name="choice_education_level" id="choice_education_level" onchange="markUnsaved()">
+                        <option value="Phd" {% if data_ci[0].education_level == "Phd" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}دكتوراه{% else %}PhD{% endif %}
+                        </option>
+                        <option value="Masters" {% if data_ci[0].education_level == "Masters" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}ماجستير{% else %}Masters{% endif %}
+                        </option>
+                        <option value="Bachelor" {% if data_ci[0].education_level == "Bachelor" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}بكالوريوس{% else %}Bachelor{% endif %}
+                        </option>
+                        <option value="Technical" {% if data_ci[0].education_level == "Technical" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}تقني{% else %}Technical{% endif %}
+                        </option>
+                        <option value="High School" {% if data_ci[0].education_level == "High School" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}ثانوية{% else %}High School{% endif %}
+                        </option>
+                        <option value="Uneducated" {% if data_ci[0].education_level == "Uneducated" %}selected{% endif %}>
+                          {% if session.get('lang', 'en') == 'ar' %}غير متعلم{% else %}Uneducated{% endif %}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}التخصص{% else %}Major{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="text" name="education_major"
+                             value="{{ data_ci[0].education_major }}"
+                             placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: إدارة أعمال{% else %}e.g. Business{% endif %}"
+                             onchange="markUnsaved()" autocomplete="off"/>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}المهنة{% else %}Profession{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="text" name="specialty"
+                             value="{{ data_ci[0].specialty }}"
+                             placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: مهندس{% else %}e.g. Engineer{% endif %}"
+                             onchange="markUnsaved()" autocomplete="off"/>
+                    </div>
+
+                    <div class="form-group-modern">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}سنوات الخبرة{% else %}Years of Experience{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="number" name="years_experience"
+                             value="{{ data_ci[0].years_of_experience }}" min="0"
+                             onchange="markUnsaved()" autocomplete="off"/>
+                    </div>
+
+                    <div class="form-group-modern" style="grid-column: span 2;">
+                      <label class="form-label-modern">
+                        {% if session.get('lang', 'en') == 'ar' %}المؤسسة التعليمية{% else %}Institution{% endif %}
+                      </label>
+                      <input class="form-control-modern" type="text" name="education_institution"
+                             value="{{ data_ci[0].education_institution }}"
+                             placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: جامعة القاهرة{% else %}e.g. MIT{% endif %}"
+                             onchange="markUnsaved()" autocomplete="off"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Experiences Card -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title">
+                <i class="material-icons">work_history</i>
+                {% if session.get('lang', 'en') == 'ar' %}الخبرات المهنية{% else %}Professional Experiences{% endif %}
+              </h6>
+
+              <!-- Add Experience Form -->
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title">
+                    <i class="material-icons">add_circle</i>
+                    {% if session.get('lang', 'en') == 'ar' %}إضافة خبرة جديدة{% else %}Add New Experience{% endif %}
+                  </span>
+                  <button type="button" class="btn-add-item" id="btn-add-experience">
+                    <i class="material-icons">add</i>
+                    {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                  </button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المجال{% else %}Field{% endif %}</label>
+                    <input class="form-control-modern" type="text" name="experience_field" id="experience_field"
+                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: التسويق{% else %}e.g. Marketing{% endif %}" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}السنوات{% else %}Years{% endif %}</label>
+                    <input class="form-control-modern" type="number" name="years_of_experience" id="years_of_experience"
+                           value="0" min="0" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}مكان العمل{% else %}Workplace{% endif %}</label>
+                    <input class="form-control-modern" type="text" name="experience_workplace" id="experience_workplace"
+                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: شركة ABC{% else %}e.g. ABC Corp{% endif %}" autocomplete="off"/>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Experiences Table -->
+              <div class="data-table-container" id="experiences-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title">
+                    <i class="material-icons">list</i>
+                    {% if session.get('lang', 'en') == 'ar' %}قائمة الخبرات{% else %}Experiences List{% endif %}
+                  </span>
+                  <span class="data-table-count">{{ data_e|length }}</span>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 35%;">{% if session.get('lang', 'en') == 'ar' %}المجال{% else %}Field{% endif %}</th>
+                      <th style="width: 20%;">{% if session.get('lang', 'en') == 'ar' %}السنوات{% else %}Years{% endif %}</th>
+                      <th style="width: 35%;">{% if session.get('lang', 'en') == 'ar' %}مكان العمل{% else %}Workplace{% endif %}</th>
+                      <th style="width: 10%;" class="text-center">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th>
+                    </tr>
+                  </thead>
+                  <tbody id="experiences-tbody">
+                    {% for row in data_e %}
+                    <tr>
+                      <td><strong>{{ row.field }}</strong></td>
+                      <td>{{ row.years_of_experience }} {% if session.get('lang', 'en') == 'ar' %}سنة{% else %}years{% endif %}</td>
+                      <td>{{ row.workplace }}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn-delete-row delete-experience-btn" data-item-id="{{ row.experience_id }}">
+                          <i class="material-icons">delete</i>
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not data_e %}
+                    <tr class="empty-row">
+                      <td colspan="4">
+                        <div class="empty-table-state">
+                          <i class="material-icons empty-table-icon">work_outline</i>
+                          <p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا توجد خبرات{% else %}No experiences added{% endif %}</p>
+                          <p class="empty-table-hint">{% if session.get('lang', 'en') == 'ar' %}أضف خبرتك الأولى{% else %}Add your first experience above{% endif %}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partners Card -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title">
+                <i class="material-icons">groups</i>
+                {% if session.get('lang', 'en') == 'ar' %}الشركاء{% else %}Partners{% endif %}
+              </h6>
+
+              <!-- Add Partner Form -->
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title">
+                    <i class="material-icons">person_add</i>
+                    {% if session.get('lang', 'en') == 'ar' %}إضافة شريك جديد{% else %}Add New Partner{% endif %}
+                  </span>
+                  <button type="button" class="btn-add-item" id="btn-add-partner">
+                    <i class="material-icons">add</i>
+                    {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                  </button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الاسم{% else %}Name{% endif %}</label>
+                    <input class="form-control-modern" type="text" name="partner_name" id="partner_name" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}صلة القرابة{% else %}Relation{% endif %}</label>
+                    <select class="form-control-modern" name="choice_partner_relation" id="choice_partner_relation">
+                      <option value="No Relation">{% if session.get('lang', 'en') == 'ar' %}لا توجد{% else %}No Relation{% endif %}</option>
+                      <option value="Brother">{% if session.get('lang', 'en') == 'ar' %}أخ{% else %}Brother{% endif %}</option>
+                      <option value="Sister">{% if session.get('lang', 'en') == 'ar' %}أخت{% else %}Sister{% endif %}</option>
+                      <option value="Father">{% if session.get('lang', 'en') == 'ar' %}أب{% else %}Father{% endif %}</option>
+                      <option value="Mother">{% if session.get('lang', 'en') == 'ar' %}أم{% else %}Mother{% endif %}</option>
+                      <option value="Son">{% if session.get('lang', 'en') == 'ar' %}ابن{% else %}Son{% endif %}</option>
+                      <option value="Husband">{% if session.get('lang', 'en') == 'ar' %}زوج{% else %}Husband{% endif %}</option>
+                      <option value="Wife">{% if session.get('lang', 'en') == 'ar' %}زوجة{% else %}Wife{% endif %}</option>
+                      <option value="Cousin">{% if session.get('lang', 'en') == 'ar' %}قريب{% else %}Cousin{% endif %}</option>
+                    </select>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الخبرة{% else %}Experience{% endif %}</label>
+                    <input class="form-control-modern" type="text" name="partner_experience" id="partner_experience" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}السنوات{% else %}Years{% endif %}</label>
+                    <input class="form-control-modern" type="number" name="partner_years_of_experience" id="partner_years_of_experience" value="0" min="0" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الدور{% else %}Role{% endif %}</label>
+                    <input class="form-control-modern" type="text" name="partner_role" id="partner_role" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الحصة %{% else %}Share %{% endif %}</label>
+                    <input class="form-control-modern" type="number" name="partner_shares" id="partner_shares" value="0" min="0" max="100" step="0.01" autocomplete="off"/>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Partners Table -->
+              <div class="data-table-container" id="partners-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title">
+                    <i class="material-icons">list</i>
+                    {% if session.get('lang', 'en') == 'ar' %}قائمة الشركاء{% else %}Partners List{% endif %}
+                  </span>
+                  <span class="data-table-count">{{ data_p|length }}</span>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}الاسم{% else %}Name{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}القرابة{% else %}Relation{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}الخبرة{% else %}Experience{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}الدور{% else %}Role{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}الحصة{% else %}Share{% endif %}</th>
+                      <th class="text-center">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th>
+                    </tr>
+                  </thead>
+                  <tbody id="partners-tbody">
+                    {% for row in data_p %}
+                    <tr>
+                      <td><strong>{{ row.partner_name }}</strong></td>
+                      <td>{{ row.partner_relation }}</td>
+                      <td>{{ row.partner_experience }}</td>
+                      <td>{{ row.partner_role }}</td>
+                      <td><span class="badge-modern badge-info">{{ row.partner_shares }}%</span></td>
+                      <td class="text-center">
+                        <button type="button" class="btn-delete-row delete-partner-btn" data-item-id="{{ row.partner_id }}">
+                          <i class="material-icons">delete</i>
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not data_p %}
+                    <tr class="empty-row">
+                      <td colspan="6">
+                        <div class="empty-table-state">
+                          <i class="material-icons empty-table-icon">group</i>
+                          <p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا يوجد شركاء{% else %}No partners added{% endif %}</p>
+                          <p class="empty-table-hint">{% if session.get('lang', 'en') == 'ar' %}أضف شريكك الأول{% else %}Add your first partner above{% endif %}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Living Expenses Card -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title">
+                <i class="material-icons">account_balance_wallet</i>
+                {% if session.get('lang', 'en') == 'ar' %}المصاريف المعيشية{% else %}Living Expenses{% endif %}
+              </h6>
+
+              <!-- Add Expense Form -->
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title">
+                    <i class="material-icons">add_card</i>
+                    {% if session.get('lang', 'en') == 'ar' %}إضافة مصاريف{% else %}Add Expense{% endif %}
+                  </span>
+                  <button type="button" class="btn-add-item" id="btn-add-expense">
+                    <i class="material-icons">add</i>
+                    {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                  </button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}نوع المصاريف{% else %}Expense Type{% endif %}</label>
+                    <select class="form-control-modern" name="choices_living_expenses" id="choices_living_expenses">
+                      <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
+                      <option value="Residential Rent">{% if session.get('lang', 'en') == 'ar' %}إيجار سكني{% else %}Residential Rent{% endif %}</option>
+                      <option value="Food Expenses">{% if session.get('lang', 'en') == 'ar' %}مصاريف الطعام{% else %}Food Expenses{% endif %}</option>
+                      <option value="Education Expenses">{% if session.get('lang', 'en') == 'ar' %}مصاريف التعليم{% else %}Education Expenses{% endif %}</option>
+                      <option value="Utilities">{% if session.get('lang', 'en') == 'ar' %}المرافق{% else %}Utilities{% endif %}</option>
+                      <option value="Car loan payments">{% if session.get('lang', 'en') == 'ar' %}أقساط سيارة{% else %}Car Loan{% endif %}</option>
+                      <option value="Housing loan payments">{% if session.get('lang', 'en') == 'ar' %}أقساط سكن{% else %}Housing Loan{% endif %}</option>
+                      <option value="Healthcare Expenses">{% if session.get('lang', 'en') == 'ar' %}رعاية صحية{% else %}Healthcare{% endif %}</option>
+                      <option value="Financial Assistance">{% if session.get('lang', 'en') == 'ar' %}مساعدة مالية{% else %}Financial Aid{% endif %}</option>
+                    </select>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}القيمة{% else %}Value{% endif %}</label>
+                    <input class="form-control-modern" type="number" name="expense_value" id="expense_value" value="" min="0" placeholder="0" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الوحدة{% else %}Period{% endif %}</label>
+                    <select class="form-control-modern" name="choice_expense_unit" id="choice_expense_unit">
+                      <option value="1">{% if session.get('lang', 'en') == 'ar' %}سنوي{% else %}Yearly{% endif %}</option>
+                      <option value="2">{% if session.get('lang', 'en') == 'ar' %}شهري{% else %}Monthly{% endif %}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expenses Table -->
+              <div class="data-table-container" id="expenses-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title">
+                    <i class="material-icons">list</i>
+                    {% if session.get('lang', 'en') == 'ar' %}قائمة المصاريف{% else %}Expenses List{% endif %}
+                  </span>
+                  <span class="data-table-count">{{ data_x|length }}</span>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}القيمة{% else %}Value{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}الفترة{% else %}Period{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}المجموع السنوي{% else %}Yearly Total{% endif %}</th>
+                      <th class="text-center">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th>
+                    </tr>
+                  </thead>
+                  <tbody id="expenses-tbody">
+                    {% for row in data_x %}
+                    <tr>
+                      <td><strong>{{ row.living_expenses }}</strong></td>
+                      <td>{{ "{:,.0f}".format(row.value) }}</td>
+                      <td>
+                        {% if row.unit == 1 %}
+                        <span class="badge-modern badge-success">{% if session.get('lang', 'en') == 'ar' %}سنوي{% else %}Yearly{% endif %}</span>
+                        {% else %}
+                        <span class="badge-modern badge-info">{% if session.get('lang', 'en') == 'ar' %}شهري{% else %}Monthly{% endif %}</span>
+                        {% endif %}
+                      </td>
+                      <td><strong class="text-success">{{ "{:,.0f}".format(row.total_value) }}</strong></td>
+                      <td class="text-center">
+                        <button type="button" class="btn-delete-row delete-expense-btn" data-item-id="{{ row.expense_id }}">
+                          <i class="material-icons">delete</i>
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not data_x %}
+                    <tr class="empty-row">
+                      <td colspan="5">
+                        <div class="empty-table-state">
+                          <i class="material-icons empty-table-icon">receipt_long</i>
+                          <p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا توجد مصاريف{% else %}No expenses added{% endif %}</p>
+                          <p class="empty-table-hint">{% if session.get('lang', 'en') == 'ar' %}أضف مصاريفك{% else %}Add your expenses above{% endif %}</p>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+                {% if data_x %}
+                <div style="padding: 1rem; background: #F0FDF4; border-top: 1px solid var(--border-color);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600; color: var(--text-primary);">
+                      {% if session.get('lang', 'en') == 'ar' %}إجمالي المصاريف السنوية{% else %}Total Yearly Expenses{% endif %}
+                    </span>
+                    <span style="font-size: 1.25rem; font-weight: 700; color: var(--success-color);">
+                      {{ "{:,.0f}".format(data_x_total) }}
+                    </span>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Other Income Card -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title">
+                <i class="material-icons">attach_money</i>
+                {% if session.get('lang', 'en') == 'ar' %}مصادر دخل أخرى{% else %}Other Income Sources{% endif %}
+              </h6>
+
+              <!-- Employed Toggle -->
+              <div class="toggle-section">
+                <div class="toggle-switch-wrapper">
+                  <label class="custom-toggle">
+                    <input type="checkbox" name="flexSwitchCheck_employed" id="toggle_employed"
+                           {% if data_emp[0].emp_where %}checked{% endif %}
+                           onchange="toggleSection('employed'); markUnsaved();">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-content">
+                  <div class="toggle-label">{% if session.get('lang', 'en') == 'ar' %}موظف حالياً؟{% else %}Currently Employed?{% endif %}</div>
+                  <div class="toggle-hint">{% if session.get('lang', 'en') == 'ar' %}أضف تفاصيل وظيفتك الحالية{% else %}Add details about your current job{% endif %}</div>
+
+                  <div class="toggle-fields {% if data_emp[0].emp_where %}show{% endif %}" id="employed-fields">
+                    <div class="grid-3">
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}جهة العمل{% else %}Employer{% endif %}</label>
+                        <input class="form-control-modern" type="text" name="employed_where"
+                               value="{{ data_emp[0].emp_where }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المسمى الوظيفي{% else %}Job Title{% endif %}</label>
+                        <input class="form-control-modern" type="text" name="employed_job_hold"
+                               value="{{ data_emp[0].emp_job_hold }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الموقع{% else %}Location{% endif %}</label>
+                        <input class="form-control-modern" type="text" name="employed_location"
+                               value="{{ data_emp[0].emp_location }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المدة (سنوات){% else %}Duration (years){% endif %}</label>
+                        <input class="form-control-modern" type="text" name="employed_duration"
+                               value="{{ data_emp[0].emp_duration }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الدخل الشهري{% else %}Monthly Income{% endif %}</label>
+                        <input class="form-control-modern" type="number" name="employed_monthly_income"
+                               value="{{ data_emp[0].emp_monthly_income }}" min="0" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Side Business Toggle -->
+              <div class="toggle-section">
+                <div class="toggle-switch-wrapper">
+                  <label class="custom-toggle">
+                    <input type="checkbox" name="flexSwitchCheck_business" id="toggle_business"
+                           {% if data_buz[0].buz_name %}checked{% endif %}
+                           onchange="toggleSection('business'); markUnsaved();">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-content">
+                  <div class="toggle-label">{% if session.get('lang', 'en') == 'ar' %}عمل جانبي؟{% else %}Side Business?{% endif %}</div>
+                  <div class="toggle-hint">{% if session.get('lang', 'en') == 'ar' %}أضف تفاصيل عملك الجانبي{% else %}Add details about your side business{% endif %}</div>
+
+                  <div class="toggle-fields {% if data_buz[0].buz_name %}show{% endif %}" id="business-fields">
+                    <div class="grid-3">
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}اسم العمل{% else %}Business Name{% endif %}</label>
+                        <input class="form-control-modern" type="text" name="business_name"
+                               value="{{ data_buz[0].buz_name }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المجال{% else %}Industry{% endif %}</label>
+                        <select class="form-control-modern" name="choices_industry" id="choices_industry" onchange="markUnsaved()">
+                          {% for row in lst_industries %}
+                          <option value="{{ row.industry_id }}" {% if row.industry_id|string == data_buz[0].buz_industry|string %}selected{% endif %}>
+                            {% if session.get('lang', 'en') == 'ar' %}{{ row.industry_ar }}{% else %}{{ row.industry }}{% endif %}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الموقع{% else %}Location{% endif %}</label>
+                        <input class="form-control-modern" type="text" name="business_location"
+                               value="{{ data_buz[0].buz_location }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المدة (سنوات){% else %}Duration (years){% endif %}</label>
+                        <input class="form-control-modern" type="text" name="business_duration"
+                               value="{{ data_buz[0].buz_duration }}" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                      <div class="form-group-modern">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الدخل الشهري{% else %}Monthly Income{% endif %}</label>
+                        <input class="form-control-modern" type="number" name="business_monthly_income"
+                               value="{{ data_buz[0].buz_monthly_income }}" min="0" onchange="markUnsaved()" autocomplete="off"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <div class="auto-save-status" id="auto-save-status">
+                <i class="material-icons">cloud_done</i>
+                <span>{% if session.get('lang', 'en') == 'ar' %}تم الحفظ{% else %}Saved{% endif %}</span>
+              </div>
+              <button type="button" class="btn-modern btn-primary-modern" id="btn-save-continue">
+                <i class="material-icons">check</i>
+                {% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}
+              </button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+const CONFIG = {
+  bplanId: '{{ bplan_id }}',
+  lang: '{{ session.get("lang", "en") }}',
+  isArabic: '{{ session.get("lang", "en") }}' === 'ar'
+};
+
+// ============================================================================
+// STATE MANAGEMENT
+// ============================================================================
+let hasUnsavedChanges = false;
+let isSaving = false;
+
+// ============================================================================
+// UNSAVED CHANGES TRACKING
+// ============================================================================
+function markUnsaved() {
+  hasUnsavedChanges = true;
+  document.getElementById('unsaved-indicator').classList.add('show');
+  updateAutoSaveStatus('unsaved');
+}
+
+function markSaved() {
+  hasUnsavedChanges = false;
+  document.getElementById('unsaved-indicator').classList.remove('show');
+  updateAutoSaveStatus('saved');
+}
+
+function updateAutoSaveStatus(status) {
+  const statusEl = document.getElementById('auto-save-status');
+  const icon = statusEl.querySelector('i');
+  const text = statusEl.querySelector('span');
+
+  statusEl.classList.remove('saving', 'saved');
+
+  if (status === 'saving') {
+    statusEl.classList.add('saving');
+    icon.textContent = 'sync';
+    text.textContent = CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...';
+  } else if (status === 'saved') {
+    statusEl.classList.add('saved');
+    icon.textContent = 'cloud_done';
+    text.textContent = CONFIG.isArabic ? 'تم الحفظ' : 'Saved';
+  } else {
+    icon.textContent = 'cloud_off';
+    text.textContent = CONFIG.isArabic ? 'تغييرات غير محفوظة' : 'Unsaved changes';
+  }
+}
+
+// Warn before leaving with unsaved changes
+window.addEventListener('beforeunload', function(e) {
+  if (hasUnsavedChanges) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// ============================================================================
+// TOAST NOTIFICATIONS
+// ============================================================================
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast-notification');
+  const icon = document.getElementById('toast-icon');
+  const iconSymbol = document.getElementById('toast-icon-symbol');
+  const messageEl = document.getElementById('toast-message');
+
+  toast.classList.remove('success', 'error');
+  icon.classList.remove('success', 'error');
+
+  toast.classList.add(type);
+  icon.classList.add(type);
+  iconSymbol.textContent = type === 'success' ? 'check' : 'error';
+  messageEl.textContent = message;
+
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+function displaySelectedImage(event, elementId) {
+  const selectedImage = document.getElementById(elementId);
+  const fileInput = event.target;
+
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      selectedImage.src = e.target.result;
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  }
+}
+
+function checkMaritalStatus() {
+  const status = document.getElementById('choice_status').value;
+  const childrenGroup = document.getElementById('children-group');
+
+  if (status === 'Single') {
+    childrenGroup.style.display = 'none';
+    document.getElementById('number_of_children').value = '0';
+  } else {
+    childrenGroup.style.display = 'block';
+  }
+}
+
+function toggleSection(section) {
+  const fields = document.getElementById(section + '-fields');
+  const toggle = document.getElementById('toggle_' + section);
+
+  if (toggle.checked) {
+    fields.classList.add('show');
+  } else {
+    fields.classList.remove('show');
+  }
+}
+
+// ============================================================================
+// SAVE CLIENT INFO BEFORE AJAX OPERATIONS
+// ============================================================================
+async function saveClientInfoSilently() {
+  const form = document.getElementById('client-profile-form');
+  const formData = new FormData(form);
+
+  // Remove table-specific fields
+  formData.delete('experience_field');
+  formData.delete('years_of_experience');
+  formData.delete('experience_workplace');
+  formData.delete('partner_name');
+  formData.delete('choice_partner_relation');
+  formData.delete('partner_experience');
+  formData.delete('partner_years_of_experience');
+  formData.delete('partner_role');
+  formData.delete('partner_shares');
+  formData.delete('choices_living_expenses');
+  formData.delete('expense_value');
+  formData.delete('choice_expense_unit');
+
+  // Add a flag to indicate silent save
+  formData.append('silent_save', 'true');
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    if (response.ok) {
+      console.log('✅ Client info saved silently');
+      return true;
+    }
+  } catch (error) {
+    console.error('❌ Error saving client info:', error);
+  }
+  return false;
+}
+
+// ============================================================================
+// AJAX TABLE OPERATIONS
+// ============================================================================
+async function refreshTable(tableId) {
+  try {
+    const response = await fetch(window.location.href, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+    if (!response.ok) {
+      window.location.reload();
+      return;
+    }
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const newContainer = doc.querySelector('#' + tableId);
+    if (newContainer) {
+      document.querySelector('#' + tableId).innerHTML = newContainer.innerHTML;
+      attachDeleteListeners();
+    }
+  } catch (error) {
+    console.error('Error refreshing table:', error);
+    window.location.reload();
+  }
+}
+
+// ============================================================================
+// ADD OPERATIONS (with auto-save of client info)
+// ============================================================================
+async function addExperience() {
+  const field = document.getElementById('experience_field').value;
+  const years = document.getElementById('years_of_experience').value;
+  const workplace = document.getElementById('experience_workplace').value;
+
+  if (!field) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال المجال' : 'Please enter a field', 'error');
+    return;
+  }
+
+  // Save client info first if there are unsaved changes
+  if (hasUnsavedChanges) {
+    await saveClientInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('experiences_add', CONFIG.bplanId);
+  formData.append('experience_field', field);
+  formData.append('years_of_experience', years || 0);
+  formData.append('experience_workplace', workplace);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت إضافة الخبرة' : 'Experience added');
+      document.getElementById('experience_field').value = '';
+      document.getElementById('years_of_experience').value = '0';
+      document.getElementById('experience_workplace').value = '';
+      markSaved();
+      await refreshTable('experiences-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+async function addPartner() {
+  const name = document.getElementById('partner_name').value;
+
+  if (!name) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال الاسم' : 'Please enter a name', 'error');
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveClientInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('partner_add', CONFIG.bplanId);
+  formData.append('partner_name', name);
+  formData.append('choice_partner_relation', document.getElementById('choice_partner_relation').value);
+  formData.append('partner_experience', document.getElementById('partner_experience').value);
+  formData.append('partner_years_of_experience', document.getElementById('partner_years_of_experience').value || 0);
+  formData.append('partner_role', document.getElementById('partner_role').value);
+  formData.append('partner_shares', document.getElementById('partner_shares').value || 0);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت إضافة الشريك' : 'Partner added');
+      document.getElementById('partner_name').value = '';
+      document.getElementById('partner_experience').value = '';
+      document.getElementById('partner_years_of_experience').value = '0';
+      document.getElementById('partner_role').value = '';
+      document.getElementById('partner_shares').value = '0';
+      markSaved();
+      await refreshTable('partners-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+async function addExpense() {
+  const expenseType = document.getElementById('choices_living_expenses').value;
+  const value = document.getElementById('expense_value').value;
+
+  if (!expenseType) {
+    showToast(CONFIG.isArabic ? 'يرجى اختيار نوع المصاريف' : 'Please select expense type', 'error');
+    return;
+  }
+
+  if (!value || value <= 0) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال قيمة صحيحة' : 'Please enter a valid value', 'error');
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveClientInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('expenses_add', CONFIG.bplanId);
+  formData.append('choices_living_expenses', expenseType);
+  formData.append('expense_value', value);
+  formData.append('choice_expense_unit', document.getElementById('choice_expense_unit').value);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت إضافة المصاريف' : 'Expense added');
+      document.getElementById('choices_living_expenses').value = '';
+      document.getElementById('expense_value').value = '';
+      markSaved();
+      await refreshTable('expenses-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+// ============================================================================
+// DELETE OPERATIONS
+// ============================================================================
+async function deleteItem(type, itemId) {
+  const confirmMsg = CONFIG.isArabic ? 'هل أنت متأكد من الحذف؟' : 'Are you sure you want to delete?';
+
+  if (!confirm(confirmMsg)) return;
+
+  const formData = new FormData();
+  formData.append(type + '_delete', itemId);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تم الحذف' : 'Deleted successfully');
+      const tableId = type === 'experience' ? 'experiences-table-container' :
+                      type === 'partner' ? 'partners-table-container' : 'expenses-table-container';
+      await refreshTable(tableId);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+function attachDeleteListeners() {
+  // Experiences
+  document.querySelectorAll('.delete-experience-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('experience', btn.dataset.itemId);
+  });
+
+  // Partners
+  document.querySelectorAll('.delete-partner-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('partner', btn.dataset.itemId);
+  });
+
+  // Expenses
+  document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('expense', btn.dataset.itemId);
+  });
+}
+
+// ============================================================================
+// SAVE & CONTINUE
+// ============================================================================
+async function saveAndContinue() {
+  if (isSaving) return;
+  isSaving = true;
+
+  updateAutoSaveStatus('saving');
+
+  const form = document.getElementById('client-profile-form');
+  const formData = new FormData(form);
+  formData.set('action', 'save');
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else if (response.ok) {
+      markSaved();
+      showToast(CONFIG.isArabic ? 'تم الحفظ بنجاح' : 'Saved successfully');
+      // Redirect to next page
+      window.location.href = '/bussiness_profile/' + CONFIG.bplanId;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast(CONFIG.isArabic ? 'حدث خطأ' : 'Error occurred', 'error');
+  } finally {
+    isSaving = false;
+  }
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  // Attach button listeners
+  document.getElementById('btn-add-experience').onclick = addExperience;
+  document.getElementById('btn-add-partner').onclick = addPartner;
+  document.getElementById('btn-add-expense').onclick = addExpense;
+  document.getElementById('btn-save-continue').onclick = saveAndContinue;
+
+  // Attach delete listeners
+  attachDeleteListeners();
+
+  // Initialize marital status check
+  checkMaritalStatus();
+
+  // RTL support
+  if (CONFIG.isArabic) {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+
+  console.log('✅ Client Profile page initialized');
+});
+</script>
+{% endblock javascripts %}

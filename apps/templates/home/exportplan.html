@@ -1,0 +1,3710 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}تصدير خطة العمل{% else %}Export Business Plan{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ==================== JADWAPLAN BRAND SYSTEM ==================== */
+:root {
+  --jadwa-blue: #4F7DF3;
+  --jadwa-blue-dark: #3A5FD9;
+  --jadwa-blue-light: #6B93F7;
+  --jadwa-blue-pale: #E8EEFF;
+  --jadwa-blue-glow: rgba(79, 125, 243, 0.15);
+  --jadwa-black: #0A0A0F;
+  --jadwa-charcoal: #1A1A24;
+  --jadwa-slate: #2D2D3A;
+  --jadwa-gray-dark: #4A4A5A;
+  --jadwa-gray: #6B6B7A;
+  --jadwa-gray-light: #9A9AAA;
+  --jadwa-gray-pale: #E5E5EA;
+  --jadwa-white: #FFFFFF;
+  --jadwa-off-white: #F8F9FC;
+  --jadwa-success: #10B981;
+  --jadwa-success-pale: #D1FAE5;
+  --jadwa-warning: #F59E0B;
+  --jadwa-warning-pale: #FEF3C7;
+  --jadwa-danger: #EF4444;
+  --jadwa-danger-pale: #FEE2E2;
+  --jadwa-info: #06B6D4;
+  --jadwa-info-pale: #CFFAFE;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem; --space-lg: 1.5rem;
+  --space-xl: 2rem; --space-2xl: 3rem; --space-3xl: 4rem;
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-xl: 24px; --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-blue: 0 8px 24px rgba(79, 125, 243, 0.25);
+  --shadow-blue-lg: 0 12px 32px rgba(79, 125, 243, 0.35);
+  --transition-fast: 150ms ease; --transition-base: 250ms ease;
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jadwa-export-container {
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--jadwa-off-white) 0%, #EDF2FF 100%);
+  min-height: 100vh;
+  padding: var(--space-xl);
+}
+
+/* Header */
+.jadwa-header {
+  background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-black) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+.jadwa-header::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 60%; height: 200%;
+  background: radial-gradient(ellipse, var(--jadwa-blue-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+.jadwa-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--jadwa-blue), var(--jadwa-blue-light), var(--jadwa-blue));
+}
+.jadwa-logo-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  z-index: 1;
+}
+.jadwa-logo-text {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.jadwa-logo-text .jadwa { color: var(--jadwa-white); }
+.jadwa-logo-text .plan { color: var(--jadwa-blue); }
+.jadwa-tagline {
+  font-size: 0.85rem;
+  color: var(--jadwa-gray-light);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.jadwa-page-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--jadwa-white);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.jadwa-page-subtitle {
+  color: var(--jadwa-gray-light);
+  font-size: 0.95rem;
+  margin-top: var(--space-sm);
+  position: relative;
+  z-index: 1;
+}
+
+/* Selector Card */
+.jadwa-selector-card {
+  background: var(--jadwa-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--jadwa-gray-pale);
+}
+.jadwa-selector-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--jadwa-gray-pale);
+}
+.jadwa-selector-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-blue);
+}
+.jadwa-selector-icon i { color: var(--jadwa-white); font-size: 1.5rem; }
+.jadwa-selector-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin: 0;
+}
+.jadwa-selector-subtitle {
+  font-size: 0.875rem;
+  color: var(--jadwa-gray);
+  margin: var(--space-xs) 0 0;
+}
+
+/* Toggle Grid */
+.jadwa-toggles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+.jadwa-toggle-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+.jadwa-toggle-item:hover { background: var(--jadwa-blue-pale); border-color: var(--jadwa-blue-light); }
+.jadwa-toggle-item.active { background: var(--jadwa-blue-pale); border-color: var(--jadwa-blue); }
+.jadwa-toggle-item.disabled { opacity: 0.5; cursor: not-allowed; }
+.jadwa-toggle-item.disabled:hover { background: var(--jadwa-off-white); border-color: transparent; }
+
+/* Custom Switch */
+.jadwa-switch { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
+.jadwa-switch input { opacity: 0; width: 0; height: 0; }
+.jadwa-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--jadwa-gray-pale);
+  border-radius: var(--radius-full);
+  transition: var(--transition-base);
+}
+.jadwa-switch-slider::before {
+  position: absolute;
+  content: "";
+  height: 22px; width: 22px;
+  left: 3px; bottom: 3px;
+  background: var(--jadwa-white);
+  border-radius: 50%;
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+.jadwa-switch input:checked + .jadwa-switch-slider {
+  background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%);
+}
+.jadwa-switch input:checked + .jadwa-switch-slider::before { transform: translateX(24px); }
+.jadwa-switch input:disabled + .jadwa-switch-slider { opacity: 0.4; cursor: not-allowed; }
+.jadwa-toggle-content { flex: 1; }
+.jadwa-toggle-label { font-weight: 600; color: var(--jadwa-charcoal); font-size: 0.95rem; margin: 0; }
+.jadwa-toggle-status { font-size: 0.75rem; margin-top: 2px; }
+.jadwa-toggle-status.complete { color: var(--jadwa-success); }
+.jadwa-toggle-status.incomplete { color: var(--jadwa-gray); }
+
+/* Buttons */
+.jadwa-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--jadwa-gray-pale);
+}
+.jadwa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.jadwa-btn-primary {
+  background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%);
+  color: var(--jadwa-white);
+  box-shadow: var(--shadow-blue);
+}
+.jadwa-btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-blue-lg); }
+.jadwa-btn-success {
+  background: linear-gradient(135deg, var(--jadwa-success) 0%, #059669 100%);
+  color: var(--jadwa-white);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+}
+.jadwa-btn-success:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(16, 185, 129, 0.35); }
+.jadwa-btn .spinner-border { width: 18px; height: 18px; border-width: 2px; }
+
+/* MVO Card */
+.jadwa-mvo-card {
+  background: var(--jadwa-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--jadwa-gray-pale);
+  position: relative;
+  overflow: hidden;
+}
+.jadwa-mvo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 4px;
+  background: linear-gradient(90deg, var(--jadwa-blue), var(--jadwa-blue-light), var(--jadwa-success));
+}
+.jadwa-mvo-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-xl); }
+.jadwa-mvo-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-black) 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.jadwa-mvo-icon i { color: var(--jadwa-blue); font-size: 1.75rem; }
+.jadwa-mvo-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--jadwa-charcoal); margin: 0; }
+.jadwa-mvo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-xl); }
+.jadwa-mvo-item {
+  padding: var(--space-lg);
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--jadwa-blue);
+}
+.jadwa-mvo-item.vision { border-left-color: var(--jadwa-success); }
+.jadwa-mvo-item.objectives { border-left-color: var(--jadwa-warning); }
+.jadwa-mvo-item-title {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jadwa-blue);
+  margin: 0 0 var(--space-sm);
+}
+.jadwa-mvo-item.vision .jadwa-mvo-item-title { color: var(--jadwa-success); }
+.jadwa-mvo-item.objectives .jadwa-mvo-item-title { color: var(--jadwa-warning); }
+.jadwa-mvo-item-text { font-size: 0.95rem; color: var(--jadwa-gray-dark); line-height: 1.7; margin: 0; }
+
+/* Content Card */
+.jadwa-content-card {
+  background: var(--jadwa-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--jadwa-gray-pale);
+}
+
+/* Timeline */
+.jadwa-timeline { position: relative; padding-left: 80px; }
+.jadwa-timeline::before {
+  content: '';
+  position: absolute;
+  left: 48px; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--jadwa-blue), var(--jadwa-blue-light), var(--jadwa-gray-pale));
+}
+.jadwa-section {
+  position: relative;
+  margin-bottom: var(--space-2xl);
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+.jadwa-section:nth-child(1) { animation-delay: 0.1s; }
+.jadwa-section:nth-child(2) { animation-delay: 0.2s; }
+.jadwa-section:nth-child(3) { animation-delay: 0.3s; }
+.jadwa-section:nth-child(4) { animation-delay: 0.4s; }
+.jadwa-section:nth-child(5) { animation-delay: 0.5s; }
+.jadwa-section:nth-child(6) { animation-delay: 0.6s; }
+.jadwa-section:nth-child(7) { animation-delay: 0.7s; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.jadwa-section-marker {
+  position: absolute;
+  left: -56px; top: 0;
+  width: 48px; height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+}
+.jadwa-section-marker i { color: var(--jadwa-white); font-size: 1.25rem; }
+.jadwa-section.client-profile .jadwa-section-marker { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+.jadwa-section.business-profile .jadwa-section-marker { background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-black) 100%); }
+.jadwa-section.business-premises .jadwa-section-marker { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); }
+.jadwa-section.market-analysis .jadwa-section-marker { background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%); }
+.jadwa-section.operations-plan .jadwa-section-marker { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+.jadwa-section.requested-fund .jadwa-section-marker { background: linear-gradient(135deg, var(--jadwa-success) 0%, #059669 100%); }
+.jadwa-section.feasibility .jadwa-section-marker { background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%); }
+.jadwa-section-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+.jadwa-section-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Content Elements */
+.jadwa-content-block { margin-bottom: var(--space-xl); }
+.jadwa-avatar-section { display: flex; justify-content: center; margin-bottom: var(--space-xl); }
+.jadwa-avatar {
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--jadwa-white);
+  box-shadow: var(--shadow-xl);
+}
+.jadwa-subsection-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jadwa-blue);
+  margin: 0 0 var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.jadwa-subsection-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px; height: 16px;
+  background: var(--jadwa-blue);
+  border-radius: 2px;
+}
+.jadwa-text { font-size: 0.95rem; color: var(--jadwa-gray-dark); line-height: 1.8; margin: 0 0 var(--space-lg); }
+
+/* Tables */
+.jadwa-table-container {
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: var(--space-lg) 0;
+}
+.jadwa-table { width: 100%; border-collapse: collapse; }
+.jadwa-table thead { background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-slate) 100%); }
+.jadwa-table thead th {
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jadwa-white);
+  text-align: left;
+}
+.jadwa-table tbody tr { border-bottom: 1px solid var(--jadwa-gray-pale); transition: background var(--transition-fast); }
+.jadwa-table tbody tr:hover { background: var(--jadwa-white); }
+.jadwa-table tbody tr:last-child { border-bottom: none; }
+.jadwa-table tbody td { padding: var(--space-md) var(--space-lg); font-size: 0.9rem; color: var(--jadwa-gray-dark); }
+.jadwa-table tfoot { background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%); }
+.jadwa-table tfoot td {
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--jadwa-white);
+}
+
+/* Badges */
+.jadwa-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+.jadwa-badge-success { background: var(--jadwa-success-pale); color: var(--jadwa-success); }
+.jadwa-badge-warning { background: var(--jadwa-warning-pale); color: var(--jadwa-warning); }
+.jadwa-badge-info { background: var(--jadwa-info-pale); color: var(--jadwa-info); }
+.jadwa-badge-primary { background: var(--jadwa-blue-pale); color: var(--jadwa-blue); }
+
+/* Charts */
+.jadwa-chart-card {
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.jadwa-chart-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+.jadwa-chart-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-blue);
+}
+.jadwa-chart-icon i { color: var(--jadwa-white); font-size: 1.25rem; }
+.jadwa-chart-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--jadwa-charcoal); margin: 0; }
+.jadwa-chart-subtitle { font-size: 0.8rem; color: var(--jadwa-gray); margin: 2px 0 0; }
+.jadwa-chart-canvas-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.jadwa-chart-canvas { width: 100% !important; height: 350px !important; }
+
+/* Gallery */
+.jadwa-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  justify-content: center;
+  align-items: center;
+  margin: var(--space-xl) auto;
+  max-width: 900px;
+}
+.jadwa-gallery-item {
+  width: 250px; height: 180px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+.jadwa-gallery-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+.jadwa-gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Projections Table */
+.jadwa-projections-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.jadwa-projections-table thead th {
+  padding: var(--space-md);
+  background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-black) 100%);
+  color: var(--jadwa-white);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+.jadwa-projections-table tbody td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--jadwa-gray-pale);
+  text-align: center;
+}
+.jadwa-projections-table tbody tr:hover { background: var(--jadwa-blue-pale); }
+.jadwa-projections-table .row-label { text-align: left; font-weight: 600; color: var(--jadwa-charcoal); }
+.jadwa-projections-table .row-sublabel { text-align: left; font-weight: 500; color: var(--jadwa-gray); padding-left: var(--space-lg); }
+.jadwa-projections-table .total-row { background: var(--jadwa-off-white); font-weight: 700; }
+.jadwa-projections-table .grand-total-row {
+  background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-slate) 100%);
+  color: var(--jadwa-white);
+}
+.jadwa-projections-table .grand-total-row td { border-bottom: none; }
+.value-positive { color: var(--jadwa-success); font-weight: 600; }
+.value-negative { color: var(--jadwa-danger); font-weight: 600; }
+.value-neutral { color: var(--jadwa-blue); font-weight: 600; }
+.value-warning { color: var(--jadwa-warning); font-weight: 600; }
+
+/* Inflation Badge */
+.jadwa-inflation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: linear-gradient(135deg, var(--jadwa-blue) 0%, var(--jadwa-blue-dark) 100%);
+  color: var(--jadwa-white);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-blue);
+  margin-bottom: var(--space-lg);
+}
+.jadwa-inflation-badge i { font-size: 1rem; }
+
+/* Export Actions */
+.jadwa-export-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) 0;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .jadwa-mvo-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .jadwa-export-container { padding: var(--space-md); }
+  .jadwa-header { padding: var(--space-lg); }
+  .jadwa-logo-text { font-size: 1.5rem; }
+  .jadwa-toggles-grid { grid-template-columns: 1fr; }
+  .jadwa-timeline { padding-left: 60px; }
+  .jadwa-timeline::before { left: 36px; }
+  .jadwa-section-marker { left: -44px; width: 40px; height: 40px; }
+  .jadwa-mvo-grid { grid-template-columns: 1fr; }
+  .jadwa-gallery-item { width: 180px; height: 130px; }
+  .jadwa-chart-card { max-width: 100%; }
+}
+
+/* RTL Support */
+[dir="rtl"] .jadwa-timeline { padding-left: 0; padding-right: 80px; }
+[dir="rtl"] .jadwa-timeline::before { left: auto; right: 48px; }
+[dir="rtl"] .jadwa-section-marker { left: auto; right: -56px; }
+[dir="rtl"] .jadwa-mvo-item { border-left: none; border-right: 4px solid var(--jadwa-blue); }
+[dir="rtl"] .jadwa-mvo-item.vision { border-right-color: var(--jadwa-success); }
+[dir="rtl"] .jadwa-mvo-item.objectives { border-right-color: var(--jadwa-warning); }
+[dir="rtl"] .jadwa-table thead th, [dir="rtl"] .jadwa-table tbody td { text-align: right; }
+
+/* Print */
+@media print {
+  .jadwa-selector-card, .jadwa-export-actions, .jadwa-actions { display: none !important; }
+  .jadwa-export-container { background: white; padding: 0; }
+  .jadwa-content-card, .jadwa-mvo-card { box-shadow: none; border: 1px solid #ddd; }
+  .jadwa-section { page-break-inside: avoid; }
+}
+
+/* ==================== PROGRESS MODAL ==================== */
+.jadwa-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+.jadwa-progress-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.jadwa-progress-modal {
+  background: var(--jadwa-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  max-width: 560px;
+  width: 90%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s ease;
+}
+.jadwa-progress-overlay.active .jadwa-progress-modal {
+  transform: scale(1) translateY(0);
+}
+.jadwa-progress-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+.jadwa-progress-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-lg);
+  background: linear-gradient(135deg, var(--jadwa-blue-pale) 0%, var(--jadwa-white) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.jadwa-progress-icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--jadwa-blue);
+  animation: spin 1s linear infinite;
+}
+.jadwa-progress-icon.completed::before {
+  border-color: var(--jadwa-success);
+  animation: none;
+}
+.jadwa-progress-icon i {
+  font-size: 2rem;
+  color: var(--jadwa-blue);
+}
+.jadwa-progress-icon.completed i {
+  color: var(--jadwa-success);
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.jadwa-progress-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin: 0 0 var(--space-xs);
+}
+.jadwa-progress-subtitle {
+  font-size: 0.95rem;
+  color: var(--jadwa-gray);
+  margin: 0;
+}
+
+/* Progress Bar */
+.jadwa-progress-bar-container {
+  margin-bottom: var(--space-xl);
+}
+.jadwa-progress-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+.jadwa-progress-percentage {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jadwa-blue);
+}
+.jadwa-progress-time {
+  font-size: 0.85rem;
+  color: var(--jadwa-gray);
+}
+.jadwa-progress-bar {
+  height: 12px;
+  background: var(--jadwa-gray-pale);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+.jadwa-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--jadwa-blue) 0%, var(--jadwa-blue-light) 100%);
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+  position: relative;
+}
+.jadwa-progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Section List */
+.jadwa-progress-sections {
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: var(--space-lg);
+  padding-right: var(--space-sm);
+}
+.jadwa-progress-sections::-webkit-scrollbar {
+  width: 6px;
+}
+.jadwa-progress-sections::-webkit-scrollbar-track {
+  background: var(--jadwa-gray-pale);
+  border-radius: 3px;
+}
+.jadwa-progress-sections::-webkit-scrollbar-thumb {
+  background: var(--jadwa-gray-light);
+  border-radius: 3px;
+}
+.jadwa-progress-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+  transition: all 0.3s ease;
+}
+.jadwa-progress-section.active {
+  background: var(--jadwa-blue-pale);
+  border-left: 3px solid var(--jadwa-blue);
+}
+.jadwa-progress-section.completed {
+  background: var(--jadwa-success-pale);
+  border-left: 3px solid var(--jadwa-success);
+}
+.jadwa-progress-section.error {
+  background: var(--jadwa-danger-pale);
+  border-left: 3px solid var(--jadwa-danger);
+}
+.jadwa-progress-section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.jadwa-progress-section.pending .jadwa-progress-section-icon {
+  background: var(--jadwa-gray-pale);
+  color: var(--jadwa-gray);
+}
+.jadwa-progress-section.active .jadwa-progress-section-icon {
+  background: var(--jadwa-blue);
+  color: var(--jadwa-white);
+  animation: pulse 1.5s infinite;
+}
+.jadwa-progress-section.completed .jadwa-progress-section-icon {
+  background: var(--jadwa-success);
+  color: var(--jadwa-white);
+}
+.jadwa-progress-section.error .jadwa-progress-section-icon {
+  background: var(--jadwa-danger);
+  color: var(--jadwa-white);
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.jadwa-progress-section-icon i {
+  font-size: 1.1rem;
+}
+.jadwa-progress-section-content {
+  flex: 1;
+  min-width: 0;
+}
+.jadwa-progress-section-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--jadwa-charcoal);
+  margin: 0;
+}
+.jadwa-progress-section-status {
+  font-size: 0.8rem;
+  color: var(--jadwa-gray);
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jadwa-progress-section.active .jadwa-progress-section-status {
+  color: var(--jadwa-blue);
+}
+.jadwa-progress-section.completed .jadwa-progress-section-status {
+  color: var(--jadwa-success);
+}
+.jadwa-progress-section-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.jadwa-progress-section.pending .jadwa-progress-section-check {
+  border: 2px solid var(--jadwa-gray-pale);
+}
+.jadwa-progress-section.active .jadwa-progress-section-check {
+  border: 2px solid var(--jadwa-blue);
+}
+.jadwa-progress-section.active .jadwa-progress-section-check::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--jadwa-blue);
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+.jadwa-progress-section.completed .jadwa-progress-section-check {
+  background: var(--jadwa-success);
+  border: none;
+}
+.jadwa-progress-section.completed .jadwa-progress-section-check i {
+  color: var(--jadwa-white);
+  font-size: 0.9rem;
+}
+
+/* Progress Footer */
+.jadwa-progress-footer {
+  text-align: center;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--jadwa-gray-pale);
+}
+.jadwa-progress-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--jadwa-warning);
+  margin-bottom: var(--space-md);
+}
+.jadwa-progress-warning i {
+  font-size: 1.1rem;
+}
+.jadwa-progress-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+/* PDF Export Loading */
+.jadwa-pdf-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl) 0;
+}
+.jadwa-pdf-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--jadwa-success) 0%, #059669 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.jadwa-pdf-icon i {
+  font-size: 2.5rem;
+  color: var(--jadwa-white);
+}
+.jadwa-pdf-icon::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 3px solid var(--jadwa-success);
+  border-radius: var(--radius-xl);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  animation: spin 1s linear infinite;
+}
+.jadwa-pdf-text {
+  text-align: center;
+}
+.jadwa-pdf-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin: 0 0 var(--space-xs);
+}
+.jadwa-pdf-subtitle {
+  font-size: 0.9rem;
+  color: var(--jadwa-gray);
+  margin: 0;
+}
+.jadwa-pdf-steps {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+.jadwa-pdf-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  color: var(--jadwa-gray);
+}
+.jadwa-pdf-step.active {
+  color: var(--jadwa-blue);
+  font-weight: 600;
+}
+.jadwa-pdf-step.completed {
+  color: var(--jadwa-success);
+}
+.jadwa-pdf-step i {
+  font-size: 1rem;
+}
+
+
+
+/* ==================== SUPPLY CHAIN FLOW ==================== */
+.jadwa-supply-chain-wrapper {
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+}
+
+.jadwa-supply-chain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) 0;
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--jadwa-gray-pale);
+}
+
+.jadwa-chain-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-lg);
+  background: var(--jadwa-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  min-width: 120px;
+  text-align: center;
+  border-top: 4px solid var(--jadwa-gray);
+  transition: all var(--transition-base);
+}
+
+.jadwa-chain-node:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.jadwa-chain-node.suppliers { border-top-color: var(--jadwa-warning); }
+.jadwa-chain-node.products { border-top-color: #8B5CF6; }
+.jadwa-chain-node.production { border-top-color: var(--jadwa-blue); }
+.jadwa-chain-node.distribution { border-top-color: var(--jadwa-success); }
+
+.jadwa-chain-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+}
+
+.jadwa-chain-node.suppliers .jadwa-chain-icon {
+  background: var(--jadwa-warning-pale);
+  color: var(--jadwa-warning);
+}
+
+.jadwa-chain-node.products .jadwa-chain-icon {
+  background: #EDE9FE;
+  color: #8B5CF6;
+}
+
+.jadwa-chain-node.production .jadwa-chain-icon {
+  background: var(--jadwa-blue-pale);
+  color: var(--jadwa-blue);
+}
+
+.jadwa-chain-node.distribution .jadwa-chain-icon {
+  background: var(--jadwa-success-pale);
+  color: var(--jadwa-success);
+}
+
+.jadwa-chain-icon i { font-size: 1.5rem; }
+
+.jadwa-chain-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--jadwa-charcoal);
+  margin-bottom: var(--space-xs);
+}
+
+.jadwa-chain-count {
+  font-size: 0.75rem;
+  color: var(--jadwa-gray);
+  font-weight: 600;
+}
+
+.jadwa-chain-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--jadwa-gray-light);
+  position: relative;
+}
+
+.jadwa-chain-arrow .jadwa-arrow-line {
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jadwa-gray-pale), var(--jadwa-gray-light));
+}
+
+.jadwa-chain-arrow i {
+  font-size: 1.25rem;
+  margin-left: -4px;
+}
+
+/* Chain Details */
+.jadwa-chain-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.jadwa-chain-detail-column {
+  background: var(--jadwa-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.jadwa-detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--jadwa-white);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.jadwa-detail-header.suppliers { background: linear-gradient(135deg, var(--jadwa-warning), #D97706); }
+.jadwa-detail-header.products { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+.jadwa-detail-header.distribution { background: linear-gradient(135deg, var(--jadwa-success), #059669); }
+
+.jadwa-detail-header i { font-size: 1.1rem; }
+
+.jadwa-detail-items {
+  padding: var(--space-sm);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.jadwa-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--jadwa-gray-pale);
+  transition: background var(--transition-fast);
+}
+
+.jadwa-detail-item:last-child { border-bottom: none; }
+
+.jadwa-detail-item:hover { background: var(--jadwa-off-white); }
+
+.jadwa-detail-name {
+  font-size: 0.8rem;
+  color: var(--jadwa-charcoal);
+  font-weight: 500;
+}
+
+.jadwa-detail-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--jadwa-gray-pale);
+  color: var(--jadwa-gray-dark);
+}
+
+/* Price badges */
+.jadwa-detail-badge.price-very-expensive { background: #FEE2E2; color: #DC2626; }
+.jadwa-detail-badge.price-expensive { background: #FEF3C7; color: #D97706; }
+.jadwa-detail-badge.price-moderate { background: var(--jadwa-blue-pale); color: var(--jadwa-blue); }
+.jadwa-detail-badge.price-affordable { background: var(--jadwa-success-pale); color: var(--jadwa-success); }
+.jadwa-detail-badge.price-very-low { background: #D1FAE5; color: #059669; }
+
+/* Type badges */
+.jadwa-detail-badge.type-wholesaler { background: var(--jadwa-blue-pale); color: var(--jadwa-blue); }
+.jadwa-detail-badge.type-distributer { background: #CFFAFE; color: #0891B2; }
+.jadwa-detail-badge.type-retailer { background: var(--jadwa-success-pale); color: var(--jadwa-success); }
+.jadwa-detail-badge.type-direct-sales { background: var(--jadwa-warning-pale); color: var(--jadwa-warning); }
+.jadwa-detail-badge.type-online { background: #EDE9FE; color: #8B5CF6; }
+
+/* ==================== CAPACITY GAUGE ==================== */
+.jadwa-gauge-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg) 0;
+}
+
+.jadwa-capacity-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--jadwa-gray-pale);
+}
+
+.jadwa-capacity-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.jadwa-capacity-label {
+  font-size: 0.8rem;
+  color: var(--jadwa-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.jadwa-capacity-value {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.jadwa-capacity-value.current { color: var(--jadwa-blue); }
+.jadwa-capacity-value.max { color: var(--jadwa-charcoal); }
+
+/* ==================== SUPPLIER RATING CARD ==================== */
+.jadwa-supplier-rating-card {
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+  max-width: 500px;
+}
+
+.jadwa-supplier-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.jadwa-rating-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.jadwa-rating-label {
+  font-size: 0.85rem;
+  color: var(--jadwa-gray-dark);
+  min-width: 100px;
+}
+
+.jadwa-rating-bar {
+  flex: 1;
+  height: 12px;
+  background: var(--jadwa-gray-pale);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.jadwa-rating-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.jadwa-rating-fill.quality { background: linear-gradient(90deg, var(--jadwa-blue), var(--jadwa-blue-light)); }
+.jadwa-rating-fill.years { background: linear-gradient(90deg, var(--jadwa-warning), #FBBF24); }
+.jadwa-rating-fill.price { background: linear-gradient(90deg, var(--jadwa-success), #34D399); }
+
+.jadwa-rating-value {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--jadwa-charcoal);
+  min-width: 60px;
+  text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .jadwa-chain-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .jadwa-supply-chain {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .jadwa-chain-arrow {
+    transform: rotate(90deg);
+  }
+  .jadwa-capacity-stats {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .jadwa-chain-node {
+    min-width: 100%;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .jadwa-chain-arrow {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .jadwa-chain-arrow i {
+  margin-left: 0;
+  margin-right: -4px;
+}
+
+
+
+
+/* ==================== CAREER ROADMAP TIMELINE ==================== */
+.jadwa-roadmap-container {
+  background: linear-gradient(135deg, #F8F9FC 0%, #EDF2FF 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.jadwa-roadmap-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #8B5CF6, #EC4899, #F59E0B);
+}
+
+.jadwa-roadmap-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.jadwa-roadmap-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+}
+
+.jadwa-roadmap-icon i {
+  color: white;
+  font-size: 1.75rem;
+}
+
+.jadwa-roadmap-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin: 0;
+}
+
+.jadwa-roadmap-subtitle {
+  font-size: 0.9rem;
+  color: var(--jadwa-gray);
+  margin: 4px 0 0;
+}
+
+/* The Roadmap */
+.jadwa-roadmap {
+  position: relative;
+  padding: var(--space-xl) 0;
+  padding-left: 40px;
+}
+
+.jadwa-road-line {
+  position: absolute;
+  left: 18px;
+  top: 60px;
+  bottom: 60px;
+  width: 4px;
+  background: linear-gradient(180deg, #8B5CF6, #EC4899, #F59E0B, #10B981);
+  border-radius: 2px;
+}
+
+.jadwa-road-line::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent,
+    transparent 10px,
+    rgba(255,255,255,0.3) 10px,
+    rgba(255,255,255,0.3) 20px
+  );
+}
+
+/* Milestone */
+.jadwa-milestone {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  position: relative;
+  animation: fadeInLeft 0.5s ease forwards;
+  opacity: 0;
+}
+
+.jadwa-milestone:nth-child(2) { animation-delay: 0.1s; }
+.jadwa-milestone:nth-child(3) { animation-delay: 0.2s; }
+.jadwa-milestone:nth-child(4) { animation-delay: 0.3s; }
+.jadwa-milestone:nth-child(5) { animation-delay: 0.4s; }
+.jadwa-milestone:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.jadwa-milestone-marker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.jadwa-milestone-dot {
+  width: 44px;
+  height: 44px;
+  background: var(--jadwa-white);
+  border: 4px solid #8B5CF6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+  transition: all var(--transition-base);
+}
+
+.jadwa-milestone:hover .jadwa-milestone-dot {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+}
+
+.jadwa-milestone-dot i {
+  color: #8B5CF6;
+  font-size: 1.25rem;
+}
+
+.jadwa-milestone.current .jadwa-milestone-dot {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border-color: #10B981;
+}
+
+.jadwa-milestone.current .jadwa-milestone-dot i {
+  color: white;
+}
+
+.jadwa-milestone-years {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #8B5CF6;
+  background: rgba(139, 92, 246, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.jadwa-milestone-content {
+  flex: 1;
+  background: var(--jadwa-white);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid #8B5CF6;
+  transition: all var(--transition-base);
+}
+
+.jadwa-milestone:hover .jadwa-milestone-content {
+  transform: translateX(8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.jadwa-milestone.current .jadwa-milestone-content {
+  border-left-color: #10B981;
+  background: linear-gradient(135deg, #D1FAE5 0%, #ECFDF5 100%);
+}
+
+.jadwa-milestone-field {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  margin-bottom: var(--space-xs);
+}
+
+.jadwa-milestone-workplace {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  color: var(--jadwa-gray);
+}
+
+.jadwa-milestone-workplace i {
+  font-size: 1rem;
+  color: #EC4899;
+}
+
+/* Journey Start */
+.jadwa-journey-start {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-left: -22px;
+  margin-top: var(--space-md);
+  color: var(--jadwa-gray);
+  font-size: 0.8rem;
+}
+
+.jadwa-journey-start i {
+  color: #8B5CF6;
+  font-size: 1.5rem;
+}
+
+/* Stats */
+.jadwa-roadmap-stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding-top: var(--space-xl);
+  margin-top: var(--space-lg);
+  border-top: 1px solid var(--jadwa-gray-pale);
+}
+
+.jadwa-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--jadwa-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.jadwa-stat-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jadwa-stat-icon i {
+  color: white;
+  font-size: 1.25rem;
+}
+
+.jadwa-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+  line-height: 1;
+}
+
+.jadwa-stat-label {
+  font-size: 0.75rem;
+  color: var(--jadwa-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==================== OWNERSHIP STRUCTURE ==================== */
+.jadwa-ownership-content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  padding: var(--space-md) 0;
+}
+
+.jadwa-ownership-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.jadwa-owner-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.jadwa-owner-item:hover {
+  background: var(--jadwa-blue-pale);
+  transform: translateX(4px);
+}
+
+/* Client Owner - Special Highlight */
+.jadwa-owner-item.client-owner {
+  background: linear-gradient(135deg, #4F7DF3 0%, #3A5FD9 100%);
+  border: none;
+  box-shadow: 0 8px 24px rgba(79, 125, 243, 0.3);
+}
+
+.jadwa-owner-item.client-owner:hover {
+  background: linear-gradient(135deg, #3A5FD9 0%, #2E4BC6 100%);
+  transform: translateX(4px);
+}
+
+.jadwa-owner-item.client-owner .jadwa-owner-name,
+.jadwa-owner-item.client-owner .jadwa-owner-role,
+.jadwa-owner-item.client-owner .jadwa-share-value {
+  color: white;
+}
+
+.jadwa-owner-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jadwa-owner-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.jadwa-owner-avatar i {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.jadwa-owner-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.jadwa-owner-info {
+  flex: 1;
+}
+
+.jadwa-owner-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--jadwa-charcoal);
+}
+
+.jadwa-owner-role {
+  font-size: 0.75rem;
+  color: var(--jadwa-gray);
+}
+
+.jadwa-owner-share {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.jadwa-share-value {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--jadwa-charcoal);
+}
+
+.jadwa-share-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--jadwa-gray-pale);
+  color: var(--jadwa-gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.jadwa-share-badge.owner {
+  background: rgba(255,255,255,0.25);
+  color: white;
+}
+
+.jadwa-ownership-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+  background: var(--jadwa-charcoal);
+  border-radius: var(--radius-md);
+  color: var(--jadwa-white);
+  font-weight: 600;
+}
+
+.jadwa-total-badge {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #10B981;
+}
+
+/* ==================== EXPENSES SECTION ==================== */
+.jadwa-expenses-content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xl);
+  padding: var(--space-md) 0;
+}
+
+.jadwa-expenses-breakdown {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.jadwa-expense-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--jadwa-off-white);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.jadwa-expense-row:hover {
+  background: #FEF2F2;
+}
+
+.jadwa-expense-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.jadwa-expense-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--jadwa-charcoal);
+}
+
+.jadwa-expense-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--jadwa-charcoal);
+  min-width: 80px;
+  text-align: right;
+}
+
+.jadwa-expense-period {
+  min-width: 50px;
+}
+
+.jadwa-expense-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+  background: linear-gradient(135deg, var(--jadwa-charcoal) 0%, var(--jadwa-black) 100%);
+  border-radius: var(--radius-md);
+  color: var(--jadwa-white);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.jadwa-total-value {
+  font-size: 1.25rem;
+  color: #EF4444;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 992px) {
+  .jadwa-roadmap-stats {
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .jadwa-roadmap {
+    padding-left: 30px;
+  }
+
+  .jadwa-road-line {
+    left: 13px;
+  }
+
+  .jadwa-milestone-dot {
+    width: 36px;
+    height: 36px;
+  }
+
+  .jadwa-milestone-dot i {
+    font-size: 1rem;
+  }
+
+  .jadwa-roadmap-stats {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .jadwa-stat-item {
+    justify-content: flex-start;
+  }
+
+  .jadwa-ownership-content,
+  .jadwa-expenses-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .jadwa-ownership-list,
+  .jadwa-expenses-breakdown {
+    width: 100%;
+  }
+
+  .jadwa-chart-canvas-container {
+    max-width: 100% !important;
+  }
+}
+
+/* ==================== RTL SUPPORT ==================== */
+[dir="rtl"] .jadwa-roadmap {
+  padding-left: 0;
+  padding-right: 40px;
+}
+
+[dir="rtl"] .jadwa-road-line {
+  left: auto;
+  right: 18px;
+}
+
+[dir="rtl"] .jadwa-milestone-content {
+  border-left: none;
+  border-right: 4px solid #8B5CF6;
+}
+
+[dir="rtl"] .jadwa-milestone.current .jadwa-milestone-content {
+  border-right-color: #10B981;
+}
+
+[dir="rtl"] .jadwa-milestone:hover .jadwa-milestone-content {
+  transform: translateX(-8px);
+}
+
+[dir="rtl"] .jadwa-owner-item:hover {
+  transform: translateX(-4px);
+}
+
+[dir="rtl"] .jadwa-owner-item.client-owner:hover {
+  transform: translateX(-4px);
+}
+
+[dir="rtl"] .jadwa-journey-start {
+  margin-left: 0;
+  margin-right: -22px;
+}
+
+[dir="rtl"] .jadwa-expense-value {
+  text-align: left;
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="jadwa-export-container" dir="{{ 'rtl' if session.get('lang', 'en') == 'ar' else 'ltr' }}">
+  <form role="form" method="POST" action="/export_plan/{{ bplan_id }}">
+
+    <!-- HEADER -->
+    <header class="jadwa-header">
+      <div class="jadwa-logo-section">
+        <span class="jadwa-logo-text"><span class="jadwa">JADWA</span><span class="plan">PLAN</span></span>
+        <span class="jadwa-tagline">we make small businesses finance-ready</span>
+      </div>
+      <h1 class="jadwa-page-title">{% if session.get('lang', 'en') == 'ar' %}تصدير خطة العمل{% else %}Export Business Plan{% endif %}</h1>
+      <p class="jadwa-page-subtitle">{{ data_bplan[0].name }} • {% if session.get('lang', 'en') == 'ar' %}إنشاء وتصدير خطة عملك الاحترافية{% else %}Generate and export your professional business plan{% endif %}</p>
+    </header>
+
+    <!-- SECTION SELECTOR -->
+    <section class="jadwa-selector-card">
+      <div class="jadwa-selector-header">
+        <div class="jadwa-selector-icon"><i class="material-icons">tune</i></div>
+        <div>
+          <h2 class="jadwa-selector-title">{% if session.get('lang', 'en') == 'ar' %}اختر الأقسام للتضمين{% else %}Select Sections to Include{% endif %}</h2>
+          <p class="jadwa-selector-subtitle">{% if session.get('lang', 'en') == 'ar' %}قم بتفعيل الأقسام التي تريد تضمينها{% else %}Toggle the sections you want to include{% endif %}</p>
+        </div>
+      </div>
+
+      <div class="jadwa-toggles-grid">
+        {% set sections = [
+          ('client_profile', 'ملف العميل', "Client's Profile"),
+          ('business_profile', 'ملف الأعمال', 'Business Profile'),
+          ('business_premises', 'مقر الأعمال', 'Business Premises'),
+          ('market_analysis', 'تحليل السوق', 'Market Analysis'),
+          ('operations_plan', 'خطة التشغيل', 'Operations Plan'),
+          ('requested_fund', 'التمويل المطلوب', 'Requested Fund'),
+          ('feasibility', 'الجدوى', 'Feasibility')
+        ] %}
+
+        {% for key, ar_label, en_label in sections %}
+        <label class="jadwa-toggle-item {% if data_checkboxes and data_checkboxes[0]['complete_' ~ key] %}active{% endif %} {% if not data_bplan[0]['complete_' ~ key] %}disabled{% endif %}">
+          <div class="jadwa-switch">
+            <input type="checkbox" id="flexSwitchCheck_{{ key }}" name="flexSwitchCheck_{{ key }}"
+                   {% if data_checkboxes and data_checkboxes[0]['complete_' ~ key] %}checked{% endif %}
+                   {% if not data_bplan[0]['complete_' ~ key] %}disabled{% endif %} autocomplete="off">
+            <span class="jadwa-switch-slider"></span>
+          </div>
+          <div class="jadwa-toggle-content">
+            <p class="jadwa-toggle-label">{% if session.get('lang', 'en') == 'ar' %}{{ ar_label }}{% else %}{{ en_label }}{% endif %}</p>
+            <p class="jadwa-toggle-status {% if data_bplan[0]['complete_' ~ key] %}complete{% else %}incomplete{% endif %}">
+              <i class="material-icons" style="font-size: 14px; vertical-align: middle;">{% if data_bplan[0]['complete_' ~ key] %}check_circle{% else %}pending{% endif %}</i>
+              {% if data_bplan[0]['complete_' ~ key] %}{% if session.get('lang', 'en') == 'ar' %}مكتمل{% else %}Complete{% endif %}{% else %}{% if session.get('lang', 'en') == 'ar' %}غير مكتمل{% else %}Incomplete{% endif %}{% endif %}
+            </p>
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="jadwa-actions">
+        <button class="jadwa-btn jadwa-btn-primary" type="submit" name="action" value="generate" id="btn_generate">
+          <i class="material-icons">auto_awesome</i>
+          {% if session.get('lang', 'en') == 'ar' %}توليد المحتوى{% else %}Generate Content{% endif %}
+        </button>
+      </div>
+    </section>
+
+    <!-- MISSION, VISION & OBJECTIVES -->
+    {% if data_ep[0].mission or data_ep[0].vision or data_ep[0].objectives %}
+    <section class="jadwa-mvo-card">
+      <div class="jadwa-mvo-header">
+        <div class="jadwa-mvo-icon"><i class="material-icons">flag</i></div>
+        <h2 class="jadwa-mvo-title">{% if session.get('lang', 'en') == 'ar' %}المهمة والرؤية والأهداف{% else %}Mission, Vision & Objectives{% endif %}</h2>
+      </div>
+      <div class="jadwa-mvo-grid">
+        {% if data_ep[0].mission %}
+        <div class="jadwa-mvo-item mission">
+          <h3 class="jadwa-mvo-item-title">{% if session.get('lang', 'en') == 'ar' %}المهمة{% else %}Mission{% endif %}</h3>
+          <p class="jadwa-mvo-item-text">{{ data_ep[0].mission }}</p>
+        </div>
+        {% endif %}
+        {% if data_ep[0].vision %}
+        <div class="jadwa-mvo-item vision">
+          <h3 class="jadwa-mvo-item-title">{% if session.get('lang', 'en') == 'ar' %}الرؤية{% else %}Vision{% endif %}</h3>
+          <p class="jadwa-mvo-item-text">{{ data_ep[0].vision }}</p>
+        </div>
+        {% endif %}
+        {% if data_ep[0].objectives %}
+        <div class="jadwa-mvo-item objectives">
+          <h3 class="jadwa-mvo-item-title">{% if session.get('lang', 'en') == 'ar' %}الأهداف{% else %}Objectives{% endif %}</h3>
+          <p class="jadwa-mvo-item-text">{{ data_ep[0].objectives }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- MAIN CONTENT -->
+    <section class="jadwa-content-card" id="capture_area">
+      <div class="jadwa-timeline">
+
+        <!-- CLIENT PROFILE -->
+        <article class="jadwa-section client-profile" id="clientProfileContent">
+          <div class="jadwa-section-marker"><i class="material-icons">person</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}ملف العميل{% else %}Client's Profile{% endif %}</h2>
+          </div>
+
+          <!-- Avatar -->
+          {% if data_ep[0].client_avatar %}
+          <div class="jadwa-avatar-section">
+            <img src="{{ url_for('static', filename='uploads/' ~ data_ep[0].client_avatar) }}" alt="Avatar" class="jadwa-avatar">
+          </div>
+          {% endif %}
+
+          <!-- Client Profile Text -->
+          {% if data_ep[0].client_profile %}<p class="jadwa-text">{{ data_ep[0].client_profile }}</p>{% endif %}
+
+          <!-- ========== EXPERIENCES SECTION ========== -->
+          {% if data_ep[0].client_experiences %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}الخبرات{% else %}Experiences{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].client_experiences }}</p>
+          {% endif %}
+
+          <!-- Experience Roadmap Timeline -->
+          {% if data_experiences|length > 0 %}
+          <div class="jadwa-roadmap-container">
+            <div class="jadwa-roadmap-header">
+              <div class="jadwa-roadmap-icon">
+                <i class="material-icons">route</i>
+              </div>
+              <div>
+                <h4 class="jadwa-roadmap-title">{% if session.get('lang', 'en') == 'ar' %}المسيرة المهنية{% else %}Career Journey{% endif %}</h4>
+                <p class="jadwa-roadmap-subtitle">
+                  {% set total_years = [] %}
+                  {% for exp in data_experiences %}
+                    {% if total_years.append(exp.years_of_experience|int) %}{% endif %}
+                  {% endfor %}
+                  {{ total_years|sum }} {% if session.get('lang', 'en') == 'ar' %}سنة من الخبرة{% else %}years of experience{% endif %}
+                </p>
+              </div>
+            </div>
+
+            <div class="jadwa-roadmap">
+              <div class="jadwa-road-line"></div>
+
+              {% for exp in data_experiences %}
+              <div class="jadwa-milestone {% if loop.last %}current{% endif %}">
+                <div class="jadwa-milestone-marker">
+                  <div class="jadwa-milestone-dot">
+                    {% if loop.last %}
+                    <i class="material-icons">flag</i>
+                    {% else %}
+                    <i class="material-icons">work</i>
+                    {% endif %}
+                  </div>
+                  <div class="jadwa-milestone-years">{{ exp.years_of_experience }} {% if session.get('lang', 'en') == 'ar' %}سنة{% else %}yrs{% endif %}</div>
+                </div>
+                <div class="jadwa-milestone-content">
+                  <div class="jadwa-milestone-field">{{ exp.field }}</div>
+                  <div class="jadwa-milestone-workplace">
+                    <i class="material-icons">location_on</i>
+                    {{ exp.workplace }}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+
+              <!-- Journey Start Point -->
+              <div class="jadwa-journey-start">
+                <i class="material-icons">play_circle</i>
+                <span>{% if session.get('lang', 'en') == 'ar' %}بداية المسيرة{% else %}Journey Start{% endif %}</span>
+              </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="jadwa-roadmap-stats">
+              <div class="jadwa-stat-item">
+                <div class="jadwa-stat-icon"><i class="material-icons">timeline</i></div>
+                <div class="jadwa-stat-info">
+                  <div class="jadwa-stat-value">{{ total_years|sum }}</div>
+                  <div class="jadwa-stat-label">{% if session.get('lang', 'en') == 'ar' %}إجمالي السنوات{% else %}Total Years{% endif %}</div>
+                </div>
+              </div>
+              <div class="jadwa-stat-item">
+                <div class="jadwa-stat-icon"><i class="material-icons">category</i></div>
+                <div class="jadwa-stat-info">
+                  <div class="jadwa-stat-value">{{ data_experiences|length }}</div>
+                  <div class="jadwa-stat-label">{% if session.get('lang', 'en') == 'ar' %}مجالات{% else %}Fields{% endif %}</div>
+                </div>
+              </div>
+              <div class="jadwa-stat-item">
+                <div class="jadwa-stat-icon"><i class="material-icons">business</i></div>
+                <div class="jadwa-stat-info">
+                  <div class="jadwa-stat-value">{{ data_experiences|length }}</div>
+                  <div class="jadwa-stat-label">{% if session.get('lang', 'en') == 'ar' %}أماكن العمل{% else %}Workplaces{% endif %}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- ========== PARTNERS SECTION ========== -->
+          {% if data_ep[0].client_partners %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}الشركاء{% else %}Partners{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].client_partners }}</p>
+          {% endif %}
+
+          <!-- Partners Ownership Chart (including client) -->
+          {% if data_partners|length > 0 %}
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon" style="background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); box-shadow: 0 8px 24px rgba(236, 72, 153, 0.25);">
+                <i class="material-icons">pie_chart</i>
+              </div>
+              <div>
+                <h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}هيكل الملكية{% else %}Ownership Structure{% endif %}</h4>
+                <p class="jadwa-chart-subtitle">{% if session.get('lang', 'en') == 'ar' %}توزيع حصص الشركة{% else %}Company shares distribution{% endif %}</p>
+              </div>
+            </div>
+            <div class="jadwa-ownership-content">
+              <div class="jadwa-chart-canvas-container" style="max-width: 300px;">
+                <canvas id="chart_partners" class="jadwa-chart-canvas" style="max-height: 300px;"></canvas>
+              </div>
+              <div class="jadwa-ownership-list">
+                <!-- Client (Owner) - Highlighted -->
+                {% set partners_total = [] %}
+                {% for partner in data_partners %}
+                  {% if partners_total.append(partner.partner_shares|int) %}{% endif %}
+                {% endfor %}
+                {% set client_share = 100 - partners_total|sum %}
+
+                <div class="jadwa-owner-item client-owner">
+                  <div class="jadwa-owner-avatar">
+                    {% if data_ep[0].client_avatar %}
+                    <img src="{{ url_for('static', filename='uploads/' ~ data_ep[0].client_avatar) }}" alt="Owner">
+                    {% else %}
+                    <i class="material-icons">person</i>
+                    {% endif %}
+                  </div>
+                  <div class="jadwa-owner-info">
+                    <div class="jadwa-owner-name">
+                      {% if data_ep[0].full_name %}{{ data_ep[0].full_name }}{% else %}{% if session.get('lang', 'en') == 'ar' %}المالك{% else %}Owner{% endif %}{% endif %}
+                    </div>
+                    <div class="jadwa-owner-role">{% if session.get('lang', 'en') == 'ar' %}المؤسس / المالك{% else %}Founder / Owner{% endif %}</div>
+                  </div>
+                  <div class="jadwa-owner-share">
+                    <span class="jadwa-share-value">{{ client_share }}%</span>
+                    <span class="jadwa-share-badge owner">{% if session.get('lang', 'en') == 'ar' %}المالك{% else %}Owner{% endif %}</span>
+                  </div>
+                </div>
+
+                <!-- Partners -->
+                {% for partner in data_partners %}
+                <div class="jadwa-owner-item">
+                  <div class="jadwa-owner-color" style="background: {{ ['#1A1A24', '#F59E0B', '#10B981', '#8B5CF6', '#06B6D4'][loop.index0 % 5] }};"></div>
+                  <div class="jadwa-owner-info">
+                    <div class="jadwa-owner-name">{{ partner.partner_name }}</div>
+                    <div class="jadwa-owner-role">{{ partner.partner_role if partner.partner_role else partner.partner_relation }}</div>
+                  </div>
+                  <div class="jadwa-owner-share">
+                    <span class="jadwa-share-value">{{ partner.partner_shares }}%</span>
+                    <span class="jadwa-share-badge">{% if session.get('lang', 'en') == 'ar' %}شريك{% else %}Partner{% endif %}</span>
+                  </div>
+                </div>
+                {% endfor %}
+
+                <!-- Total Validation -->
+                <div class="jadwa-ownership-total">
+                  <span>{% if session.get('lang', 'en') == 'ar' %}إجمالي الملكية{% else %}Total Ownership{% endif %}</span>
+                  <span class="jadwa-total-badge">100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- ========== LIVING EXPENSES SECTION ========== -->
+          {% if data_ex|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}المصاريف المعيشية{% else %}Living Expenses{% endif %}</h3>
+          {% if data_ep[0].client_expenses %}<p class="jadwa-text">{{ data_ep[0].client_expenses }}</p>{% endif %}
+          <!-- Expenses Chart -->
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);">
+                <i class="material-icons">account_balance_wallet</i>
+              </div>
+              <div>
+                <h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}توزيع المصاريف{% else %}Expenses Breakdown{% endif %}</h4>
+                <p class="jadwa-chart-subtitle">{% if session.get('lang', 'en') == 'ar' %}المصاريف السنوية حسب النوع{% else %}Annual expenses by category{% endif %}</p>
+              </div>
+            </div>
+            <div class="jadwa-expenses-content">
+              <div class="jadwa-chart-canvas-container" style="max-width: 260px;">
+                <canvas id="chart_expenses" class="jadwa-chart-canvas" style="max-height: 260px;"></canvas>
+              </div>
+              <div class="jadwa-expenses-breakdown">
+                {% for expense in data_ex %}
+                <div class="jadwa-expense-row">
+                  <div class="jadwa-expense-color" style="background: {{ ['#4F7DF3', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#06B6D4', '#1A1A24'][loop.index0 % 7] }};"></div>
+                  <div class="jadwa-expense-name">{{ expense.living_expenses }}</div>
+                  <div class="jadwa-expense-value">${{ "{:,}".format(expense.value) }}</div>
+                  <div class="jadwa-expense-period">
+                    <span class="jadwa-badge {% if expense.unit == 1 %}jadwa-badge-success{% else %}jadwa-badge-info{% endif %}">
+                      {% if expense.unit == 1 %}{% if session.get('lang', 'en') == 'ar' %}سنوي{% else %}/yr{% endif %}{% else %}{% if session.get('lang', 'en') == 'ar' %}شهري{% else %}/mo{% endif %}{% endif %}
+                    </span>
+                  </div>
+                </div>
+                {% endfor %}
+                <div class="jadwa-expense-total">
+                  <span>{% if session.get('lang', 'en') == 'ar' %}الإجمالي السنوي{% else %}Annual Total{% endif %}</span>
+                  <span class="jadwa-total-value">${{ "{:,}".format(data_x_total) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          {% endif %}
+
+          <!-- ========== EMPLOYMENT SECTION ========== -->
+          {% if data_ep[0].client_employed %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}العمل الحالي{% else %}Employment{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].client_employed }}</p>
+          {% endif %}
+
+          <!-- ========== SIDE BUSINESS SECTION ========== -->
+          {% if data_ep[0].side_business %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}عمل جانبي{% else %}Side Business{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].side_business }}</p>
+          {% endif %}
+        </article>
+
+        <!-- BUSINESS PROFILE -->
+        <article class="jadwa-section business-profile" id="businessProfileContent">
+          <div class="jadwa-section-marker"><i class="material-icons">business</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}ملف الأعمال{% else %}Business Profile{% endif %}</h2>
+          </div>
+          {% if data_ep[0].business_profile %}<p class="jadwa-text">{{ data_ep[0].business_profile }}</p>{% endif %}
+          {% if data_ep[0].buz_product_services %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}المنتجات والخدمات{% else %}Products & Services{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].buz_product_services }}</p>
+          {% endif %}
+          {% if data_staff|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}فريق العمل{% else %}Staff{% endif %}</h3>
+          <div class="jadwa-table-container">
+            <table class="jadwa-table">
+              <thead><tr><th>{% if session.get('lang', 'en') == 'ar' %}المنصب{% else %}Position{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}الراتب{% else %}Salary{% endif %}</th></tr></thead>
+              <tbody>
+                {% for row in data_staff %}
+                <tr>
+                  <td><strong>{{ row.staff_position }}</strong></td>
+                  <td><span class="jadwa-badge {% if row.work_time == 'Full time' %}jadwa-badge-primary{% else %}jadwa-badge-warning{% endif %}">{{ row.work_time }}</span></td>
+                  <td><strong>${{ "{:,}".format(row.staff_salary) }}</strong></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot><tr><td colspan="2" style="text-align: right;">{% if session.get('lang', 'en') == 'ar' %}الإجمالي السنوي{% else %}Total Annual{% endif %}</td><td><strong>${{ "{:,}".format(data_bs_total) }}</strong></td></tr></tfoot>
+            </table>
+          </div>
+          {% if data_ep[0].buz_staff %}<p class="jadwa-text">{{ data_ep[0].buz_staff }}</p>{% endif %}
+          {% endif %}
+          {% if data_br|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}الموارد{% else %}Resources{% endif %}</h3>
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon"><i class="material-icons">donut_small</i></div>
+              <div><h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}توزيع الموارد{% else %}Resource Distribution{% endif %}</h4></div>
+            </div>
+            <div class="jadwa-chart-canvas-container">
+              <canvas id="chart_existing_resources" class="jadwa-chart-canvas"></canvas>
+            </div>
+          </div>
+          {% if data_ep[0].buz_resource %}<p class="jadwa-text">{{ data_ep[0].buz_resource }}</p>{% endif %}
+          {% endif %}
+          {% if data_fin|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}التاريخ المالي{% else %}Financial History{% endif %}</h3>
+          {% if data_ep[0].financial_history %}<p class="jadwa-text">{{ data_ep[0].financial_history }}</p>{% endif %}
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon"><i class="material-icons">trending_up</i></div>
+              <div><h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}المبيعات والأرباح{% else %}Sales & Profit{% endif %}</h4></div>
+            </div>
+            <div class="jadwa-chart-canvas-container">
+              <canvas id="chart_financial_history" class="jadwa-chart-canvas"></canvas>
+            </div>
+          </div>
+          {% endif %}
+          {% if data_ep[0].source_of_funding %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}مصادر التمويل{% else %}Funding Sources{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].source_of_funding }}</p>
+          {% endif %}
+        </article>
+
+        <!-- BUSINESS PREMISES -->
+        <article class="jadwa-section business-premises" id="businessPremisesContent">
+          <div class="jadwa-section-marker"><i class="material-icons">location_on</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}مقر الأعمال{% else %}Business Premises{% endif %}</h2>
+          </div>
+          {% if data_ep[0].business_premises %}<p class="jadwa-text">{{ data_ep[0].business_premises }}</p>{% endif %}
+          {% if data_photo|length > 0 %}
+          <div class="jadwa-gallery" id="businessPremisesImage">
+            {% for row in data_photo %}
+            <div class="jadwa-gallery-item"><img src="/static/uploads/{{ row.bplan_id }}/{{ row.premises_photo_filename }}" alt="Premises"></div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </article>
+
+        <!-- MARKET ANALYSIS -->
+        <article class="jadwa-section market-analysis" id="MarketAnalysisContent">
+          <div class="jadwa-section-marker"><i class="material-icons">analytics</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}تحليل السوق{% else %}Market Analysis{% endif %}</h2>
+          </div>
+          {% if data_mkt_segments|length > 0 and data_mkt_segments[0].segment_name %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}شرائح السوق{% else %}Market Segments{% endif %}</h3>
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon"><i class="material-icons">pie_chart</i></div>
+              <div><h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}توزيع الشرائح{% else %}Segment Distribution{% endif %}</h4></div>
+            </div>
+            <div class="jadwa-chart-canvas-container">
+              <canvas id="chart_business_segments" class="jadwa-chart-canvas"></canvas>
+            </div>
+          </div>
+          {% if data_ep[0].market_analysis %}<p class="jadwa-text">{{ data_ep[0].market_analysis }}</p>{% endif %}
+          {% endif %}
+          {% if data_comp_preferences|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}تفضيلات العملاء{% else %}Customer Preferences{% endif %}</h3>
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon"><i class="material-icons">bar_chart</i></div>
+              <div><h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}مقارنة التفضيلات{% else %}Preference Comparison{% endif %}</h4></div>
+            </div>
+            <div class="jadwa-chart-canvas-container" style="max-width: 600px;">
+              <canvas id="chart_customer_preference" class="jadwa-chart-canvas"></canvas>
+            </div>
+          </div>
+          {% endif %}
+        </article>
+
+        <!-- OPERATIONS PLAN -->
+        <article class="jadwa-section operations-plan" id="OperationsPlanContent">
+          <div class="jadwa-section-marker"><i class="material-icons">settings</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}خطة التشغيل{% else %}Operations Plan{% endif %}</h2>
+          </div>
+
+          <!-- ========== 1. SUPPLIERS TEXT ========== -->
+          {% if data_ep[0].buz_suppliers %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}الموردون{% else %}Suppliers{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].buz_suppliers }}</p>
+          {% endif %}
+
+          <!-- ========== 2. SUPPLIER COMPARISON CHART ========== -->
+          {% if data_suppliers|length > 1 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}مقارنة الموردين{% else %}Supplier Comparison{% endif %}</h3>
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon"><i class="material-icons">compare</i></div>
+              <div>
+                <h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}تقييم الموردين{% else %}Supplier Ratings{% endif %}</h4>
+                <p class="jadwa-chart-subtitle">{% if session.get('lang', 'en') == 'ar' %}الجودة، السعر، الاتساق، وسنوات التعاون{% else %}Quality, Price, Consistency & Years of Collaboration{% endif %}</p>
+              </div>
+            </div>
+            <div class="jadwa-chart-canvas-container">
+              <canvas id="chart_supplier_radar" class="jadwa-chart-canvas"></canvas>
+            </div>
+          </div>
+          {% elif data_suppliers|length == 1 %}
+          <!-- Single supplier - show as rating bars -->
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}تقييم المورد{% else %}Supplier Rating{% endif %}</h3>
+          <div class="jadwa-supplier-rating-card">
+            <div class="jadwa-supplier-name">{{ data_suppliers[0].supplier_name }}</div>
+            <div class="jadwa-rating-row">
+              <span class="jadwa-rating-label">{% if session.get('lang', 'en') == 'ar' %}الجودة{% else %}Quality{% endif %}</span>
+              <div class="jadwa-rating-bar">
+                <div class="jadwa-rating-fill quality" style="width: {{
+                  100 if data_suppliers[0].quality == 'High quality' else
+                  80 if data_suppliers[0].quality == 'Good quality' else
+                  60 if data_suppliers[0].quality == 'Consistent' else 40 }}%"></div>
+              </div>
+              <span class="jadwa-rating-value">
+                {% if data_suppliers[0].quality == 'High quality' %}5/5
+                {% elif data_suppliers[0].quality == 'Good quality' %}4/5
+                {% elif data_suppliers[0].quality == 'Consistent' %}3/5
+                {% else %}2/5{% endif %}
+              </span>
+            </div>
+            <div class="jadwa-rating-row">
+              <span class="jadwa-rating-label">{% if session.get('lang', 'en') == 'ar' %}سنوات التعاون{% else %}Years{% endif %}</span>
+              <div class="jadwa-rating-bar">
+                <div class="jadwa-rating-fill years" style="width: {{
+                  100 if data_suppliers[0].years_of_collaboration == '10+' else
+                  80 if data_suppliers[0].years_of_collaboration == '7-10' else
+                  60 if data_suppliers[0].years_of_collaboration == '5-7' else
+                  40 if data_suppliers[0].years_of_collaboration == '3-5' else
+                  20 if data_suppliers[0].years_of_collaboration == '1-3' else 10 }}%"></div>
+              </div>
+              <span class="jadwa-rating-value">{{ data_suppliers[0].years_of_collaboration }} {% if session.get('lang', 'en') == 'ar' %}سنة{% else %}yrs{% endif %}</span>
+            </div>
+            {% if data_suppliers[0].products|length > 0 %}
+            <div class="jadwa-rating-row">
+              <span class="jadwa-rating-label">{% if session.get('lang', 'en') == 'ar' %}مستوى السعر{% else %}Price Level{% endif %}</span>
+              <div class="jadwa-rating-bar">
+                <div class="jadwa-rating-fill price" style="width: 60%"></div>
+              </div>
+              <span class="jadwa-rating-value">{{ data_suppliers[0].products|length }} {% if session.get('lang', 'en') == 'ar' %}منتجات{% else %}products{% endif %}</span>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- ========== 3. PRODUCTION TEXT ========== -->
+          {% if data_ep[0].buz_production %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}الإنتاج{% else %}Production{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].buz_production }}</p>
+          {% if data_ep[0].enhance_production %}<p class="jadwa-text">{{ data_ep[0].enhance_production }}</p>{% endif %}
+          {% endif %}
+
+          <!-- ========== 4. CAPACITY UTILIZATION GAUGE ========== -->
+          {% if data_production|length > 0 and data_production[0].max_expected_capacity and data_production[0].max_expected_capacity > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}استخدام الطاقة الإنتاجية{% else %}Capacity Utilization{% endif %}</h3>
+          <div class="jadwa-chart-card">
+            <div class="jadwa-chart-header">
+              <div class="jadwa-chart-icon"><i class="material-icons">speed</i></div>
+              <div>
+                <h4 class="jadwa-chart-title">{% if session.get('lang', 'en') == 'ar' %}نسبة استغلال الطاقة{% else %}Production Capacity Usage{% endif %}</h4>
+                <p class="jadwa-chart-subtitle">{% if session.get('lang', 'en') == 'ar' %}الطاقة الحالية مقابل القصوى{% else %}Current vs Maximum Capacity{% endif %}</p>
+              </div>
+            </div>
+            <div class="jadwa-gauge-container">
+              <canvas id="chart_capacity_gauge" class="jadwa-chart-canvas" style="max-height: 250px;"></canvas>
+            </div>
+            <div class="jadwa-capacity-stats">
+              <div class="jadwa-capacity-stat">
+                <span class="jadwa-capacity-label">{% if session.get('lang', 'en') == 'ar' %}الطاقة الحالية{% else %}Current{% endif %}</span>
+                <span class="jadwa-capacity-value current">{{ data_production[0].current_capacity }} {{ data_production[0].production_unit }}/{{ data_production[0].time_frame }}</span>
+              </div>
+              <div class="jadwa-capacity-stat">
+                <span class="jadwa-capacity-label">{% if session.get('lang', 'en') == 'ar' %}الطاقة القصوى{% else %}Maximum{% endif %}</span>
+                <span class="jadwa-capacity-value max">{{ data_production[0].max_expected_capacity }} {{ data_production[0].production_unit }}/{{ data_production[0].time_frame }}</span>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- ========== 5. DISTRIBUTION TEXT ========== -->
+          {% if data_ep[0].buz_distribution %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}التوزيع{% else %}Distribution{% endif %}</h3>
+          <p class="jadwa-text">{{ data_ep[0].buz_distribution }}</p>
+          {% if data_ep[0].customer_support %}<p class="jadwa-text">{{ data_ep[0].customer_support }}</p>{% endif %}
+          {% endif %}
+
+          <!-- ========== 6. SUPPLY CHAIN FLOW DIAGRAM (SUMMARY) ========== -->
+          {% if data_suppliers|length > 0 or data_production|length > 0 or data_distribution|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}ملخص سلسلة التوريد{% else %}Supply Chain Summary{% endif %}</h3>
+
+          <div class="jadwa-supply-chain-wrapper">
+            <!-- Main Flow -->
+            <div class="jadwa-supply-chain">
+              <!-- Suppliers Node -->
+              <div class="jadwa-chain-node suppliers">
+                <div class="jadwa-chain-icon">
+                  <i class="material-icons">local_shipping</i>
+                </div>
+                <div class="jadwa-chain-label">{% if session.get('lang', 'en') == 'ar' %}الموردون{% else %}Suppliers{% endif %}</div>
+                <div class="jadwa-chain-count">{{ data_suppliers|length if data_suppliers else 0 }}</div>
+              </div>
+
+              <!-- Arrow 1 -->
+              <div class="jadwa-chain-arrow">
+                <div class="jadwa-arrow-line"></div>
+                <i class="material-icons">arrow_forward</i>
+              </div>
+
+              <!-- Products Node -->
+              <div class="jadwa-chain-node products">
+                <div class="jadwa-chain-icon">
+                  <i class="material-icons">inventory_2</i>
+                </div>
+                <div class="jadwa-chain-label">{% if session.get('lang', 'en') == 'ar' %}المنتجات{% else %}Products{% endif %}</div>
+                <div class="jadwa-chain-count">
+                  {% set total_products = [] %}
+                  {% for supplier in data_suppliers %}
+                    {% if supplier.products %}
+                      {% for p in supplier.products %}
+                        {% if total_products.append(1) %}{% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ total_products|length }}
+                </div>
+              </div>
+
+              <!-- Arrow 2 -->
+              <div class="jadwa-chain-arrow">
+                <div class="jadwa-arrow-line"></div>
+                <i class="material-icons">arrow_forward</i>
+              </div>
+
+              <!-- Production Node -->
+              <div class="jadwa-chain-node production">
+                <div class="jadwa-chain-icon">
+                  <i class="material-icons">precision_manufacturing</i>
+                </div>
+                <div class="jadwa-chain-label">{% if session.get('lang', 'en') == 'ar' %}الإنتاج{% else %}Production{% endif %}</div>
+                <div class="jadwa-chain-count">{{ data_production|length if data_production else 0 }} {% if session.get('lang', 'en') == 'ar' %}خطوط{% else %}lines{% endif %}</div>
+              </div>
+
+              <!-- Arrow 3 -->
+              <div class="jadwa-chain-arrow">
+                <div class="jadwa-arrow-line"></div>
+                <i class="material-icons">arrow_forward</i>
+              </div>
+
+              <!-- Distribution Node -->
+              <div class="jadwa-chain-node distribution">
+                <div class="jadwa-chain-icon">
+                  <i class="material-icons">storefront</i>
+                </div>
+                <div class="jadwa-chain-label">{% if session.get('lang', 'en') == 'ar' %}التوزيع{% else %}Distribution{% endif %}</div>
+                <div class="jadwa-chain-count">{{ data_distribution|length if data_distribution else 0 }} {% if session.get('lang', 'en') == 'ar' %}قنوات{% else %}channels{% endif %}</div>
+              </div>
+            </div>
+
+            <!-- Detailed Breakdown -->
+            <div class="jadwa-chain-details">
+              <!-- Suppliers Detail -->
+              <div class="jadwa-chain-detail-column">
+                <div class="jadwa-detail-header suppliers">
+                  <i class="material-icons">local_shipping</i>
+                  <span>{% if session.get('lang', 'en') == 'ar' %}الموردون{% else %}Suppliers{% endif %}</span>
+                </div>
+                <div class="jadwa-detail-items">
+                  {% for supplier in data_suppliers %}
+                  <div class="jadwa-detail-item">
+                    <span class="jadwa-detail-name">{{ supplier.supplier_name }}</span>
+                    <span class="jadwa-detail-badge">{{ supplier.products|length if supplier.products else 0 }} {% if session.get('lang', 'en') == 'ar' %}منتج{% else %}products{% endif %}</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Products Detail -->
+              <div class="jadwa-chain-detail-column">
+                <div class="jadwa-detail-header products">
+                  <i class="material-icons">inventory_2</i>
+                  <span>{% if session.get('lang', 'en') == 'ar' %}المنتجات{% else %}Products{% endif %}</span>
+                </div>
+                <div class="jadwa-detail-items">
+                  {% for supplier in data_suppliers %}
+                    {% for product in supplier.products %}
+                    <div class="jadwa-detail-item">
+                      <span class="jadwa-detail-name">{{ product.product_service }}</span>
+                      <span class="jadwa-detail-badge price-{{ product.prices|lower|replace(' ', '-') }}">
+                        {% if product.prices == 'Very expensive' %}{% if session.get('lang', 'en') == 'ar' %}مكلف جداً{% else %}V.Expensive{% endif %}
+                        {% elif product.prices == 'Expensive' %}{% if session.get('lang', 'en') == 'ar' %}مكلف{% else %}Expensive{% endif %}
+                        {% elif product.prices == 'Moderate' %}{% if session.get('lang', 'en') == 'ar' %}معتدل{% else %}Moderate{% endif %}
+                        {% elif product.prices == 'Affordable' %}{% if session.get('lang', 'en') == 'ar' %}معقول{% else %}Affordable{% endif %}
+                        {% elif product.prices == 'Very low' %}{% if session.get('lang', 'en') == 'ar' %}منخفض{% else %}V.Low{% endif %}
+                        {% else %}{{ product.prices }}{% endif %}
+                      </span>
+                    </div>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Distribution Detail -->
+              <div class="jadwa-chain-detail-column">
+                <div class="jadwa-detail-header distribution">
+                  <i class="material-icons">storefront</i>
+                  <span>{% if session.get('lang', 'en') == 'ar' %}قنوات التوزيع{% else %}Distribution Channels{% endif %}</span>
+                </div>
+                <div class="jadwa-detail-items">
+                  {% for dist in data_distribution %}
+                  <div class="jadwa-detail-item">
+                    <span class="jadwa-detail-name">{{ dist.distribution_name if dist.distribution_name else dist.type }}</span>
+                    <span class="jadwa-detail-badge type-{{ dist.type|lower|replace(' ', '-') }}">
+                      {% if session.get('lang', 'en') == 'ar' %}
+                        {% if dist.type == 'Wholesaler' %}جملة
+                        {% elif dist.type == 'Distributer' %}موزع
+                        {% elif dist.type == 'Retailer' %}تجزئة
+                        {% elif dist.type == 'Direct Sales' %}مباشر
+                        {% elif dist.type == 'Online' %}أونلاين
+                        {% else %}{{ dist.type }}{% endif %}
+                      {% else %}
+                        {{ dist.type }}
+                      {% endif %}
+                    </span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+        </article>
+
+        <!-- REQUESTED FUND -->
+        <article class="jadwa-section requested-fund" id="RequestedFundContent">
+          <div class="jadwa-section-marker"><i class="material-icons">payments</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}التمويل المطلوب{% else %}Requested Fund{% endif %}</h2>
+          </div>
+          {% if data_ep[0].requested_fund %}<p class="jadwa-text">{{ data_ep[0].requested_fund }}</p>{% endif %}
+          {% if data_machines|length > 0 or data_installation|length > 0 or data_materials|length > 0 or data_salaries|length > 0 or data_ocosts|length > 0 %}
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}تفاصيل البنود{% else %}Item Details{% endif %}</h3>
+          <div class="jadwa-table-container">
+            <table class="jadwa-table">
+              <thead><tr><th>{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}التفاصيل{% else %}Details{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}الإجمالي{% else %}Total{% endif %}</th></tr></thead>
+              <tbody>
+                {% for row in data_machines %}<tr><td><strong>{% if session.get('lang', 'en') == 'ar' %}آلات{% else %}Machinery{% endif %}</strong> - {{ row.item }}</td><td>{{ row.quantity }} {{ row.unit }}</td><td class="value-positive">${{ "{:,}".format(row.total_cost) }}</td></tr>{% endfor %}
+                {% for row in data_installation %}<tr><td><strong>{% if session.get('lang', 'en') == 'ar' %}تركيب{% else %}Installation{% endif %}</strong></td><td>-</td><td class="value-positive">${{ "{:,}".format(row.total_cost) }}</td></tr>{% endfor %}
+                {% for row in data_materials %}<tr><td><strong>{% if session.get('lang', 'en') == 'ar' %}مواد{% else %}Materials{% endif %}</strong> - {{ row.item }}</td><td>{{ row.quantity }} {{ row.unit }}</td><td class="value-positive">${{ "{:,}".format(row.total_cost) }}</td></tr>{% endfor %}
+                {% for row in data_salaries %}<tr><td><strong>{% if session.get('lang', 'en') == 'ar' %}رواتب{% else %}Salaries{% endif %}</strong> - {{ row.item }}</td><td>-</td><td class="value-positive">${{ "{:,}".format(row.total_cost) }}</td></tr>{% endfor %}
+                {% for row in data_ocosts %}<tr><td><strong>{% if session.get('lang', 'en') == 'ar' %}أخرى{% else %}Other{% endif %}</strong> - {{ row.item }}</td><td>{{ row.quantity }} {{ row.unit }}</td><td class="value-positive">${{ "{:,}".format(row.total_cost) }}</td></tr>{% endfor %}
+              </tbody>
+              <tfoot><tr><td colspan="2" style="text-align: right;">{% if session.get('lang', 'en') == 'ar' %}الإجمالي{% else %}Total{% endif %}</td><td><strong>${{ "{:,}".format(data_fund_total) }}</strong></td></tr></tfoot>
+            </table>
+          </div>
+          {% endif %}
+        </article>
+
+        <!-- FEASIBILITY -->
+        <article class="jadwa-section feasibility" id="FeasibilityContent">
+          <div class="jadwa-section-marker"><i class="material-icons">insights</i></div>
+          <div class="jadwa-section-header">
+            <h2 class="jadwa-section-title">{% if session.get('lang', 'en') == 'ar' %}الجدوى المالية{% else %}Financial Feasibility{% endif %}</h2>
+          </div>
+          {% if data_ep[0].feasibility %}<p class="jadwa-text">{{ data_ep[0].feasibility }}</p>{% endif %}
+          <div class="jadwa-inflation-badge">
+            <i class="material-icons">trending_up</i>
+            {% if session.get('lang', 'en') == 'ar' %}معدل التضخم: {{ current_inflation_rate }}%{% else %}Inflation Rate: {{ current_inflation_rate }}%{% endif %}
+          </div>
+          <h3 class="jadwa-subsection-title">{% if session.get('lang', 'en') == 'ar' %}التوقعات المالية (5 سنوات){% else %}Financial Projections (5 Years){% endif %}</h3>
+          <div class="jadwa-table-container" style="overflow-x: auto;">
+            <table class="jadwa-projections-table">
+              <thead>
+                <tr>
+                  <th>{% if session.get('lang', 'en') == 'ar' %}البند{% else %}Item{% endif %}</th>
+                  <th>{% if session.get('lang', 'en') == 'ar' %}التفاصيل{% else %}Details{% endif %}</th>
+                  <th>{% if session.get('lang', 'en') == 'ar' %}الحالي{% else %}Current{% endif %}</th>
+                  {% for y in range(1, 6) %}<th>{% if session.get('lang', 'en') == 'ar' %}السنة {{ y }}{% else %}Year {{ y }}{% endif %}</th>{% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in data_projections if product.type == 'product' %}
+                <tr><td class="row-label">{{ product.name }}</td><td class="row-sublabel">{% if session.get('lang', 'en') == 'ar' %}الكمية{% else %}Qty{% endif %}</td>{% for y in product.years %}<td>{{ y.quantity|round(0)|int }}</td>{% endfor %}</tr>
+                <tr><td></td><td class="row-sublabel">{% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price{% endif %}</td>{% for y in product.years %}<td class="value-neutral">${{ y.price_per_unit|round(2) }}</td>{% endfor %}</tr>
+                <tr><td></td><td class="row-sublabel">{% if session.get('lang', 'en') == 'ar' %}الإيرادات{% else %}Revenue{% endif %}</td>{% for y in product.years %}<td class="value-positive">${{ "{:,.0f}".format(y.revenue) }}</td>{% endfor %}</tr>
+                <tr class="total-row"><td></td><td class="row-sublabel">{% if session.get('lang', 'en') == 'ar' %}التكلفة{% else %}Cost{% endif %}</td>{% for y in product.years %}<td class="value-negative">${{ "{:,.0f}".format(y.cost) }}</td>{% endfor %}</tr>
+                {% endfor %}
+                <tr class="total-row"><td colspan="2" class="row-label">{% if session.get('lang', 'en') == 'ar' %}إجمالي الإيرادات{% else %}TOTAL REVENUE{% endif %}</td>{% for y in data_total_projections.years %}<td class="value-positive"><strong>${{ "{:,.0f}".format(y.grand_total_revenue) }}</strong></td>{% endfor %}</tr>
+                {% for expense in data_projections if expense.type == 'expense' and expense.name != 'Total Operating Expenses' %}
+                <tr><td class="row-label">{{ expense.name }}</td><td class="row-sublabel">{% if session.get('lang', 'en') == 'ar' %}التكلفة{% else %}Cost{% endif %}</td>{% for y in expense.years %}<td class="value-warning">${{ "{:,.0f}".format(y.amount) }}</td>{% endfor %}</tr>
+                {% endfor %}
+                <tr class="total-row"><td colspan="2" class="row-label">{% if session.get('lang', 'en') == 'ar' %}إجمالي المصاريف{% else %}TOTAL EXPENSES{% endif %}</td>{% for y in data_total_projections.years %}<td class="value-warning"><strong>${{ "{:,.0f}".format(y.total_operating_expenses) }}</strong></td>{% endfor %}</tr>
+                <tr class="grand-total-row"><td colspan="2" class="row-label">{% if session.get('lang', 'en') == 'ar' %}صافي الربح{% else %}NET PROFIT{% endif %}</td>{% for y in data_total_projections.years %}<td><strong>${{ "{:,.0f}".format(y.profit) }}</strong></td>{% endfor %}</tr>
+                <tr class="grand-total-row"><td colspan="2" class="row-label">{% if session.get('lang', 'en') == 'ar' %}هامش الربح{% else %}MARGIN{% endif %}</td>{% for y in data_total_projections.years %}<td><strong>{{ y.margin|round(1) }}%</strong></td>{% endfor %}</tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- EXPORT ACTIONS -->
+    <div class="jadwa-export-actions">
+      <button type="button" id="pdffff" class="jadwa-btn jadwa-btn-success">
+        <i class="material-icons">picture_as_pdf</i>
+        {% if session.get('lang', 'en') == 'ar' %}تصدير كـ PDF{% else %}Export as PDF{% endif %}
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<!-- PROGRESS MODAL -->
+<div class="jadwa-progress-overlay" id="progressOverlay">
+  <div class="jadwa-progress-modal">
+    <!-- Generate Content Mode -->
+    <div id="generateProgressContent">
+      <div class="jadwa-progress-header">
+        <div class="jadwa-progress-icon" id="progressIcon">
+          <i class="material-icons" id="progressIconSymbol">auto_awesome</i>
+        </div>
+        <h3 class="jadwa-progress-title" id="progressTitle">
+          {% if session.get('lang', 'en') == 'ar' %}جاري توليد المحتوى{% else %}Generating Content{% endif %}
+        </h3>
+        <p class="jadwa-progress-subtitle" id="progressSubtitle">
+          {% if session.get('lang', 'en') == 'ar' %}يرجى الانتظار بينما يقوم الذكاء الاصطناعي بإنشاء خطة عملك{% else %}Please wait while AI creates your business plan{% endif %}
+        </p>
+      </div>
+
+      <div class="jadwa-progress-bar-container">
+        <div class="jadwa-progress-stats">
+          <span class="jadwa-progress-percentage" id="progressPercentage">0%</span>
+          <span class="jadwa-progress-time" id="progressTime">
+            {% if session.get('lang', 'en') == 'ar' %}الوقت المتبقي: جاري الحساب...{% else %}Time remaining: Calculating...{% endif %}
+          </span>
+        </div>
+        <div class="jadwa-progress-bar">
+          <div class="jadwa-progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="jadwa-progress-sections" id="progressSections">
+        <!-- Sections will be dynamically added here -->
+      </div>
+
+      <div class="jadwa-progress-footer">
+        <div class="jadwa-progress-warning" id="progressWarning">
+          <i class="material-icons">info</i>
+          <span>{% if session.get('lang', 'en') == 'ar' %}لا تغلق هذه الصفحة{% else %}Please don't close this page{% endif %}</span>
+        </div>
+        <div class="jadwa-progress-actions" id="progressActions" style="display: none;">
+          <button type="button" class="jadwa-btn jadwa-btn-primary" onclick="window.location.reload()">
+            <i class="material-icons">refresh</i>
+            {% if session.get('lang', 'en') == 'ar' %}تحديث الصفحة{% else %}Refresh Page{% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF Export Mode -->
+    <div id="pdfProgressContent" style="display: none;">
+      <div class="jadwa-pdf-loading">
+        <div class="jadwa-pdf-icon">
+          <i class="material-icons">picture_as_pdf</i>
+        </div>
+        <div class="jadwa-pdf-text">
+          <h3 class="jadwa-pdf-title" id="pdfTitle">
+            {% if session.get('lang', 'en') == 'ar' %}جاري إنشاء ملف PDF{% else %}Creating PDF{% endif %}
+          </h3>
+          <p class="jadwa-pdf-subtitle" id="pdfSubtitle">
+            {% if session.get('lang', 'en') == 'ar' %}يرجى الانتظار...{% else %}Please wait...{% endif %}
+          </p>
+        </div>
+        <div class="jadwa-pdf-steps">
+          <div class="jadwa-pdf-step active" id="pdfStep1">
+            <i class="material-icons">hourglass_empty</i>
+            <span>{% if session.get('lang', 'en') == 'ar' %}التجهيز{% else %}Preparing{% endif %}</span>
+          </div>
+          <div class="jadwa-pdf-step" id="pdfStep2">
+            <i class="material-icons">description</i>
+            <span>{% if session.get('lang', 'en') == 'ar' %}الإنشاء{% else %}Generating{% endif %}</span>
+          </div>
+          <div class="jadwa-pdf-step" id="pdfStep3">
+            <i class="material-icons">download</i>
+            <span>{% if session.get('lang', 'en') == 'ar' %}التنزيل{% else %}Downloading{% endif %}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/static/assets/js/plugins/chartjs.min.js"></script>
+
+<script>
+// ==================== CONFIGURATION ====================
+const CONFIG = {
+  bplanId: '{{ bplan_id }}',
+  lang: '{{ session.get("lang", "en") }}',
+  pollInterval: 2000,
+  maxPollAttempts: 120,
+  sections: {
+    client_profile: {
+      icon: 'person',
+      name: { en: "Client's Profile", ar: 'ملف العميل' }
+    },
+    business_profile: {
+      icon: 'business',
+      name: { en: 'Business Profile', ar: 'ملف الأعمال' }
+    },
+    business_premises: {
+      icon: 'location_on',
+      name: { en: 'Business Premises', ar: 'مقر الأعمال' }
+    },
+    market_analysis: {
+      icon: 'analytics',
+      name: { en: 'Market Analysis', ar: 'تحليل السوق' }
+    },
+    operations_plan: {
+      icon: 'settings',
+      name: { en: 'Operations Plan', ar: 'خطة التشغيل' }
+    },
+    requested_fund: {
+      icon: 'payments',
+      name: { en: 'Requested Fund', ar: 'التمويل المطلوب' }
+    },
+    feasibility: {
+      icon: 'insights',
+      name: { en: 'Feasibility', ar: 'الجدوى' }
+    },
+    mission_vision: {
+      icon: 'flag',
+      name: { en: 'Mission & Vision', ar: 'المهمة والرؤية' }
+    },
+    objectives: {
+      icon: 'track_changes',
+      name: { en: 'Objectives', ar: 'الأهداف' }
+    }
+  }
+};
+
+// ==================== PROGRESS MODAL ====================
+class ProgressModal {
+  constructor() {
+    this.overlay = document.getElementById('progressOverlay');
+    this.generateContent = document.getElementById('generateProgressContent');
+    this.pdfContent = document.getElementById('pdfProgressContent');
+    this.progressIcon = document.getElementById('progressIcon');
+    this.progressIconSymbol = document.getElementById('progressIconSymbol');
+    this.progressTitle = document.getElementById('progressTitle');
+    this.progressSubtitle = document.getElementById('progressSubtitle');
+    this.progressPercentage = document.getElementById('progressPercentage');
+    this.progressTime = document.getElementById('progressTime');
+    this.progressBarFill = document.getElementById('progressBarFill');
+    this.progressSections = document.getElementById('progressSections');
+    this.progressWarning = document.getElementById('progressWarning');
+    this.progressActions = document.getElementById('progressActions');
+
+    this.startTime = null;
+    this.pollCount = 0;
+    this.pollTimer = null;
+    this.selectedSections = [];
+  }
+
+  show(mode = 'generate') {
+    if (mode === 'generate') {
+      this.generateContent.style.display = 'block';
+      this.pdfContent.style.display = 'none';
+    } else {
+      this.generateContent.style.display = 'none';
+      this.pdfContent.style.display = 'block';
+    }
+    this.overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  hide() {
+    this.overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    if (this.pollTimer) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
+  setSelectedSections(sections) {
+    this.selectedSections = sections;
+    this.renderSections();
+  }
+
+  renderSections() {
+    const html = this.selectedSections.map(key => {
+      const section = CONFIG.sections[key];
+      if (!section) return '';
+      return `
+        <div class="jadwa-progress-section pending" data-section="${key}">
+          <div class="jadwa-progress-section-icon">
+            <i class="material-icons">${section.icon}</i>
+          </div>
+          <div class="jadwa-progress-section-content">
+            <p class="jadwa-progress-section-name">${section.name[CONFIG.lang]}</p>
+            <p class="jadwa-progress-section-status">${CONFIG.lang === 'ar' ? 'في الانتظار...' : 'Waiting...'}</p>
+          </div>
+          <div class="jadwa-progress-section-check">
+            <i class="material-icons" style="display: none;">check</i>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Add mission/vision and objectives at the end
+    const additionalSections = `
+      <div class="jadwa-progress-section pending" data-section="mission_vision">
+        <div class="jadwa-progress-section-icon">
+          <i class="material-icons">flag</i>
+        </div>
+        <div class="jadwa-progress-section-content">
+          <p class="jadwa-progress-section-name">${CONFIG.lang === 'ar' ? 'المهمة والرؤية' : 'Mission & Vision'}</p>
+          <p class="jadwa-progress-section-status">${CONFIG.lang === 'ar' ? 'في الانتظار...' : 'Waiting...'}</p>
+        </div>
+        <div class="jadwa-progress-section-check">
+          <i class="material-icons" style="display: none;">check</i>
+        </div>
+      </div>
+      <div class="jadwa-progress-section pending" data-section="objectives">
+        <div class="jadwa-progress-section-icon">
+          <i class="material-icons">track_changes</i>
+        </div>
+        <div class="jadwa-progress-section-content">
+          <p class="jadwa-progress-section-name">${CONFIG.lang === 'ar' ? 'الأهداف' : 'Objectives'}</p>
+          <p class="jadwa-progress-section-status">${CONFIG.lang === 'ar' ? 'في الانتظار...' : 'Waiting...'}</p>
+        </div>
+        <div class="jadwa-progress-section-check">
+          <i class="material-icons" style="display: none;">check</i>
+        </div>
+      </div>
+    `;
+
+    this.progressSections.innerHTML = html + additionalSections;
+  }
+
+  updateSection(key, status, message = '') {
+    const sectionEl = this.progressSections.querySelector(`[data-section="${key}"]`);
+    if (!sectionEl) return;
+
+    sectionEl.className = `jadwa-progress-section ${status}`;
+
+    const statusEl = sectionEl.querySelector('.jadwa-progress-section-status');
+    const checkEl = sectionEl.querySelector('.jadwa-progress-section-check i');
+
+    if (status === 'active') {
+      statusEl.textContent = message || (CONFIG.lang === 'ar' ? 'جاري التوليد...' : 'Generating...');
+    } else if (status === 'completed') {
+      statusEl.textContent = CONFIG.lang === 'ar' ? 'مكتمل ✓' : 'Completed ✓';
+      checkEl.style.display = 'block';
+    } else if (status === 'error') {
+      statusEl.textContent = message || (CONFIG.lang === 'ar' ? 'حدث خطأ' : 'Error occurred');
+    }
+
+    // Scroll to active section
+    if (status === 'active') {
+      sectionEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  updateProgress(percentage, timeRemaining = null) {
+    this.progressPercentage.textContent = `${Math.round(percentage)}%`;
+    this.progressBarFill.style.width = `${percentage}%`;
+
+    if (timeRemaining !== null) {
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = Math.floor(timeRemaining % 60);
+      if (CONFIG.lang === 'ar') {
+        this.progressTime.textContent = `الوقت المتبقي: ${mins > 0 ? mins + ' دقيقة ' : ''}${secs} ثانية`;
+      } else {
+        this.progressTime.textContent = `Time remaining: ${mins > 0 ? mins + 'm ' : ''}${secs}s`;
+      }
+    }
+  }
+
+  showCompleted() {
+    this.progressIcon.classList.add('completed');
+    this.progressIconSymbol.textContent = 'check_circle';
+    this.progressTitle.textContent = CONFIG.lang === 'ar' ? 'اكتمل التوليد!' : 'Generation Complete!';
+    this.progressSubtitle.textContent = CONFIG.lang === 'ar' ? 'تم إنشاء خطة عملك بنجاح' : 'Your business plan has been created successfully';
+    this.progressWarning.style.display = 'none';
+    this.progressActions.style.display = 'flex';
+    this.updateProgress(100);
+  }
+
+  showError(message) {
+    this.progressIcon.classList.add('error');
+    this.progressIconSymbol.textContent = 'error';
+    this.progressIcon.querySelector('i').style.color = 'var(--jadwa-danger)';
+    this.progressTitle.textContent = CONFIG.lang === 'ar' ? 'حدث خطأ' : 'An Error Occurred';
+    this.progressSubtitle.textContent = message;
+    this.progressWarning.style.display = 'none';
+    this.progressActions.style.display = 'flex';
+  }
+
+  // PDF specific methods
+  updatePdfStep(step) {
+    for (let i = 1; i <= 3; i++) {
+      const stepEl = document.getElementById(`pdfStep${i}`);
+      stepEl.classList.remove('active', 'completed');
+      if (i < step) {
+        stepEl.classList.add('completed');
+        stepEl.querySelector('i').textContent = 'check_circle';
+      } else if (i === step) {
+        stepEl.classList.add('active');
+      }
+    }
+  }
+
+  showPdfComplete() {
+    document.getElementById('pdfTitle').textContent = CONFIG.lang === 'ar' ? 'تم إنشاء PDF!' : 'PDF Created!';
+    document.getElementById('pdfSubtitle').textContent = CONFIG.lang === 'ar' ? 'جاري تنزيل الملف...' : 'Downloading file...';
+    this.updatePdfStep(4);
+  }
+}
+
+const progressModal = new ProgressModal();
+
+// ==================== TOGGLE VISIBILITY ====================
+document.addEventListener('DOMContentLoaded', function() {
+  const configs = [
+    { id: 'flexSwitchCheck_client_profile', contents: ['clientProfileContent'] },
+    { id: 'flexSwitchCheck_business_profile', contents: ['businessProfileContent'] },
+    { id: 'flexSwitchCheck_business_premises', contents: ['businessPremisesContent', 'businessPremisesImage'] },
+    { id: 'flexSwitchCheck_market_analysis', contents: ['MarketAnalysisContent'] },
+    { id: 'flexSwitchCheck_operations_plan', contents: ['OperationsPlanContent'] },
+    { id: 'flexSwitchCheck_requested_fund', contents: ['RequestedFundContent'] },
+    { id: 'flexSwitchCheck_feasibility', contents: ['FeasibilityContent'] }
+  ];
+  configs.forEach(c => {
+    const toggle = document.getElementById(c.id);
+    if (!toggle) return;
+    const els = c.contents.map(id => document.getElementById(id)).filter(e => e);
+    els.forEach(el => el.style.display = toggle.checked ? 'block' : 'none');
+    toggle.addEventListener('change', function() {
+      els.forEach(el => el.style.display = this.checked ? 'block' : 'none');
+      const parent = toggle.closest('.jadwa-toggle-item');
+      if (parent) parent.classList.toggle('active', this.checked);
+    });
+  });
+});
+
+// ==================== PDF EXPORT ====================
+const { jsPDF } = window.jspdf;
+
+document.getElementById("pdffff").onclick = async function() {
+  const btn = this;
+  const originalText = btn.innerHTML;
+
+  // Show PDF progress modal
+  progressModal.show('pdf');
+  btn.disabled = true;
+
+  try {
+    // Step 1: Preparing
+    progressModal.updatePdfStep(1);
+    document.getElementById('pdfSubtitle').textContent = CONFIG.lang === 'ar' ? 'جاري تجهيز البيانات...' : 'Preparing document...';
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Step 2: Generating PDF on server
+    progressModal.updatePdfStep(2);
+    document.getElementById('pdfSubtitle').textContent = CONFIG.lang === 'ar' ? 'جاري إنشاء ملف PDF...' : 'Generating PDF...';
+
+    // Call the backend PDF generation endpoint
+    const response = await fetch(`/export_plan/pdf/${CONFIG.bplanId}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(CONFIG.lang === 'ar' ? 'فشل في إنشاء PDF' : 'Failed to generate PDF');
+    }
+
+    // Step 3: Downloading
+    progressModal.updatePdfStep(3);
+    document.getElementById('pdfSubtitle').textContent = CONFIG.lang === 'ar' ? 'جاري تنزيل الملف...' : 'Downloading...';
+
+    // Get the blob and trigger download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "{{ data_bplan[0].name }}_Business_Plan.pdf";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    // Complete
+    progressModal.showPdfComplete();
+
+    setTimeout(() => {
+      progressModal.hide();
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }, 1500);
+
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    document.getElementById('pdfTitle').textContent = CONFIG.lang === 'ar' ? 'حدث خطأ' : 'Error Occurred';
+    document.getElementById('pdfSubtitle').textContent = error.message;
+
+    setTimeout(() => {
+      progressModal.hide();
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }, 3000);
+  }
+};
+
+// ==================== GENERATE CONTENT ====================
+async function generateContent() {
+  // Get selected sections
+  const sectionMap = {
+    'flexSwitchCheck_client_profile': 'client_profile',
+    'flexSwitchCheck_business_profile': 'business_profile',
+    'flexSwitchCheck_business_premises': 'business_premises',
+    'flexSwitchCheck_market_analysis': 'market_analysis',
+    'flexSwitchCheck_operations_plan': 'operations_plan',
+    'flexSwitchCheck_requested_fund': 'requested_fund',
+    'flexSwitchCheck_feasibility': 'feasibility'
+  };
+
+  const selectedSections = [];
+  const formData = new FormData();
+  formData.append('action', 'generate');
+
+  Object.entries(sectionMap).forEach(([checkboxId, sectionKey]) => {
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox && checkbox.checked) {
+      selectedSections.push(sectionKey);
+      formData.append(checkboxId, 'on');
+    }
+  });
+
+  if (selectedSections.length === 0) {
+    alert(CONFIG.lang === 'ar' ? 'الرجاء اختيار قسم واحد على الأقل' : 'Please select at least one section');
+    return;
+  }
+
+  // Show progress modal
+  progressModal.setSelectedSections(selectedSections);
+  progressModal.show('generate');
+  progressModal.startTime = Date.now();
+
+  // Start the first section as active
+  if (selectedSections.length > 0) {
+    progressModal.updateSection(selectedSections[0], 'active');
+  }
+
+  try {
+    // Send generate request
+    const response = await fetch(`/export_plan/${CONFIG.bplanId}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    // Start polling for progress
+    startProgressPolling(selectedSections);
+
+  } catch (error) {
+    console.error('Generation error:', error);
+    progressModal.showError(error.message);
+  }
+}
+
+function startProgressPolling(selectedSections) {
+  let pollCount = 0;
+  let completedSections = new Set();
+  let currentIndex = 0;
+  const totalSections = selectedSections.length + 2; // +2 for mission/vision and objectives
+  const estimatedTimePerSection = 15; // seconds
+
+  progressModal.pollTimer = setInterval(async () => {
+    pollCount++;
+
+    // Calculate estimated progress based on time
+    const elapsed = (Date.now() - progressModal.startTime) / 1000;
+    const estimatedTotal = totalSections * estimatedTimePerSection;
+    const timeBasedProgress = Math.min((elapsed / estimatedTotal) * 100, 95);
+
+    try {
+      // Try the enhanced progress endpoint first
+      let progressData;
+      try {
+        const progressResponse = await fetch(`/export_plan/progress/${CONFIG.bplanId}`);
+        progressData = await progressResponse.json();
+      } catch (e) {
+        // Fallback to status endpoint
+        const statusParams = selectedSections.map(s => `check_${s}=true`).join('&');
+        const statusResponse = await fetch(`/export_plan/status/${CONFIG.bplanId}?${statusParams}`);
+        progressData = await statusResponse.json();
+      }
+
+      if (progressData.found !== false) {
+        // Update based on real progress if available
+        if (progressData.sections) {
+          Object.entries(progressData.sections).forEach(([key, data]) => {
+            if (data.status === 'completed' && !completedSections.has(key)) {
+              completedSections.add(key);
+              progressModal.updateSection(key, 'completed');
+
+              // Activate next section
+              const nextKey = selectedSections[completedSections.size];
+              if (nextKey) {
+                progressModal.updateSection(nextKey, 'active');
+              }
+            } else if (data.status === 'in_progress') {
+              progressModal.updateSection(key, 'active', data.message);
+            }
+          });
+
+          // Check mission/vision and objectives
+          if (progressData.mission_vision?.status === 'in_progress') {
+            progressModal.updateSection('mission_vision', 'active');
+          } else if (progressData.mission_vision?.status === 'completed') {
+            progressModal.updateSection('mission_vision', 'completed');
+          }
+
+          if (progressData.objectives?.status === 'in_progress') {
+            progressModal.updateSection('objectives', 'active');
+          } else if (progressData.objectives?.status === 'completed') {
+            progressModal.updateSection('objectives', 'completed');
+          }
+
+          const realProgress = progressData.percentage || timeBasedProgress;
+          const timeRemaining = Math.max(0, estimatedTotal - elapsed);
+          progressModal.updateProgress(realProgress, timeRemaining);
+
+          if (progressData.status === 'completed' || progressData.complete) {
+            clearInterval(progressModal.pollTimer);
+            progressModal.updateSection('mission_vision', 'completed');
+            progressModal.updateSection('objectives', 'completed');
+            progressModal.showCompleted();
+            return;
+          }
+        } else {
+          // Fallback: simulate progress based on time
+          simulateProgress(selectedSections, elapsed, estimatedTimePerSection, completedSections);
+
+          const timeRemaining = Math.max(0, estimatedTotal - elapsed);
+          progressModal.updateProgress(timeBasedProgress, timeRemaining);
+
+          if (progressData.complete) {
+            clearInterval(progressModal.pollTimer);
+            // Mark all as complete
+            selectedSections.forEach(s => progressModal.updateSection(s, 'completed'));
+            progressModal.updateSection('mission_vision', 'completed');
+            progressModal.updateSection('objectives', 'completed');
+            progressModal.showCompleted();
+            return;
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error('Polling error:', error);
+    }
+
+    // Timeout after max attempts
+    if (pollCount >= CONFIG.maxPollAttempts) {
+      clearInterval(progressModal.pollTimer);
+      // Assume complete after timeout
+      selectedSections.forEach(s => progressModal.updateSection(s, 'completed'));
+      progressModal.updateSection('mission_vision', 'completed');
+      progressModal.updateSection('objectives', 'completed');
+      progressModal.showCompleted();
+    }
+
+  }, CONFIG.pollInterval);
+}
+
+function simulateProgress(selectedSections, elapsed, timePerSection, completedSections) {
+  const allSections = [...selectedSections, 'mission_vision', 'objectives'];
+  const completedCount = Math.floor(elapsed / timePerSection);
+
+  allSections.forEach((section, index) => {
+    if (index < completedCount && !completedSections.has(section)) {
+      completedSections.add(section);
+      progressModal.updateSection(section, 'completed');
+    } else if (index === completedCount) {
+      progressModal.updateSection(section, 'active');
+    }
+  });
+}
+
+// Form submission handler
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form[action="/export_plan/{{ bplan_id }}"]');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      if (e.submitter && e.submitter.value === 'generate') {
+        e.preventDefault();
+        generateContent();
+      }
+    });
+  }
+
+  // Also attach to button click
+  const generateBtn = document.getElementById('btn_generate');
+  if (generateBtn) {
+    generateBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      generateContent();
+    });
+  }
+});
+
+// ==================== CHARTS ====================
+const colors = { blue: '#4F7DF3', dark: '#1A1A24', warn: '#F59E0B', success: '#10B981', purple: '#8B5CF6', pink: '#EC4899', info: '#06B6D4' };
+const palette = [colors.blue, colors.dark, colors.warn, colors.success, colors.purple, colors.pink, colors.info];
+
+{% if data_fin|length > 0 %}
+new Chart(document.getElementById("chart_financial_history"), {
+  type: "bar",
+  data: {
+    labels: [{% for i in data_fin %}"{{ i.financial_year }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [
+      { label: "Sales", backgroundColor: colors.dark, borderRadius: 6, data: [{% for i in data_fin %}{{ i.financial_sales }}{% if not loop.last %},{% endif %}{% endfor %}], maxBarThickness: 40 },
+      { label: "Profit", backgroundColor: colors.blue, borderRadius: 6, data: [{% for i in data_fin %}{{ i.financial_profit }}{% if not loop.last %},{% endif %}{% endfor %}], maxBarThickness: 40 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
+});
+{% endif %}
+
+{% if data_br|length > 0 %}
+new Chart(document.getElementById("chart_existing_resources"), {
+  type: "doughnut",
+  data: {
+    labels: [{% for i in data_br %}"{{ i.resource_subtype }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{ data: [{% for i in data_br %}{{ i.resource_value }}{% if not loop.last %},{% endif %}{% endfor %}], backgroundColor: palette, borderWidth: 0, cutout: '60%' }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } } }
+});
+{% endif %}
+
+{% if data_mkt_segments|length > 0 %}
+new Chart(document.getElementById("chart_business_segments"), {
+  type: "doughnut",
+  data: {
+    labels: [{% for i in data_mkt_segments %}"{{ i.segment_name }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{ data: [{% for i in data_mkt_segments %}{{ i.segment_percentage }}{% if not loop.last %},{% endif %}{% endfor %}], backgroundColor: palette, borderWidth: 0, cutout: '60%' }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } } }
+});
+{% endif %}
+
+{% if data_comp_preferences|length > 0 %}
+const prefData = {{ data_comp_preferences|tojson|safe }} || [];
+if (prefData.length > 0) {
+  new Chart(document.getElementById("chart_customer_preference"), {
+    type: "bar",
+    data: {
+      labels: prefData.map(i => i.preference),
+      datasets: [
+        { label: "{{ data_bplan[0]['name'] }}", backgroundColor: colors.blue, borderRadius: 4, data: prefData.map(i => i.preference_value), maxBarThickness: 35 },
+        { label: "{{ data_compname[0].competitor_name_1st or 'Comp 1' }}", backgroundColor: colors.dark, borderRadius: 4, data: prefData.map(i => i.competitor1_value), maxBarThickness: 35 },
+        { label: "{{ data_compname[0].competitor_name_2nd or 'Comp 2' }}", backgroundColor: colors.warn, borderRadius: 4, data: prefData.map(i => i.competitor2_value), maxBarThickness: 35 },
+        { label: "{{ data_compname[0].competitor_name_3rd or 'Comp 3' }}", backgroundColor: colors.pink, borderRadius: 4, data: prefData.map(i => i.competitor3_value), maxBarThickness: 35 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true, max: 5 }, x: { grid: { display: false } } } }
+  });
+}
+{% endif %}
+
+
+
+
+// ==================== CAPACITY UTILIZATION GAUGE ====================
+{% if data_production|length > 0 and data_production[0].max_expected_capacity and data_production[0].max_expected_capacity > 0 %}
+(function() {
+  const currentCapacity = {{ data_production[0].current_capacity|default(0) }};
+  const maxCapacity = {{ data_production[0].max_expected_capacity|default(1) }};
+  const utilizationPercent = Math.round((currentCapacity / maxCapacity) * 100);
+
+  // Determine color based on utilization
+  let gaugeColor = '#10B981'; // Green for good (under 75%)
+  if (utilizationPercent > 90) gaugeColor = '#EF4444'; // Red for over capacity
+  else if (utilizationPercent > 75) gaugeColor = '#F59E0B'; // Orange for high
+
+  new Chart(document.getElementById("chart_capacity_gauge"), {
+    type: "doughnut",
+    data: {
+      datasets: [{
+        data: [utilizationPercent, 100 - utilizationPercent],
+        backgroundColor: [gaugeColor, '#E5E5EA'],
+        borderWidth: 0,
+        cutout: '75%'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      rotation: -90,
+      circumference: 180,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      }
+    },
+    plugins: [{
+      id: 'gaugeText',
+      afterDraw: function(chart) {
+        const ctx = chart.ctx;
+        const centerX = chart.width / 2;
+        const centerY = chart.height - 30;
+
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Percentage
+        ctx.font = 'bold 36px "Space Grotesk", sans-serif';
+        ctx.fillStyle = '#1A1A24';
+        ctx.fillText(utilizationPercent + '%', centerX, centerY - 20);
+
+        // Label
+        ctx.font = '14px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#6B6B7A';
+        ctx.fillText('{% if session.get("lang", "en") == "ar" %}نسبة الاستخدام{% else %}Utilization{% endif %}', centerX, centerY + 15);
+
+        ctx.restore();
+      }
+    }]
+  });
+})();
+{% endif %}
+
+// ==================== SUPPLIER COMPARISON RADAR ====================
+{% if data_suppliers|length > 1 %}
+(function() {
+  // Helper functions to convert string values to numbers
+  function convertQuality(quality) {
+    const map = {
+      'High quality': 5,
+      'Good quality': 4,
+      'Consistent': 3,
+      'Commercial': 2
+    };
+    return map[quality] || 2;
+  }
+
+  function convertYears(years) {
+    const map = {
+      '10+': 5,
+      '7-10': 4,
+      '5-7': 3,
+      '3-5': 2,
+      '1-3': 1,
+      '0-1': 0.5
+    };
+    return map[years] || 1;
+  }
+
+  function convertPrice(price) {
+    // Higher score = better for buyer (lower price)
+    const map = {
+      'Very low': 5,
+      'Affordable': 4,
+      'Moderate': 3,
+      'Expensive': 2,
+      'Very expensive': 1
+    };
+    return map[price] || 3;
+  }
+
+  function convertQuantity(quantity) {
+    const map = {
+      'Consistent': 5,
+      'Inconsistent': 2
+    };
+    return map[quantity] || 3;
+  }
+
+  // Calculate average scores for each supplier's products
+  function calculateProductScores(products) {
+    if (!products || products.length === 0) {
+      return { avgPrice: 3, avgQuantity: 3 };
+    }
+
+    let totalPrice = 0;
+    let totalQuantity = 0;
+
+    products.forEach(product => {
+      totalPrice += convertPrice(product.prices);
+      totalQuantity += convertQuantity(product.quantity);
+    });
+
+    return {
+      avgPrice: totalPrice / products.length,
+      avgQuantity: totalQuantity / products.length
+    };
+  }
+
+  // Build supplier data from template
+  const suppliersData = [
+    {% for supplier in data_suppliers %}
+    {
+      name: "{{ supplier.supplier_name }}",
+      quality: "{{ supplier.quality }}",
+      years: "{{ supplier.years_of_collaboration }}",
+      products: {{ supplier.products|tojson|safe if supplier.products else '[]' }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  // Limit to 4 suppliers for readability
+  const displaySuppliers = suppliersData.slice(0, 4);
+
+  // Color palette
+  const colors = ['#4F7DF3', '#1A1A24', '#F59E0B', '#10B981'];
+  const bgColors = ['rgba(79, 125, 243, 0.2)', 'rgba(26, 26, 36, 0.2)', 'rgba(245, 158, 11, 0.2)', 'rgba(16, 185, 129, 0.2)'];
+
+  // Build datasets
+  const datasets = displaySuppliers.map((supplier, index) => {
+    const productScores = calculateProductScores(supplier.products);
+
+    return {
+      label: supplier.name,
+      data: [
+        convertQuality(supplier.quality),
+        convertYears(supplier.years),
+        productScores.avgPrice,
+        productScores.avgQuantity
+      ],
+      backgroundColor: bgColors[index],
+      borderColor: colors[index],
+      borderWidth: 2,
+      pointBackgroundColor: colors[index],
+      pointBorderColor: '#fff',
+      pointRadius: 5,
+      pointHoverRadius: 7
+    };
+  });
+
+  new Chart(document.getElementById("chart_supplier_radar"), {
+    type: "radar",
+    data: {
+      labels: [
+        '{% if session.get("lang", "en") == "ar" %}الجودة{% else %}Quality{% endif %}',
+        '{% if session.get("lang", "en") == "ar" %}سنوات التعاون{% else %}Years{% endif %}',
+        '{% if session.get("lang", "en") == "ar" %}مستوى السعر{% else %}Price Level{% endif %}',
+        '{% if session.get("lang", "en") == "ar" %}اتساق الكمية{% else %}Qty Consistency{% endif %}'
+      ],
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true,
+          min: 0,
+          max: 5,
+          ticks: {
+            stepSize: 1,
+            font: { size: 10 },
+            backdropColor: 'transparent'
+          },
+          pointLabels: {
+            font: {
+              size: 12,
+              weight: '600',
+              family: "'Plus Jakarta Sans', sans-serif"
+            },
+            color: '#1A1A24'
+          },
+          grid: {
+            color: 'rgba(0,0,0,0.05)'
+          },
+          angleLines: {
+            color: 'rgba(0,0,0,0.05)'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+            padding: 20,
+            font: {
+              size: 12,
+              family: "'Plus Jakarta Sans', sans-serif"
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const labels = ['Quality', 'Years', 'Price', 'Consistency'];
+              return context.dataset.label + ': ' + context.raw.toFixed(1) + '/5';
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+{% endif %}
+
+
+
+// ==================== PARTNERS OWNERSHIP PIE CHART (Including Client) ====================
+{% if data_partners|length > 0 %}
+(function() {
+  // Calculate partners total
+  const partnersData = [
+    {% for partner in data_partners %}
+    {
+      name: "{{ partner.partner_name }}",
+      shares: {{ partner.partner_shares|default(0) }},
+      role: "{{ partner.partner_role if partner.partner_role else partner.partner_relation }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const partnersTotal = partnersData.reduce((sum, p) => sum + p.shares, 0);
+  const clientShare = 100 - partnersTotal;
+
+  // Client name (owner)
+  const clientName = "{{ data_ep[0].full_name if data_ep[0].full_name else ('المالك' if session.get('lang', 'en') == 'ar' else 'Owner') }}";
+
+  // Build complete ownership data - Client first!
+  const ownershipData = [
+    { name: clientName, shares: clientShare, role: "{% if session.get('lang', 'en') == 'ar' %}المؤسس{% else %}Founder{% endif %}", isOwner: true },
+    ...partnersData.map(p => ({ ...p, isOwner: false }))
+  ];
+
+  // Color palette - Blue for owner, then other colors for partners
+  const colors = ['#4F7DF3', '#1A1A24', '#F59E0B', '#10B981', '#8B5CF6', '#06B6D4', '#EC4899'];
+
+  new Chart(document.getElementById("chart_partners"), {
+    type: "doughnut",
+    data: {
+      labels: ownershipData.map(o => o.name),
+      datasets: [{
+        data: ownershipData.map(o => o.shares),
+        backgroundColor: ownershipData.map((_, i) => colors[i % colors.length]),
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        cutout: '55%',
+        hoverOffset: 15
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const owner = ownershipData[context.dataIndex];
+              return owner.name + ': ' + owner.shares + '%';
+            },
+            afterLabel: function(context) {
+              const owner = ownershipData[context.dataIndex];
+              return '👤 ' + owner.role;
+            }
+          }
+        }
+      }
+    },
+    plugins: [{
+      id: 'centerText',
+      afterDraw: function(chart) {
+        const ctx = chart.ctx;
+        const centerX = chart.width / 2;
+        const centerY = chart.height / 2;
+
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // "100%" text
+        ctx.font = 'bold 28px "Space Grotesk", sans-serif';
+        ctx.fillStyle = '#1A1A24';
+        ctx.fillText('100%', centerX, centerY - 6);
+
+        // Label
+        ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#6B6B7A';
+        ctx.fillText('{% if session.get("lang", "en") == "ar" %}الملكية{% else %}Ownership{% endif %}', centerX, centerY + 16);
+
+        ctx.restore();
+      }
+    }]
+  });
+})();
+{% endif %}
+
+// ==================== EXPENSES DONUT CHART ====================
+{% if data_ex|length > 0 %}
+(function() {
+  const expensesData = [
+    {% for expense in data_ex %}
+    {
+      name: "{{ expense.living_expenses }}",
+      value: {{ expense.value|default(0) }},
+      total: {{ expense.total_value|default(expense.value|default(0)) }},
+      unit: {{ expense.unit|default(1) }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  // Color palette
+  const colors = ['#4F7DF3', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899', '#06B6D4', '#1A1A24'];
+
+  // Use total_value for annual comparison
+  const chartData = expensesData.map(e => e.total || e.value);
+
+  new Chart(document.getElementById("chart_expenses"), {
+    type: "doughnut",
+    data: {
+      labels: expensesData.map(e => e.name),
+      datasets: [{
+        data: chartData,
+        backgroundColor: expensesData.map((_, i) => colors[i % colors.length]),
+        borderWidth: 0,
+        cutout: '60%',
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const expense = expensesData[context.dataIndex];
+              const total = chartData.reduce((a, b) => a + b, 0);
+              const percentage = ((context.raw / total) * 100).toFixed(1);
+              return expense.name + ': $' + context.raw.toLocaleString() + ' (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    },
+    plugins: [{
+      id: 'centerText',
+      afterDraw: function(chart) {
+        const ctx = chart.ctx;
+        const centerX = chart.width / 2;
+        const centerY = chart.height / 2;
+
+        const total = chartData.reduce((a, b) => a + b, 0);
+
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Total value
+        ctx.font = 'bold 18px "Space Grotesk", sans-serif';
+        ctx.fillStyle = '#EF4444';
+
+        // Format number
+        let displayValue;
+        if (total >= 1000000) {
+          displayValue = '$' + (total / 1000000).toFixed(1) + 'M';
+        } else if (total >= 1000) {
+          displayValue = '$' + (total / 1000).toFixed(1) + 'K';
+        } else {
+          displayValue = '$' + total;
+        }
+        ctx.fillText(displayValue, centerX, centerY - 6);
+
+        // Label
+        ctx.font = '10px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#6B6B7A';
+        ctx.fillText('{% if session.get("lang", "en") == "ar" %}سنوياً{% else %}Yearly{% endif %}', centerX, centerY + 12);
+
+        ctx.restore();
+      }
+    }]
+  });
+})();
+{% endif %}
+</script>
+{% endblock javascripts %}

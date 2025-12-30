@@ -1,0 +1,2642 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    مقر العمل
+  {% else %}
+    Business Premises
+  {% endif %}
+{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-fluid pl-5 pt-3">
+  <div class="row">
+    <div class="col-10">
+
+      <form role="form" method="POST" action="/business_premises/{{ bplan_id }}">
+
+        <div class="row px-8 pt-0 pb-3">
+          <span class="me-2 text-xxs font-weight-bold">
+            {% if session.get('lang', 'en') == 'ar' %}
+              تم الإكمال بنسبة
+            {% endif %}
+            {{ data_comp[0].completion }}%
+            {% if session.get('lang', 'en') == 'ar' %}
+              من الملف
+            {% else %}
+              Completed
+            {% endif %}
+          </span>
+          <div class="progress">
+            {% if data_comp[0].completion == 100: %}
+            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% elif data_comp[0].completion >= 50: %}
+              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% else %}
+              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% endif %}
+          </div>
+        </div>
+
+              <!-- Title + Business Information card -->
+              <div class="card my-3">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                  <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+
+                    <h5 class="text-white text-capitalize ps-3 mx-3">
+                      {% if session.get('lang', 'en') == 'ar' %}
+                        مقر العمل
+                      {% else %}
+                        Business Premises
+                      {% endif %}
+                    </h5>
+
+                  </div>
+                </div>
+                <!--first part-->
+                <div class="card-body px-6 pt-2">
+                  <h5 class="font-weight-bolder text-info mt-4">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      تفاصيل المقر
+                    {% else %}
+                      Premises details
+                    {% endif %}
+                  </h5>
+
+                  <!-- ADD card body -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="card card-body bg-gray-100 px-4 py-2">
+
+                        <!-- 1st row -->
+                        <div class="row">
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  العنوان
+                                {% else %}
+                                  Address
+                                {% endif %}
+                              </label>
+                            </div>
+                            <div class="input-group input-group-static mb-0">
+                              <input class="multisteps-form__input form-control" type="text" name="premise_address" value="" autocomplete="off"/>
+                            </div>
+                          </div>
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  رقم القطعة
+                                {% else %}
+                                  Plot Number
+                                {% endif %}
+                              </label>
+                            </div>
+                            <div class="input-group input-group-static mb-0">
+                              <input class="multisteps-form__input form-control" type="text" name="plot_number" value="" autocomplete="off"/>
+                            </div>
+                          </div>
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  مساحة القطعة (م²)
+                                {% else %}
+                                  Plot Area (SQM)
+                                {% endif %}
+                              </label>
+                            </div>
+                            <div class="input-group input-group-static mb-3">
+                              <input class="multisteps-form__input form-control" type="number" name="plot_area" value="0" autocomplete="off"/>
+                            </div>
+                          </div>
+
+                        </div>
+
+                        <!-- 2nd row -->
+                        <div class="row">
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  طبيعة المقر
+                                {% else %}
+                                  Premises Nature
+                                {% endif %}
+                              </label>
+                            </div><br>
+                            <div class="input-group input-group-static mb-0">
+                              <select class="multisteps-form__input form-control" name="choice_premise_nature" id="choice_premise_nature" multiple>
+                                <option value="Land">{% if session.get('lang', 'en') == 'ar' %}أرض{% else %}Land{% endif %}</option>
+                                <option value="Hangar">{% if session.get('lang', 'en') == 'ar' %}هنغار{% else %}Hangar{% endif %}</option>
+                                <option value="Chamber">{% if session.get('lang', 'en') == 'ar' %}غرفة{% else %}Chamber{% endif %}</option>
+                                <option value="Warehouse">{% if session.get('lang', 'en') == 'ar' %}مستودع{% else %}Warehouse{% endif %}</option>
+                                <option value="Office Space">{% if session.get('lang', 'en') == 'ar' %}مساحة مكتبية{% else %}Office Space{% endif %}</option>
+                                <option value="Retail Space">{% if session.get('lang', 'en') == 'ar' %}مساحة بيع بالتجزئة{% else %}Retail Space{% endif %}</option>
+                                <option value="Basement">{% if session.get('lang', 'en') == 'ar' %}قبو{% else %}Basement{% endif %}</option>
+                                <option value="Mezzanine">{% if session.get('lang', 'en') == 'ar' %}ميزانين{% else %}Mezzanine{% endif %}</option>
+                                <option value="Apartment">{% if session.get('lang', 'en') == 'ar' %}شقة{% else %}Apartment{% endif %}</option>
+                                <option value="Building">{% if session.get('lang', 'en') == 'ar' %}مبنى{% else %}Building{% endif %}</option>
+                                <option value="Atelier">{% if session.get('lang', 'en') == 'ar' %}مرسم{% else %}Atelier{% endif %}</option>
+                                <option value="From Home">{% if session.get('lang', 'en') == 'ar' %}من المنزل{% else %}From Home{% endif %}</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  المحيط
+                                {% else %}
+                                  Surroundings
+                                {% endif %}
+                              </label>
+                            </div><br>
+                            <div class="input-group input-group-static mb-0">
+                              <select class="multisteps-form__input form-control" name="choice_surroundings" id="choice_surroundings" multiple>
+                                <option value="Banks">{% if session.get('lang', 'en') == 'ar' %}بنوك{% else %}Banks{% endif %}</option>
+                                <option value="Restaurants">{% if session.get('lang', 'en') == 'ar' %}مطاعم{% else %}Restaurants{% endif %}</option>
+                                <option value="Forests">{% if session.get('lang', 'en') == 'ar' %}غابات{% else %}Forests{% endif %}</option>
+                                <option value="Farms">{% if session.get('lang', 'en') == 'ar' %}مزارع{% else %}Farms{% endif %}</option>
+                                <option value="Universities">{% if session.get('lang', 'en') == 'ar' %}جامعات{% else %}Universities{% endif %}</option>
+                                <option value="Cafes">{% if session.get('lang', 'en') == 'ar' %}مقاهي{% else %}Cafes{% endif %}</option>
+                                <option value="Malls">{% if session.get('lang', 'en') == 'ar' %}مراكز تجارية{% else %}Malls{% endif %}</option>
+                                <option value="Workshops">{% if session.get('lang', 'en') == 'ar' %}ورش عمل{% else %}Workshops{% endif %}</option>
+                                <option value="Shops">{% if session.get('lang', 'en') == 'ar' %}محلات{% else %}Shops{% endif %}</option>
+                                <option value="Factories">{% if session.get('lang', 'en') == 'ar' %}مصانع{% else %}Factories{% endif %}</option>
+                                <option value="Trees">{% if session.get('lang', 'en') == 'ar' %}أشجار{% else %}Trees{% endif %}</option>
+                                <option value="Offices">{% if session.get('lang', 'en') == 'ar' %}مكاتب{% else %}Offices{% endif %}</option>
+                                <option value="Residential Buildings">{% if session.get('lang', 'en') == 'ar' %}مباني سكنية{% else %}Residential Buildings{% endif %}</option>
+                                <option value="Shopping Centers">{% if session.get('lang', 'en') == 'ar' %}مراكز تسوق{% else %}Shopping Centers{% endif %}</option>
+                                <option value="Cultivated Lands">{% if session.get('lang', 'en') == 'ar' %}أراضي مزروعة{% else %}Cultivated Lands{% endif %}</option>
+                                <option value="Hospitals">{% if session.get('lang', 'en') == 'ar' %}مستشفيات{% else %}Hospitals{% endif %}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  ملكية المقر
+                                {% else %}
+                                  Premises Ownership
+                                {% endif %}
+                              </label>
+                            </div><br>
+                            <div class="input-group input-group-static mb-3">
+                              <select class="multisteps-form__input form-control" name="choice_premises_ownershipe" id="choice_premises_ownershipe" onchange="check()">
+                                <option value="Fully Owned" selected>{% if session.get('lang', 'en') == 'ar' %}مملوك بالكامل{% else %}Fully Owned{% endif %}</option>
+                                <option value="Partially Owned">{% if session.get('lang', 'en') == 'ar' %}مملوك جزئياً{% else %}Partially Owned{% endif %}</option>
+                                <option value="Rented">{% if session.get('lang', 'en') == 'ar' %}مؤجر{% else %}Rented{% endif %}</option>
+                                <option value="Indulgence">{% if session.get('lang', 'en') == 'ar' %}تنازل{% else %}Indulgence{% endif %}</option>
+                                <option value="Other">{% if session.get('lang', 'en') == 'ar' %}أخرى{% else %}Other{% endif %}</option>
+                              </select>
+                            </div>
+                          </div>
+
+                        </div>
+
+                        <!-- 3rd row -->
+                        <div class="row">
+                            <div class="col">
+                              <div class="input-group input-group-static mb-4">
+                                <label class="form-label text-dark" id="partner_name_label" style="display: none;">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    اسم الشريك
+                                  {% else %}
+                                    Partner Name
+                                  {% endif %}
+                                </label>
+                              </div>
+                              <div class="input-group input-group-static mb-0">
+                                <input class="multisteps-form__input form-control" type="text" name="partner_name" id="partner_name" style="display: none;" autocomplete="off"/>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="input-group input-group-static mb-4">
+                                <label class="form-label text-dark" id="partner_relation_label" style="display: none;">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    صلة القرابة
+                                  {% else %}
+                                    Partner Relation
+                                  {% endif %}
+                                </label>
+                              </div>
+                              <div class="input-group input-group-static mb-0" id="partner_relation" style="display: none;">
+                                <select class="multisteps-form__input form-control" name="choice_partner_relation" id="choice_partner_relation">
+                                  <option value="No Relation">{% if session.get('lang', 'en') == 'ar' %}لا توجد صلة{% else %}No Relation{% endif %}</option>
+                                  <option value="Brother">{% if session.get('lang', 'en') == 'ar' %}أخ{% else %}Brother{% endif %}</option>
+                                  <option value="Sister">{% if session.get('lang', 'en') == 'ar' %}أخت{% else %}Sister{% endif %}</option>
+                                  <option value="Father">{% if session.get('lang', 'en') == 'ar' %}أب{% else %}Father{% endif %}</option>
+                                  <option value="Mother">{% if session.get('lang', 'en') == 'ar' %}أم{% else %}Mother{% endif %}</option>
+                                  <option value="Son">{% if session.get('lang', 'en') == 'ar' %}ابن{% else %}Son{% endif %}</option>
+                                  <option value="Cousin">{% if session.get('lang', 'en') == 'ar' %}ابن عم/عمة{% else %}Cousin{% endif %}</option>
+                                  <option value="Father in law">{% if session.get('lang', 'en') == 'ar' %}حماه{% else %}Father in law{% endif %}</option>
+                                  <option value="Mother in law">{% if session.get('lang', 'en') == 'ar' %}حماة{% else %}Mother in law{% endif %}</option>
+                                  <option value="Brother in law">{% if session.get('lang', 'en') == 'ar' %}نسيب{% else %}Brother in law{% endif %}</option>
+                                  <option value="Sister in law">{% if session.get('lang', 'en') == 'ar' %}نسيبة{% else %}Sister in law{% endif %}</option>
+                                  <option value="Husband">{% if session.get('lang', 'en') == 'ar' %}زوج{% else %}Husband{% endif %}</option>
+                                  <option value="Wife">{% if session.get('lang', 'en') == 'ar' %}زوجة{% else %}Wife{% endif %}</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="input-group input-group-static mb-4">
+                                <label class="form-label text-dark" id="percentge_of_ownership_label" style="display: none;">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    نسبة الملكية
+                                  {% else %}
+                                    Percentage of Ownership
+                                  {% endif %}
+                                </label>
+                              </div>
+                              <div class="input-group input-group-static mb-0">
+                                <input class="multisteps-form__input form-control" type="number" name="percentge_of_ownership" id="percentge_of_ownership" style="display: none;" autocomplete="off"/>
+                              </div>
+                            </div>
+                        </div>
+
+                        <!-- 4th row -->
+                        <div class="row">
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark" id="rent_fees_label" style="display: none;">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  رسوم الإيجار
+                                {% else %}
+                                  Rent Fees
+                                {% endif %}
+                              </label>
+                            </div>
+                            <div class="input-group input-group-static mb-0">
+                              <input class="multisteps-form__input form-control" type="number" name="rent_fees" id="rent_fees" style="display: none;" autocomplete="off"/>
+                            </div>
+                          </div>
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark" id="rent_period_label" style="display: none;">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  مدة الإيجار
+                                {% else %}
+                                  Rent Period
+                                {% endif %}
+                              </label>
+                            </div>
+                            <div class="input-group input-group-static mb-0">
+                              <input class="multisteps-form__input form-control" type="number" name="rent_period" id="rent_period" style="display: none;" autocomplete="off"/>
+                            </div>
+                          </div>
+
+                          <div class="col">
+                            <div class="input-group input-group-static mb-4">
+                              <label class="form-label text-dark" id="rent_unit_label" style="display: none;">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  الوحدة
+                                {% else %}
+                                  Unit
+                                {% endif %}
+                              </label>
+                            </div>
+                            <div class="input-group input-group-static mb-0" id="rent_unit" style="display: none;">
+                              <select class="multisteps-form__input form-control" name="choice_rent_unit" id="choice_rent_unit">
+                                <option value="Day">{% if session.get('lang', 'en') == 'ar' %}يوم{% else %}Day{% endif %}</option>
+                                <option value="Month">{% if session.get('lang', 'en') == 'ar' %}شهر{% else %}Month{% endif %}</option>
+                                <option value="Year">{% if session.get('lang', 'en') == 'ar' %}سنة{% else %}Year{% endif %}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+                    </div>
+
+                    <div class="col-1 align-self-end">
+                      <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="premise_add" value="{{ bplan_id }}">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                          إضافة
+                        {% else %}
+                          add
+                        {% endif %}
+                      </button>
+                    </div>
+                  </div>
+
+                    <!-- 3rd row -->
+                    <div class="row mt-4">
+                      <div class="col-12">
+                        <!-- Use a different card class to avoid conflict with header -->
+                        <div class="custom-card shadow-sm border-0">
+                          <div class="custom-card-header bg-gray-200 p-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                              <h5 class="mb-0 text-dark font-weight-bolder">
+                                <i class="material-icons me-2">business</i>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  قائمة المقرات التجارية
+                                {% else %}
+                                  Business Premises List
+                                {% endif %}
+                              </h5>
+                              <span class="badge bg-dark text-white fs-6">
+                                {{ data_bp|length }}
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  مقر
+                                {% else %}
+                                  premises
+                                {% endif %}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div class="custom-card-body p-0">
+                            <div class="table-responsive" id="premises-table-container">
+                              <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-gray-100">
+                                  <tr>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ps-4">
+                                      {% if session.get('lang', 'en') == 'ar' %}
+                                        📍 العنوان
+                                      {% else %}
+                                        📍 Address
+                                      {% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ps-3">
+                                      {% if session.get('lang', 'en') == 'ar' %}
+                                        🔢 التفاصيل
+                                      {% else %}
+                                        🔢 Details
+                                      {% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ps-3">
+                                      {% if session.get('lang', 'en') == 'ar' %}
+                                        🏢 الملكية
+                                      {% else %}
+                                        🏢 Ownership
+                                      {% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder ps-3">
+                                      {% if session.get('lang', 'en') == 'ar' %}
+                                        🌆 المحيط
+                                      {% else %}
+                                        🌆 Surrounding
+                                      {% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xs font-weight-bolder text-center">
+                                      {% if session.get('lang', 'en') == 'ar' %}
+                                        ⚡ الإجراء
+                                      {% else %}
+                                        ⚡ Action
+                                      {% endif %}
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for row in data_bp %}
+                                  <tr class="border-bottom">
+                                    <td class="ps-4 py-3">
+                                      <div class="d-flex align-items-center">
+                                        <div class="icon-shape icon-sm bg-dark text-white rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                          <i class="material-icons text-xs">location_on</i>
+                                        </div>
+                                        <div>
+                                          <h6 class="mb-0 text-sm text-dark">{{ row.premise_address }}</h6>
+                                          <p class="text-xs text-muted mb-0">
+                                            <i class="material-icons text-xs me-1">tag</i>
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                              قطعة #
+                                            {% else %}
+                                              Plot #
+                                            {% endif %}
+                                            {{ row.plot_number }}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </td>
+
+                                    <td class="ps-3 py-3">
+                                      <div class="d-flex flex-column">
+                                        <span class="text-sm font-weight-bold text-dark mb-1">
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            {% set natures = row.premise_nature.split(', ') %}
+                                            {% for nature in natures %}
+                                              {% if nature == 'Land' %}أرض
+                                              {% elif nature == 'Hangar' %}هنغار
+                                              {% elif nature == 'Chamber' %}غرفة
+                                              {% elif nature == 'Warehouse' %}مستودع
+                                              {% elif nature == 'Office Space' %}مساحة مكتبية
+                                              {% elif nature == 'Retail Space' %}مساحة بيع بالتجزئة
+                                              {% elif nature == 'Basement' %}قبو
+                                              {% elif nature == 'Mezzanine' %}ميزانين
+                                              {% elif nature == 'Apartment' %}شقة
+                                              {% elif nature == 'Building' %}مبنى
+                                              {% elif nature == 'Atelier' %}مرسم
+                                              {% elif nature == 'From Home' %}من المنزل
+                                              {% else %}{{ nature }}{% endif %}
+                                              {% if not loop.last %}، {% endif %}
+                                            {% endfor %}
+                                          {% else %}
+                                            {{ row.premise_nature }}
+                                          {% endif %}
+                                        </span>
+                                        <span class="text-xs text-muted">
+                                          <i class="material-icons text-xs me-1">square_foot</i>
+                                          {{ row.plot_area }}
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            م²
+                                          {% else %}
+                                            sqm
+                                          {% endif %}
+                                        </span>
+                                      </div>
+                                    </td>
+
+                                    <td class="ps-3 py-3">
+                                      <div class="d-flex flex-column">
+                                        <span class="badge
+                                          {% if row.premise_ownership == 'Fully Owned' %}bg-success
+                                          {% elif row.premise_ownership == 'Rented' %}bg-warning
+                                          {% elif row.premise_ownership == 'Partially Owned' %}bg-info
+                                          {% else %}bg-secondary{% endif %}
+                                          text-white text-xs mb-1">
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            {% if row.premise_ownership == 'Fully Owned' %}مملوك بالكامل
+                                            {% elif row.premise_ownership == 'Rented' %}مؤجر
+                                            {% elif row.premise_ownership == 'Partially Owned' %}مملوك جزئياً
+                                            {% elif row.premise_ownership == 'Indulgence' %}تنازل
+                                            {% elif row.premise_ownership == 'Other' %}أخرى
+                                            {% else %}{{ row.premise_ownership }}{% endif %}
+                                          {% else %}
+                                            {{ row.premise_ownership }}
+                                          {% endif %}
+                                        </span>
+                                        {% if row.premise_ownership == 'Partially Owned' %}
+                                        <span class="text-xs text-muted">
+                                          <i class="material-icons text-xs me-1">person</i>
+                                          {{ row.partner_name }} ({{ row.percentage_of_ownership }}%)
+                                        </span>
+                                        {% elif row.premise_ownership == 'Rented' %}
+                                        <span class="text-xs text-muted">
+                                          <i class="material-icons text-xs me-1">payments</i>
+                                          ${{ row.rent_fees }}/
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            {% if row.rent_unit == 'Day' %}يوم
+                                            {% elif row.rent_unit == 'Month' %}شهر
+                                            {% elif row.rent_unit == 'Year' %}سنة
+                                            {% else %}{{ row.rent_unit }}{% endif %}
+                                          {% else %}
+                                            {{ row.rent_unit }}
+                                          {% endif %}
+                                        </span>
+                                        {% endif %}
+                                      </div>
+                                    </td>
+
+                                    <td class="ps-3 py-3" style="max-width: 200px;">
+                                      <div class="d-flex flex-wrap gap-1">
+                                        {% set surroundings = row.premise_surrounding.split(', ') %}
+                                        {% for surrounding in surroundings[:3] %}
+                                        <span class="badge bg-light text-dark text-xs border">
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            {% if surrounding == 'Banks' %}بنوك
+                                            {% elif surrounding == 'Restaurants' %}مطاعم
+                                            {% elif surrounding == 'Forests' %}غابات
+                                            {% elif surrounding == 'Farms' %}مزارع
+                                            {% elif surrounding == 'Universities' %}جامعات
+                                            {% elif surrounding == 'Cafes' %}مقاهي
+                                            {% elif surrounding == 'Malls' %}مراكز تجارية
+                                            {% elif surrounding == 'Workshops' %}ورش عمل
+                                            {% elif surrounding == 'Shops' %}محلات
+                                            {% elif surrounding == 'Factories' %}مصانع
+                                            {% elif surrounding == 'Trees' %}أشجار
+                                            {% elif surrounding == 'Offices' %}مكاتب
+                                            {% elif surrounding == 'Residential Buildings' %}مباني سكنية
+                                            {% elif surrounding == 'Shopping Centers' %}مراكز تسوق
+                                            {% elif surrounding == 'Cultivated Lands' %}أراضي مزروعة
+                                            {% elif surrounding == 'Hospitals' %}مستشفيات
+                                            {% else %}{{ surrounding }}{% endif %}
+                                          {% else %}
+                                            {{ surrounding }}
+                                          {% endif %}
+                                        </span>
+                                        {% endfor %}
+                                        {% if surroundings|length > 3 %}
+                                        <span class="badge bg-light text-dark text-xs border">
+                                          +{{ surroundings|length - 3 }}
+                                        </span>
+                                        {% endif %}
+                                      </div>
+                                    </td>
+
+                                    <td class="text-center py-3">
+                                      <button type="button" class="btn btn-sm btn-outline-danger delete-premise-btn"
+                                              data-bs-toggle="tooltip"
+                                              data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المقر{% else %}Delete Premise{% endif %}"
+                                              data-premise-id="{{ row.premise_id }}">
+                                        <i class="material-icons text-xs">delete</i>
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  {% endfor %}
+
+                                  {% if not data_bp %}
+                                  <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                      <div class="text-muted">
+                                        <i class="material-icons display-4 text-gray-300 mb-3">business</i>
+                                        <h6 class="text-gray-500">
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            لا توجد مقرات مضافة حتى الآن
+                                          {% else %}
+                                            No premises added yet
+                                          {% endif %}
+                                        </h6>
+                                        <p class="text-xs text-gray-400">
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            ابدأ بإضافة مقرك الأول باستخدام النموذج أعلاه
+                                          {% else %}
+                                            Start by adding your first premise using the form above
+                                          {% endif %}
+                                        </p>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  {% endif %}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+
+                          {% if data_bp %}
+                          <div class="custom-card-footer bg-transparent border-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                              <p class="text-sm text-muted mb-0">
+                                <i class="material-icons text-xs me-1">info</i>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  إجمالي المقرات: <strong>{{ data_bp|length }}</strong>
+                                {% else %}
+                                  Total premises: <strong>{{ data_bp|length }}</strong>
+                                {% endif %}
+                              </p>
+                              <div class="text-end">
+                                <small class="text-muted">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    💡 انقر على أيقونة الحذف لإزالة مقر
+                                  {% else %}
+                                    💡 Click delete icon to remove a premise
+                                  {% endif %}
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+
+                    <style>
+                    /* Custom card classes to avoid Bootstrap conflicts */
+                    .custom-card {
+                        background: #fff;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                        overflow: hidden;
+                        margin-bottom: 1.5rem;
+                    }
+
+                    .custom-card-header {
+                        border-bottom: 1px solid #e2e8f0;
+                        border-radius: 12px 12px 0 0;
+                    }
+
+                    .custom-card-body {
+                        background: #fff;
+                    }
+
+                    .custom-card-footer {
+                        border-top: 1px solid #e2e8f0;
+                        border-radius: 0 0 12px 12px;
+                    }
+
+                    /* Keep your existing styles */
+                    .icon-shape {
+                        width: 32px;
+                        height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .table-hover tbody tr:hover {
+                        background-color: rgba(0, 0, 0, 0.02);
+                    }
+
+                    .bg-gray-100 {
+                        background-color: #f8f9fa !important;
+                    }
+
+                    .bg-gray-200 {
+                        background-color: #e9ecef !important;
+                    }
+
+                    .text-xs {
+                        font-size: 0.75rem !important;
+                    }
+
+                    .text-sm {
+                        font-size: 0.875rem !important;
+                    }
+
+                    /* Ensure header stays intact */
+                    .card-header.p-0.position-relative.mt-n4.mx-3.z-index-2 {
+                        z-index: 1000 !important;
+                        position: relative !important;
+                    }
+                    </style>
+                    <script>
+                    // Function to refresh the premises table
+                    function refreshPremisesTable() {
+                      fetch(window.location.href)
+                        .then(response => response.text())
+                        .then(html => {
+                          // Create a temporary DOM element to parse the response
+                          const parser = new DOMParser();
+                          const doc = parser.parseFromString(html, 'text/html');
+
+                          // Find the updated table in the response
+                          const newTableContainer = doc.querySelector('#premises-table-container');
+                          if (newTableContainer) {
+                            // Replace the current table with the updated one
+                            const currentTableContainer = document.querySelector('#premises-table-container');
+                            currentTableContainer.innerHTML = newTableContainer.innerHTML;
+
+                            // Re-attach event listeners to new delete buttons
+                            attachDeleteListeners();
+                          }
+                        })
+                        .catch(error => {
+                          console.error('Error refreshing table:', error);
+                          // Fallback: reload the page if AJAX fails
+                          window.location.reload();
+                        });
+                    }
+
+                    // Function to handle AJAX deletion
+                    function attachDeleteListeners() {
+                      document.querySelectorAll('.delete-premise-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                          const premiseId = this.getAttribute('data-premise-id');
+                          const confirmMessage = "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المقر؟{% else %}Are you sure you want to delete this premise?{% endif %}";
+
+                          if (confirm(confirmMessage)) {
+                            const formData = new FormData();
+                            formData.append('premise_delete', premiseId);
+
+                            fetch(window.location.href, {
+                              method: 'POST',
+                              body: formData
+                            })
+                            .then(response => {
+                              if (response.ok) {
+                                // Success - refresh the table
+                                refreshPremisesTable();
+                              } else {
+                                throw new Error('Network response was not ok');
+                              }
+                            })
+                            .catch(error => {
+                              console.error('Error deleting premise:', error);
+                              alert('Error deleting premise. Please try again.');
+                            });
+                          }
+                        });
+                      });
+                    }
+
+                    // Function to handle AJAX form submission for adding premises
+                    function setupAddPremiseForm() {
+                      const addButton = document.querySelector('button[name="premise_add"]');
+
+                      addButton.addEventListener('click', function(e) {
+                        e.preventDefault();
+
+                        // Get all form data
+                        const formData = new FormData();
+                        formData.append('premise_add', this.value);
+                        formData.append('premise_address', document.querySelector('input[name="premise_address"]').value);
+                        formData.append('plot_number', document.querySelector('input[name="plot_number"]').value);
+                        formData.append('plot_area', document.querySelector('input[name="plot_area"]').value);
+                        formData.append('choice_premises_ownershipe', document.querySelector('select[name="choice_premises_ownershipe"]').value);
+
+                        // Get multiple select values
+                        const premiseNatureSelect = document.querySelector('select[name="choice_premise_nature"]');
+                        const selectedNature = Array.from(premiseNatureSelect.selectedOptions).map(option => option.value);
+                        selectedNature.forEach(value => formData.append('choice_premise_nature', value));
+
+                        const surroundingsSelect = document.querySelector('select[name="choice_surroundings"]');
+                        const selectedSurroundings = Array.from(surroundingsSelect.selectedOptions).map(option => option.value);
+                        selectedSurroundings.forEach(value => formData.append('choice_surroundings', value));
+
+                        // Add conditional fields if they are visible
+                        const partnerName = document.querySelector('input[name="partner_name"]');
+                        if (partnerName && partnerName.style.display !== 'none') {
+                          formData.append('partner_name', partnerName.value);
+                        }
+
+                        const partnerRelation = document.querySelector('select[name="choice_partner_relation"]');
+                        if (partnerRelation && partnerRelation.style.display !== 'none') {
+                          formData.append('partner_relation', partnerRelation.value);
+                        }
+
+                        const ownershipPercent = document.querySelector('input[name="percentge_of_ownership"]');
+                        if (ownershipPercent && ownershipPercent.style.display !== 'none') {
+                          formData.append('percentge_of_ownership', ownershipPercent.value);
+                        }
+
+                        const rentFees = document.querySelector('input[name="rent_fees"]');
+                        if (rentFees && rentFees.style.display !== 'none') {
+                          formData.append('rent_fees', rentFees.value);
+                        }
+
+                        const rentPeriod = document.querySelector('input[name="rent_period"]');
+                        if (rentPeriod && rentPeriod.style.display !== 'none') {
+                          formData.append('rent_period', rentPeriod.value);
+                        }
+
+                        const rentUnit = document.querySelector('select[name="choice_rent_unit"]');
+                        if (rentUnit && rentUnit.style.display !== 'none') {
+                          formData.append('choice_rent_unit', rentUnit.value);
+                        }
+
+                        // Send AJAX request
+                        fetch(window.location.href, {
+                          method: 'POST',
+                          body: formData
+                        })
+                        .then(response => {
+                          if (response.ok) {
+                            // Clear form fields after successful add
+                            document.querySelector('input[name="premise_address"]').value = '';
+                            document.querySelector('input[name="plot_number"]').value = '';
+                            document.querySelector('input[name="plot_area"]').value = '0';
+                            document.querySelector('select[name="choice_premise_nature"]').selectedIndex = -1;
+                            document.querySelector('select[name="choice_surroundings"]').selectedIndex = -1;
+                            document.querySelector('select[name="choice_premises_ownershipe"]').value = 'Fully Owned';
+
+                            // Refresh the table
+                            refreshPremisesTable();
+                          } else {
+                            throw new Error('Network response was not ok');
+                          }
+                        })
+                        .catch(error => {
+                          console.error('Error adding premise:', error);
+                          alert('Error adding premise. Please try again.');
+                        });
+                      });
+                    }
+
+                    // Initialize when DOM is loaded
+                    document.addEventListener('DOMContentLoaded', function() {
+                      setupAddPremiseForm();
+                      attachDeleteListeners();
+                    });
+                    </script>
+
+                </div>
+
+                <!-- Photo Upload Section - Fixed alignment and checkbox selection -->
+                <div class="card-body px-6 pt-2">
+                    <h5 class="font-weight-bolder text-info mt-0 mb-4">
+                        <i class="material-icons text-lg me-2 align-middle">photo_library</i>
+                        {% if session.get('lang', 'en') == 'ar' %}
+                        صور المقر
+                        {% else %}
+                        Premise Photos
+                        {% endif %}
+                    </h5>
+
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-4">
+                                <!-- Upload Zone -->
+                                <div class="col-md-6">
+                                    <div id="photo-upload-zone-wrapper" class="upload-zone p-4 border-2 border-dashed rounded-3 bg-light text-center position-relative"
+                                         style="border-color: #17a2b8 !important; transition: all 0.3s ease;">
+                                        <div class="upload-icon mb-3">
+                                            <i class="material-icons text-info" style="font-size: 48px;" id="photo-upload-icon">photo_camera</i>
+                                        </div>
+                                        <h6 class="text-dark mb-2" id="photo-upload-title">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                            اسحب وأفلت الصور هنا
+                                            {% else %}
+                                            Drag & drop photos here
+                                            {% endif %}
+                                        </h6>
+                                        <p class="text-sm text-muted mb-2" id="photo-upload-subtitle">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                            أو انقر للاستعراض
+                                            {% else %}
+                                            or click to browse
+                                            {% endif %}
+                                        </p>
+
+                                        <!-- Upload progress indicator -->
+                                        <div id="photo-upload-progress" class="progress mt-3" style="display: none; height: 6px;">
+                                            <div id="photo-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                        </div>
+
+                                        <!-- Upload status messages -->
+                                        <div id="photo-upload-status" class="mt-2" style="display: none;"></div>
+
+                                        <div class="d-flex justify-content-center gap-2 flex-wrap mb-2">
+                                            <span class="badge bg-light text-dark border">JPG</span>
+                                            <span class="badge bg-light text-dark border">PNG</span>
+                                            <span class="badge bg-light text-dark border">WEBP</span>
+                                        </div>
+                                        <p class="text-xs text-muted mb-0">
+                                            <i class="material-icons text-xs align-middle">info</i>
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                            حجم أقصى: 5 ميجابايت للصورة
+                                            {% else %}
+                                            Max size: 5MB per photo
+                                            {% endif %}
+                                        </p>
+                                        <!-- This is the actual Dropzone element -->
+                                        <div class="dropzone needsclick" id="photo-dropzone"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Photo Instructions & Features -->
+                                <div class="col-md-6">
+                                    <div class="ps-md-3">
+                                        <div class="mb-4">
+                                            <h6 class="text-dark font-weight-bold mb-3">
+                                                <i class="material-icons text-info text-sm me-2 align-middle">tips_and_updates</i>
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                نصائح للصور المثالية
+                                                {% else %}
+                                                Photo Tips
+                                                {% endif %}
+                                            </h6>
+                                            <ul class="list-unstyled text-sm text-muted">
+                                                <li class="mb-2">
+                                                    <i class="material-icons text-success text-xs align-middle me-1">check_circle</i>
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                    صور واضحة وجيدة الإضاءة
+                                                    {% else %}
+                                                    Clear, well-lit photos
+                                                    {% endif %}
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="material-icons text-success text-xs align-middle me-1">check_circle</i>
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                    صور من زوايا متعددة
+                                                    {% else %}
+                                                    Photos from multiple angles
+                                                    {% endif %}
+                                                </li>
+                                                <li class="mb-2">
+                                                    <i class="material-icons text-success text-xs align-middle me-1">check_circle</i>
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                    صور للواجهة الخارجية والداخلية
+                                                    {% else %}
+                                                    Both exterior and interior shots
+                                                    {% endif %}
+                                                </li>
+                                                <li class="mb-0">
+                                                    <i class="material-icons text-success text-xs align-middle me-1">check_circle</i>
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                    صور عالية الجودة
+                                                    {% else %}
+                                                    High-quality images
+                                                    {% endif %}
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Batch Upload Info -->
+                                        <div class="bg-light rounded-3 p-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="material-icons text-info text-sm me-2">batch_prediction</i>
+                                                <span class="text-dark font-weight-bold text-sm">
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                    رفع متعدد
+                                                    {% else %}
+                                                    Batch Upload
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <p class="text-xs text-muted mb-0">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                يمكنك رفع حتى 10 صور مرة واحدة
+                                                {% else %}
+                                                You can upload up to 10 photos at once
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Uploaded Photos Gallery Container -->
+                <div id="photo-gallery-container">
+                    {% if data_bp_photo %}
+                    <div class="card-body px-6 pt-2">  <!-- Added same padding as Premise Photos -->
+                        <h6 class="font-weight-bolder text-info mb-4">  <!-- Changed mb-3 to mb-4 for consistency -->
+                            <i class="material-icons text-sm me-2">collections</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                            الصور المرفوعة
+                            {% else %}
+                            Uploaded Photos
+                            {% endif %}
+                <!--            <span class="badge bg-info ms-2">{{ data_bp_photo|length }}</span>-->
+                        </h6>
+
+                        <form method="POST" action="/business_premises/{{ bplan_id }}" id="photo-delete-form">
+                            <div class="row" id="photo-gallery">
+                                {% for row in data_bp_photo %}
+                                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                                    <div class="card photo-card border-0 shadow-sm position-relative">
+                                        <div class="position-relative overflow-hidden rounded-top">
+                                            <img class="card-img-top photo-thumbnail"
+                                                 src="/static/uploads/{{ row.bplan_id }}/{{ row.premises_photo_filename }}"
+                                                 alt="Photo {{ loop.index }}"
+                                                 style="height: 150px; object-fit: cover; width: 100%;">
+                                            <div class="position-absolute top-0 end-0 m-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input photo-checkbox"
+                                                           type="checkbox"
+                                                           name="photo_to_delete"
+                                                           value="{{ row.photo_id }}"
+                                                           id="photo{{ row.photo_id }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3 text-center">
+                                            <small class="text-muted d-block">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                صورة {{ loop.index }}
+                                                {% else %}
+                                                Photo {{ loop.index }}
+                                                {% endif %}
+                                            </small>
+                                            <label class="form-check-label text-xs text-muted mt-1 cursor-pointer" for="photo{{ row.photo_id }}">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                حدد للحذف
+                                                {% else %}
+                                                Select to delete
+                                                {% endif %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mt-4 text-center">
+                                <button type="submit" name="delete_photo" class="btn btn-danger px-4">
+                                    <i class="material-icons text-sm me-2">delete_sweep</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                    حذف الصور المحددة
+                                    {% else %}
+                                    Delete Selected Photos
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <style>
+                .upload-zone:hover {
+                    background-color: #e7f3f5 !important;
+                    border-color: #138496 !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.15);
+                }
+
+                .upload-zone.uploading {
+                    border-color: #ffc107 !important;
+                    background-color: #fff3cd !important;
+                }
+
+                .upload-zone.uploaded {
+                    border-color: #28a745 !important;
+                    background-color: #d4edda !important;
+                }
+
+                .upload-zone.error {
+                    border-color: #dc3545 !important;
+                    background-color: #f8d7da !important;
+                }
+
+                .upload-icon {
+                    animation: float 3s ease-in-out infinite;
+                }
+
+                /* Dropzone custom styling */
+                #photo-dropzone {
+                    border: none !important;
+                    background: transparent !important;
+                    min-height: auto !important;
+                    padding: 0 !important;
+                }
+
+                #photo-dropzone .dz-message {
+                    display: none !important;
+                }
+
+                #photo-dropzone .dz-preview {
+                    margin: 0 !important;
+                    min-height: auto !important;
+                }
+
+                #photo-dropzone .dz-preview .dz-image {
+                    border-radius: 8px !important;
+                    width: 80px !important;
+                    height: 80px !important;
+                }
+
+                @keyframes float {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-10px); }
+                }
+
+                .photo-thumbnail {
+                    transition: all 0.3s ease;
+                    border: 2px solid transparent;
+                }
+
+                .photo-thumbnail:hover {
+                    transform: scale(1.05);
+                    border-color: #17a2b8;
+                }
+
+                .upload-success {
+                    animation: successPulse 2s ease-in-out;
+                }
+
+                @keyframes successPulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+
+                /* Gallery animations */
+                .gallery-fade-in {
+                    animation: fadeIn 0.5s ease-in;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                /* Fixed checkbox styling */
+                .photo-checkbox {
+                    width: 18px !important;
+                    height: 18px !important;
+                    cursor: pointer;
+                    border: 2px solid #6c757d !important;
+                }
+
+                .photo-checkbox:checked {
+                    background-color: #dc3545 !important;
+                    border-color: #dc3545 !important;
+                }
+
+                .photo-checkbox:focus {
+                    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+                }
+
+                .cursor-pointer {
+                    cursor: pointer;
+                }
+
+                /* Card hover effect with checkbox */
+                .photo-card:hover .photo-checkbox {
+                    border-color: #dc3545 !important;
+                }
+
+                /* Ensure proper alignment */
+                .card-body.px-6.pt-2 {
+                    padding-left: 3rem !important;
+                    padding-right: 3rem !important;
+                }
+
+                @media (max-width: 768px) {
+                    .card-body.px-6.pt-2 {
+                        padding-left: 1.5rem !important;
+                        padding-right: 1.5rem !important;
+                    }
+                }
+                </style>
+
+                <script>
+                // Fixed photo upload functionality with proper gallery refresh
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Remove any existing Dropzone instances for photos
+                    if (Dropzone.instances.length > 0) {
+                        Dropzone.instances.forEach(instance => {
+                            if (instance.element.id === 'photo-dropzone' || instance.element.id === 'myDropzone') {
+                                instance.destroy();
+                            }
+                        });
+                    }
+
+                    // Initialize photo Dropzone with proper configuration
+                    const photoDropzone = new Dropzone('#photo-dropzone', {
+                        url: '/upload/{{ bplan_id }}',
+                        paramName: 'file',
+                        maxFilesize: 5, // MB
+                        acceptedFiles: 'image/*',
+                        maxFiles: 10,
+                        addRemoveLinks: false,
+                        autoProcessQueue: true,
+                        clickable: '#photo-upload-zone-wrapper',
+                        previewsContainer: '#photo-dropzone',
+                        parallelUploads: 3,
+                        dictDefaultMessage: '',
+                        dictFileTooBig: '{% if session.get("lang", "en") == "ar" %}الملف كبير جداً ({{filesize}}MB). الحد الأقصى: {{maxFilesize}}MB.{% else %}File is too big ({{filesize}}MB). Max filesize: {{maxFilesize}}MB.{% endif %}',
+                        dictInvalidFileType: '{% if session.get("lang", "en") == "ar" %}نوع الملف غير مدعوم. فقط الصور مسموحة.{% else %}Invalid file type. Only images are allowed.{% endif %}',
+                        dictMaxFilesExceeded: '{% if session.get("lang", "en") == "ar" %}لا يمكنك رفع أكثر من {{maxFiles}} ملفات{% else %}You can not upload more than {{maxFiles}} files{% endif %}',
+
+                        init: function() {
+                            this.on('addedfile', function(file) {
+                                console.log('Photo added:', file.name);
+                                showUploadProgress();
+                                updateUploadStatus('{% if session.get("lang", "en") == "ar" %}جاري الرفع...{% else %}Uploading...{% endif %}', 'info');
+                            });
+
+                            this.on('uploadprogress', function(file, progress) {
+                                console.log('Upload progress:', progress + '%');
+                                document.getElementById('photo-progress-bar').style.width = progress + '%';
+                            });
+
+                            this.on('success', function(file, response) {
+                                console.log('Photo uploaded successfully:', response);
+                                showIndividualUploadSuccess(file.name);
+
+                                // Refresh the photo gallery after successful upload
+                                refreshPhotoGallery();
+                            });
+
+                            this.on('error', function(file, errorMessage) {
+                                console.error('Photo upload failed:', errorMessage);
+                                showUploadError(file.name, errorMessage);
+                                this.removeFile(file);
+                            });
+
+                            this.on('queuecomplete', function() {
+                                console.log('All files uploaded');
+                                showBatchUploadSuccess();
+                            });
+
+                            this.on('maxfilesexceeded', function(file) {
+                                alert('{% if session.get("lang", "en") == "ar" %}لا يمكنك رفع أكثر من 10 صور{% else %}You can not upload more than 10 photos{% endif %}');
+                                this.removeFile(file);
+                            });
+                        }
+                    });
+
+                    // Show upload progress UI
+                    function showUploadProgress() {
+                        const uploadZone = document.getElementById('photo-upload-zone-wrapper');
+                        const progressBar = document.getElementById('photo-upload-progress');
+                        const uploadIcon = document.getElementById('photo-upload-icon');
+
+                        uploadZone.classList.add('uploading');
+                        uploadIcon.textContent = 'cloud_upload';
+                        progressBar.style.display = 'block';
+                    }
+
+                    // Show individual upload success
+                    function showIndividualUploadSuccess(filename) {
+                        const statusDiv = document.getElementById('photo-upload-status');
+                        const successMsg = document.createElement('div');
+                        successMsg.className = 'alert alert-success py-1 px-2 mb-1 d-flex align-items-center';
+                        successMsg.innerHTML = `
+                            <i class="material-icons text-xs me-1">check_circle</i>
+                            <span class="text-xs">${filename} - {% if session.get("lang", "en") == "ar" %}تم الرفع{% else %}Uploaded{% endif %}</span>
+                        `;
+                        statusDiv.appendChild(successMsg);
+                        statusDiv.style.display = 'block';
+                    }
+
+                    // Show batch upload success
+                    function showBatchUploadSuccess() {
+                        const uploadZone = document.getElementById('photo-upload-zone-wrapper');
+                        const uploadIcon = document.getElementById('photo-upload-icon');
+                        const uploadTitle = document.getElementById('photo-upload-title');
+                        const progressBar = document.getElementById('photo-upload-progress');
+
+                        uploadZone.classList.remove('uploading');
+                        uploadZone.classList.add('uploaded');
+                        uploadIcon.textContent = 'check_circle';
+                        uploadIcon.classList.remove('text-info');
+                        uploadIcon.classList.add('text-success');
+                        uploadIcon.classList.add('upload-success');
+
+                        uploadTitle.innerHTML = `
+                            {% if session.get('lang', 'en') == 'ar' %}
+                            تم الرفع بنجاح!
+                            {% else %}
+                            Upload completed successfully!
+                            {% endif %}
+                        `;
+
+                        progressBar.style.display = 'none';
+
+                        // Reset after 3 seconds
+                        setTimeout(resetPhotoUploadVisual, 3000);
+                    }
+
+                    // Show upload error
+                    function showUploadError(filename, errorMessage) {
+                        const statusDiv = document.getElementById('photo-upload-status');
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'alert alert-danger py-1 px-2 mb-1 d-flex align-items-center';
+                        errorMsg.innerHTML = `
+                            <i class="material-icons text-xs me-1">error</i>
+                            <span class="text-xs">${filename} - ${errorMessage}</span>
+                        `;
+                        statusDiv.appendChild(errorMsg);
+                        statusDiv.style.display = 'block';
+                    }
+
+                    // Update upload status
+                    function updateUploadStatus(message, type) {
+                        const statusDiv = document.getElementById('photo-upload-status');
+                        statusDiv.innerHTML = `
+                            <div class="alert alert-${type} py-1 px-2 mb-1 d-flex align-items-center">
+                                <i class="material-icons text-xs me-1">${type === 'info' ? 'info' : 'warning'}</i>
+                                <span class="text-xs">${message}</span>
+                            </div>
+                        `;
+                        statusDiv.style.display = 'block';
+                    }
+
+                    // Reset photo upload visual state
+                    function resetPhotoUploadVisual() {
+                        const uploadZone = document.getElementById('photo-upload-zone-wrapper');
+                        const uploadIcon = document.getElementById('photo-upload-icon');
+                        const uploadTitle = document.getElementById('photo-upload-title');
+                        const uploadSubtitle = document.getElementById('photo-upload-subtitle');
+                        const statusDiv = document.getElementById('photo-upload-status');
+
+                        uploadZone.classList.remove('uploading', 'uploaded', 'error');
+                        uploadIcon.textContent = 'photo_camera';
+                        uploadIcon.classList.remove('text-success', 'upload-success');
+                        uploadIcon.classList.add('text-info');
+
+                        uploadTitle.innerHTML = `
+                            {% if session.get('lang', 'en') == 'ar' %}
+                            اسحب وأفلت الصور هنا
+                            {% else %}
+                            Drag & drop photos here
+                            {% endif %}
+                        `;
+
+                        uploadSubtitle.style.display = 'block';
+                        statusDiv.style.display = 'none';
+                        statusDiv.innerHTML = '';
+
+                        document.getElementById('photo-progress-bar').style.width = '0%';
+                        document.getElementById('photo-upload-progress').style.display = 'none';
+                    }
+
+                    // FIXED: Enhanced photo gallery refresh with proper AJAX
+                    function refreshPhotoGallery() {
+                        console.log('Refreshing photo gallery...');
+
+                        // Show loading state
+                        const galleryContainer = document.getElementById('photo-gallery-container');
+                        if (galleryContainer) {
+                            galleryContainer.style.opacity = '0.7';
+                            galleryContainer.style.transition = 'opacity 0.3s ease';
+                        }
+
+                        fetch(window.location.href, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'text/html'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+
+                            // Find the photo gallery container in the response
+                            const newGalleryContainer = doc.getElementById('photo-gallery-container');
+
+                            if (newGalleryContainer) {
+                                console.log('Found updated gallery container');
+
+                                // Replace the entire gallery container
+                                const currentContainer = document.getElementById('photo-gallery-container');
+                                if (currentContainer) {
+                                    currentContainer.innerHTML = newGalleryContainer.innerHTML;
+                                    currentContainer.style.opacity = '1';
+
+                                    // Add fade-in animation to new content
+                                    const newGallery = currentContainer.querySelector('#photo-gallery');
+                                    if (newGallery) {
+                                        newGallery.classList.add('gallery-fade-in');
+                                    }
+
+                                    // Re-initialize photo viewers and checkbox handlers
+                                    initializePhotoViewers();
+                                    initializeCheckboxHandlers();
+
+                                    // IMPORTANT: Re-initialize your existing AJAX deletion handler
+                                    setupPhotoDeleteForm();
+
+                                    console.log('Gallery updated successfully');
+                                }
+                            } else {
+                                console.log('No gallery container found in response, creating new one');
+                                createNewGallerySection(doc);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error refreshing photo gallery:', error);
+                            // Fallback: reload the page if AJAX fails
+                            console.log('AJAX failed, reloading page...');
+                            window.location.reload();
+                        });
+                    }
+
+                    // Create new gallery section if it doesn't exist
+                    function createNewGallerySection(doc) {
+                        const uploadSection = document.querySelector('#photo-upload-zone-wrapper').closest('.card-body');
+                        const gallerySection = doc.querySelector('.row.mt-4');
+
+                        if (gallerySection) {
+                            const newSection = document.createElement('div');
+                            newSection.id = 'photo-gallery-container';
+                            newSection.innerHTML = gallerySection.outerHTML;
+                            uploadSection.parentNode.insertBefore(newSection, uploadSection.nextSibling);
+
+                            // Initialize photo viewers and handlers
+                            initializePhotoViewers();
+                            initializeCheckboxHandlers();
+                            setupPhotoDeleteForm(); // Initialize your existing deletion handler
+                        }
+                    }
+
+                    // Initialize checkbox handlers for proper selection
+                    function initializeCheckboxHandlers() {
+                        // Add click handlers to the entire card for easier selection
+                        document.querySelectorAll('.photo-card').forEach(card => {
+                            const checkbox = card.querySelector('.photo-checkbox');
+                            const label = card.querySelector('label[for]');
+
+                            // Make the entire card clickable (except the checkbox itself)
+                            card.addEventListener('click', function(e) {
+                                if (e.target !== checkbox && e.target !== label) {
+                                    checkbox.checked = !checkbox.checked;
+                                    // Trigger change event to ensure proper styling
+                                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                                    e.stopPropagation();
+                                }
+                            });
+
+                            // Add change event to update visual state
+                            checkbox.addEventListener('change', function() {
+                                if (this.checked) {
+                                    this.classList.add('checked');
+                                    card.style.border = '2px solid #dc3545';
+                                } else {
+                                    this.classList.remove('checked');
+                                    card.style.border = '';
+                                }
+                            });
+
+                            // Initialize visual state
+                            if (checkbox.checked) {
+                                card.style.border = '2px solid #dc3545';
+                            }
+                        });
+
+                        // Also make labels clickable
+                        document.querySelectorAll('label[for^="photo"]').forEach(label => {
+                            label.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                            });
+                        });
+                    }
+
+                    // Initialize photo viewers (lightbox functionality)
+                    function initializePhotoViewers() {
+                        document.querySelectorAll('.photo-card img').forEach(img => {
+                            img.style.cursor = 'pointer';
+                            // Remove existing click listeners to avoid duplicates
+                            img.replaceWith(img.cloneNode(true));
+                        });
+
+                        // Re-attach click listeners
+                        document.querySelectorAll('.photo-card img').forEach(img => {
+                            img.addEventListener('click', function(e) {
+                                e.stopPropagation(); // Prevent card selection when clicking image
+                                const src = this.src;
+                                // Simple lightbox implementation
+                                const lightbox = document.createElement('div');
+                                lightbox.style.cssText = `
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    background: rgba(0,0,0,0.9);
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    z-index: 9999;
+                                    cursor: zoom-out;
+                                `;
+                                lightbox.innerHTML = `
+                                    <img src="${src}" style="max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 8px;">
+                                `;
+                                lightbox.addEventListener('click', () => lightbox.remove());
+                                document.body.appendChild(lightbox);
+                            });
+                        });
+                    }
+
+                    // Initialize when page loads
+                    initializePhotoViewers();
+                    initializeCheckboxHandlers();
+
+                    // Your existing AJAX deletion script will handle the photo deletion
+                    // No need to call setupPhotoDeleteForm() here as it's already in your main script
+                });
+
+                // Remove the conflicting setupPhotoDeleteHandler function completely
+                // Your existing AJAX script will handle the deletion
+                </script>
+
+
+
+
+                  <!-- Document Upload Section -->
+                    <div class="card-body px-6 pt-2">
+                        <h5 class="font-weight-bolder text-info mt-0 mb-4">
+                            <i class="material-icons text-lg me-2 align-middle">folder_open</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                            المستندات
+                            {% else %}
+                            Premise Documents
+                            {% endif %}
+                        </h5>
+
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center g-4">
+                                    <!-- Upload Zone -->
+                                    <div class="col-md-6">
+                                        <div id="upload-zone-wrapper" class="upload-zone p-4 border-2 border-dashed rounded-3 bg-light text-center position-relative"
+                                             style="border-color: #17a2b8 !important; transition: all 0.3s ease;">
+                                            <div class="upload-icon mb-3">
+                                                <i class="material-icons text-info" style="font-size: 48px;" id="upload-icon">cloud_upload</i>
+                                            </div>
+                                            <h6 class="text-dark mb-2" id="upload-title">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                اسحب وأفلت المستندات هنا
+                                                {% else %}
+                                                Drag & drop documents here
+                                                {% endif %}
+                                            </h6>
+                                            <p class="text-sm text-muted mb-2" id="upload-subtitle">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                أو انقر للاستعراض
+                                                {% else %}
+                                                or click to browse
+                                                {% endif %}
+                                            </p>
+
+                                            <!-- File uploaded indicator (hidden by default) -->
+                                            <div id="file-uploaded-indicator" style="display: none;">
+                                                <div class="alert alert-success d-inline-flex align-items-center mb-2 py-2 px-3">
+                                                    <i class="material-icons me-2">check_circle</i>
+                                                    <span id="uploaded-filename-display">document.pdf</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-center gap-2 flex-wrap mb-2">
+                                                <span class="badge bg-light text-dark border">PDF</span>
+                                                <span class="badge bg-light text-dark border">DOCX</span>
+                                                <span class="badge bg-light text-dark border">XLSX</span>
+                                                <span class="badge bg-light text-dark border">JPG</span>
+                                                <span class="badge bg-light text-dark border">PNG</span>
+                                                <span class="badge bg-light text-dark border">WEBP</span>
+                                            </div>
+                                            <p class="text-xs text-muted mb-0">
+                                                <i class="material-icons text-xs align-middle">info</i>
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                حجم أقصى: 20 ميجابايت
+                                                {% else %}
+                                                Max size: 20MB
+                                                {% endif %}
+                                            </p>
+                                            <div action="/upload_doc_temp/{{ bplan_id }}"
+                                                 class="dropzone border-0 bg-transparent position-absolute top-0 start-0 w-100 h-100"
+                                                 id="doc-dropzone"
+                                                 style="opacity: 0; cursor: pointer; pointer-events: auto;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Description Input & Add Button -->
+                                    <div class="col-md-6">
+                                        <div class="ps-md-3">
+                                            <div class="mb-3">
+                                                <label class="form-label text-dark font-weight-bold mb-2">
+                                                    <i class="material-icons text-info text-sm me-2 align-middle">description</i>
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                    وصف المستند
+                                                    {% else %}
+                                                    Document Description
+                                                    {% endif %}
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <textarea
+                                                    class="form-control"
+                                                    name="doc_description"
+                                                    id="doc-description"
+                                                    rows="4"
+                                                    placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل وصفاً تفصيلياً للمستند...{% else %}Enter a detailed description of the document...{% endif %}"
+                                                    maxlength="200"
+                                                    style="resize: none;"></textarea>
+                                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                                    <small class="text-muted">
+                                                        <i class="material-icons text-xs align-middle">lightbulb</i>
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                        اكتب وصفاً واضحاً
+                                                        {% else %}
+                                                        Write a clear description
+                                                        {% endif %}
+                                                    </small>
+                                                    <small class="text-muted" id="char-count">0/200</small>
+                                                </div>
+                                            </div>
+
+                                            <button id="add-doc-btn"
+                                                    class="btn bg-gradient-info btn-lg w-100 shadow-sm"
+                                                    type="button"
+                                                    disabled>
+                                                <i class="material-icons text-sm me-2 align-middle">add_circle</i>
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                إضافة المستند
+                                                {% else %}
+                                                Add Document
+                                                {% endif %}
+                                            </button>
+                                            <p class="text-xs text-center text-muted mt-2 mb-0">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                قم بتحميل ملف أولاً ثم أضف وصفاً
+                                                {% else %}
+                                                Upload a file first, then add description
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                    .upload-zone:hover {
+                        background-color: #e7f3f5 !important;
+                        border-color: #138496 !important;
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.15);
+                    }
+
+                    .upload-icon {
+                        animation: float 3s ease-in-out infinite;
+                    }
+
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0px); }
+                        50% { transform: translateY(-10px); }
+                    }
+
+                    #doc-description:focus {
+                        border-color: #17a2b8;
+                        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+                    }
+
+                    #add-doc-btn:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+
+                    .upload-zone.uploaded {
+                        border-color: #28a745 !important;
+                        background-color: #d4edda !important;
+                    }
+                    </style>
+
+                    <script>
+                    // Character counter for description
+                    document.getElementById('doc-description').addEventListener('input', function() {
+                        const charCount = this.value.length;
+                        document.getElementById('char-count').textContent = charCount + '/200';
+                    });
+
+                    // Function to show upload success indicator
+                    function showUploadSuccess(filename) {
+                        // Change upload zone to green
+                        const uploadZone = document.getElementById('upload-zone-wrapper');
+                        uploadZone.classList.add('uploaded');
+
+                        // Change icon to checkmark
+                        const icon = document.getElementById('upload-icon');
+                        icon.textContent = 'check_circle';
+                        icon.classList.remove('text-info');
+                        icon.classList.add('text-success');
+
+                        // Update title
+                        document.getElementById('upload-title').innerHTML =
+                            "{% if session.get('lang', 'en') == 'ar' %}تم التحميل بنجاح!{% else %}Uploaded Successfully!{% endif %}";
+
+                        // Show filename
+                        document.getElementById('uploaded-filename-display').textContent = filename;
+                        document.getElementById('file-uploaded-indicator').style.display = 'block';
+                        document.getElementById('upload-subtitle').style.display = 'none';
+                    }
+
+                    // Function to reset upload visual state
+                    function resetUploadVisual() {
+                        const uploadZone = document.getElementById('upload-zone-wrapper');
+                        uploadZone.classList.remove('uploaded');
+
+                        const icon = document.getElementById('upload-icon');
+                        icon.textContent = 'cloud_upload';
+                        icon.classList.remove('text-success');
+                        icon.classList.add('text-info');
+
+                        document.getElementById('upload-title').innerHTML =
+                            "{% if session.get('lang', 'en') == 'ar' %}اسحب وأفلت المستندات هنا{% else %}Drag & drop documents here{% endif %}";
+
+                        document.getElementById('file-uploaded-indicator').style.display = 'none';
+                        document.getElementById('upload-subtitle').style.display = 'block';
+                    }
+                    </script>
+
+                                      <!-- JS for Dropzone -->
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                          let currentUploadedDoc = null;
+
+                          console.log('Initializing document upload...');
+
+                          const docDropzone = new Dropzone('#doc-dropzone', {
+                            url: '/upload_doc_temp/{{ bplan_id }}',
+                            paramName: 'file',
+                            maxFilesize: 20,
+                            acceptedFiles: '.pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp',  // ← UPDATED
+                            addRemoveLinks: false,
+                            autoProcessQueue: true,
+                            clickable: true,
+                            previewsContainer: false,
+                            maxFiles: 1,
+                            dictDefaultMessage: '',
+
+                            init: function() {
+                                this.on('success', function(file, response) {
+                                  console.log('Document uploaded successfully:', response);
+                                  currentUploadedDoc = { filename: response.filename };
+                                  document.getElementById('add-doc-btn').disabled = false;
+
+                                  // ✅ Show green success indicator
+                                  showUploadSuccess(response.filename);
+
+                                  this.removeAllFiles();
+                                });
+
+                              this.on('error', function(file, response) {
+                                console.error('Document upload failed:', response);
+                                alert('Upload failed: ' + (response.error || 'Unknown error'));
+                                this.removeAllFiles();
+                              });
+                            }
+                          });
+
+                          // Function to add document to the UI - MOVED OUTSIDE CLICK HANDLER
+                          function addDocumentToUI(filename, description, docId) {
+                            console.log('Adding document to UI:', filename, description, docId);
+
+                            // Look for the existing documents section more specifically
+                            // Find all h6 elements and check their text content
+                            let docsContainer = null;
+                            const allH6 = document.querySelectorAll('h6.font-weight-bolder.text-info');
+
+                            for (let h6 of allH6) {
+                              if (h6.textContent.includes('Uploaded Documents') || h6.textContent.includes('المستندات المحملة')) {
+                                // Found the right heading - now get the container
+                                docsContainer = h6.parentElement.querySelector('form > .row');
+                                console.log('Found existing docs container via heading');
+                                break;
+                              }
+                            }
+
+                            // If still not found, try direct approach - look for the form with doc_to_delete checkboxes
+                            if (!docsContainer) {
+                              const forms = document.querySelectorAll('form[method="POST"]');
+                              for (let form of forms) {
+                                if (form.querySelector('input[name="doc_to_delete"]')) {
+                                  docsContainer = form.querySelector('.row');
+                                  console.log('Found existing docs container via form');
+                                  break;
+                                }
+                              }
+                            }
+
+                            if (docsContainer) {
+                              // Documents section exists - add to it
+                              console.log('Adding to existing container');
+
+                              // Count existing documents
+                              const docIndex = docsContainer.querySelectorAll('.col-md-4').length + 1;
+
+                              // Create new document card
+                              const docCard = document.createElement('div');
+                              docCard.className = 'col-md-4 mb-3';
+
+                              docCard.innerHTML = `
+                                <div class="card border">
+                                  <div class="card-body">
+                                    <p class="mb-1 text-dark fw-bold">${filename}</p>
+                                    <p class="text-muted small mb-2">${description || "No description"}</p>
+                                    <a href="{{ url_for('static', filename='uploads/docs/') }}{{ bplan_id }}/${filename}"
+                                       target="_blank" class="btn btn-outline-info btn-sm">View</a>
+                                    <div class="form-check mt-2">
+                                      <input class="form-check-input" type="checkbox" name="doc_to_delete" value="${docId}" id="doc_new_${docId}">
+                                      <label class="form-check-label text-xs" for="doc_new_${docId}">Select to delete</label>
+                                    </div>
+                                  </div>
+                                </div>
+                              `;
+
+                              // Add to container
+                              docsContainer.appendChild(docCard);
+                              console.log('Document card added successfully');
+
+                            } else {
+                              // No documents section exists yet - create it
+                              console.log('Creating new documents section');
+
+                              // Find the document upload card-body to insert after it
+                              const uploadSection = document.querySelector('#add-doc-btn').closest('.card-body');
+
+                              const newSection = document.createElement('div');
+                              newSection.className = 'row mt-4';
+                              newSection.innerHTML = `
+                                <div class="col-12">
+                                  <h6 class="font-weight-bolder text-info mb-3">Uploaded Documents</h6>
+                                  <form method="POST" action="{{ url_for('home_blueprint.business_premises', bplan_id=bplan_id) }}">
+                                    <div class="row">
+                                      <div class="col-md-4 mb-3">
+                                        <div class="card border">
+                                          <div class="card-body">
+                                            <p class="mb-1 text-dark fw-bold">${filename}</p>
+                                            <p class="text-muted small mb-2">${description || "No description"}</p>
+                                            <a href="{{ url_for('static', filename='uploads/docs/') }}{{ bplan_id }}/${filename}"
+                                               target="_blank" class="btn btn-outline-info btn-sm">View</a>
+                                            <div class="form-check mt-2">
+                                              <input class="form-check-input" type="checkbox" name="doc_to_delete" value="${docId}" id="doc_new_${docId}">
+                                              <label class="form-check-label text-xs" for="doc_new_${docId}">Select to delete</label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="mt-3 text-center">
+                                      <button type="submit" name="delete_doc" class="btn btn-sm btn-danger">
+                                        <i class="material-icons text-sm me-1">delete</i> Delete Selected Documents
+                                      </button>
+                                    </div>
+                                  </form>
+                                </div>
+                              `;
+
+                              // Insert after upload section's parent
+                              uploadSection.parentElement.insertBefore(newSection, uploadSection.nextSibling);
+                              console.log('New documents section created');
+                            }
+                          }
+
+                          // Add Document Button Click
+                          const addDocButton = document.getElementById('add-doc-btn');
+                          addDocButton.addEventListener('click', function() {
+                            if (!currentUploadedDoc) {
+                              alert('Please upload a document first');
+                              return;
+                            }
+
+                            const description = document.getElementById('doc-description').value.trim();
+                            if (!description) {
+                              alert('Please enter a description');
+                              return;
+                            }
+
+                            addDocButton.disabled = true;
+                            const originalText = addDocButton.innerHTML;
+                            addDocButton.innerHTML = '<i class="material-icons text-sm me-1">hourglass_empty</i> Adding...';
+
+                            const formData = new FormData();
+                            formData.append('filename', currentUploadedDoc.filename);
+                            formData.append('description', description);
+
+                            fetch('/save_doc/{{ bplan_id }}', {
+                              method: 'POST',
+                              body: formData
+                            })
+                            .then(response => {
+                              if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                              }
+                              return response.json();
+                            })
+                            .then(data => {
+                      if (data.error) {
+                        alert('Error: ' + data.error);
+                        addDocButton.disabled = false;
+                        addDocButton.innerHTML = originalText;
+                      } else {
+                        console.log('Document saved successfully:', data);
+                        addDocumentToUI(data.filename, data.description, data.doc_id);
+
+                        // Reset form
+                        document.getElementById('doc-description').value = '';
+                        currentUploadedDoc = null;
+                        addDocButton.disabled = false;
+                        addDocButton.innerHTML = originalText;
+
+                        // ✅ Reset visual state
+                        resetUploadVisual();
+                      }
+                    })
+                            .catch(error => {
+                              console.error('Error saving document:', error);
+                              alert('Error saving document. Please try again.');
+                              addDocButton.disabled = false;
+                              addDocButton.innerHTML = originalText;
+                            });
+                          });
+
+                        }); // End of DOMContentLoaded
+                    </script>
+
+<div>
+{% if data_bp_doc %}
+<div class="card-body px-6 pt-2">
+    <h6 class="font-weight-bolder text-info mb-4">
+        <i class="material-icons text-sm me-2">folder</i>
+        {% if session.get('lang', 'en') == 'ar' %}
+        المستندات المرفوعة
+        {% else %}
+        Uploaded Documents
+        {% endif %}
+        <span class="badge bg-info ms-2">{{ data_bp_doc|length }}</span>
+    </h6>
+
+    <form method="POST" action="{{ url_for('home_blueprint.business_premises', bplan_id=bplan_id) }}" id="doc-delete-form">
+        <div class="row" id="documents-gallery">
+            {% for row in data_bp_doc %}
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                <div class="card document-card border-0 shadow-sm position-relative h-100">
+                    <div class="card-body p-4">
+                        <!-- Document Icon and Header -->
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="icon-shape icon-md bg-gradient-info text-white rounded-3 me-3 flex-shrink-0">
+                                <i class="material-icons text-xs">description</i>
+                            </div>
+                            <div class="flex-grow-1 min-width-0">
+                                <h6 class="text-dark fw-bold mb-1 text-truncate" title="{{ row.premises_doc_filename }}">
+                                    {{ row.premises_doc_filename }}
+                                </h6>
+                                <p class="text-muted small mb-2 text-truncate-2" title="{{ row.description or 'No description' }}">
+                                    {{ row.description or ("لا يوجد وصف" if session.get('lang', 'en') == 'ar' else "No description") }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Actions and Checkbox -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('static', filename='uploads/docs/' + bplan_id|string + '/' + row.premises_doc_filename) }}"
+                                   target="_blank" class="btn btn-outline-info btn-sm d-flex align-items-center">
+                                    <i class="material-icons text-xs me-1">visibility</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                    عرض
+                                    {% else %}
+                                    View
+                                    {% endif %}
+                                </a>
+                                <a href="{{ url_for('static', filename='uploads/docs/' + bplan_id|string + '/' + row.premises_doc_filename) }}"
+                                   download class="btn btn-outline-primary btn-sm d-flex align-items-center">
+                                    <i class="material-icons text-xs me-1">download</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                    تحميل
+                                    {% else %}
+                                    Download
+                                    {% endif %}
+                                </a>
+                            </div>
+
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input document-checkbox"
+                                       type="checkbox"
+                                       name="doc_to_delete"
+                                       value="{{ row.doc_id }}"
+                                       id="doc{{ row.doc_id }}">
+                                <label class="form-check-label visually-hidden" for="doc{{ row.doc_id }}">
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                    حدد للحذف
+                                    {% else %}
+                                    Select to delete
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Selection Label -->
+                        <div class="text-center mt-3">
+                            <label class="form-check-label text-xs text-muted cursor-pointer" for="doc{{ row.doc_id }}">
+                                <i class="material-icons text-xs me-1">check_box</i>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                حدد للحذف
+                                {% else %}
+                                Select to delete
+                                {% endif %}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4 text-center">
+            <button type="submit" name="delete_doc" class="btn btn-danger px-4 py-2">
+                <i class="material-icons text-sm me-2">delete_sweep</i>
+                {% if session.get('lang', 'en') == 'ar' %}
+                حذف المستندات المحددة
+                {% else %}
+                Delete Selected Documents
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.document-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.document-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    border-color: #17a2b8;
+}
+
+.document-card.selected {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.icon-shape.icon-md {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer;
+    border: 2px solid #6c757d !important;
+}
+
+.document-checkbox:checked {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.document-checkbox:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.min-width-0 {
+    min-width: 0;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Make entire card clickable for selection */
+.document-card {
+    cursor: pointer;
+}
+
+.document-card .btn,
+.document-card .form-check-input {
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .document-card .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .document-card .d-flex.gap-2 {
+        justify-content: center;
+    }
+}
+
+/* Animation for selection */
+.document-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.document-checkbox:checked ~ .document-card {
+    border-color: #dc3545;
+}
+</style>
+
+<script>
+// Enhanced document selection functionality
+document.addEventListener('DOMContentLoaded', function() {
+    function initializeDocumentCheckboxes() {
+        document.querySelectorAll('.document-card').forEach(card => {
+            const checkbox = card.querySelector('.document-checkbox');
+
+            // Make the entire card clickable (except buttons and checkbox)
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('a') && e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    updateCardSelection(card, checkbox.checked);
+                    e.stopPropagation();
+                }
+            });
+
+            // Update card appearance when checkbox changes
+            checkbox.addEventListener('change', function() {
+                updateCardSelection(card, this.checked);
+            });
+
+            // Initialize visual state
+            updateCardSelection(card, checkbox.checked);
+        });
+
+        // Make labels clickable without triggering card click
+        document.querySelectorAll('label[for^="doc"]').forEach(label => {
+            label.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+    }
+
+    function updateCardSelection(card, isSelected) {
+        if (isSelected) {
+            card.classList.add('selected');
+            card.style.borderColor = '#dc3545';
+            card.style.backgroundColor = '#fff5f5';
+        } else {
+            card.classList.remove('selected');
+            card.style.borderColor = '';
+            card.style.backgroundColor = '';
+        }
+    }
+
+    // Initialize document checkboxes
+    initializeDocumentCheckboxes();
+
+    // Re-initialize after AJAX operations (if any)
+    if (typeof refreshDocumentGallery === 'function') {
+        const originalRefresh = refreshDocumentGallery;
+        window.refreshDocumentGallery = function() {
+            originalRefresh();
+            setTimeout(initializeDocumentCheckboxes, 100);
+        };
+    }
+});
+</script>
+{% endif %}
+</div>
+                  <div class="button-row d-flex mt-4">
+                    <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}" type="submit" name="action" value="save">
+                      {% if session.get('lang', 'en') == 'ar' %}
+                        حفظ
+                      {% else %}
+                        Save
+                      {% endif %}
+                    </button>
+                  </div>
+                </div>
+
+
+
+
+              </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+                </div>
+
+              </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+</body>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+
+<script>
+
+function check(){
+  if(document.getElementById('choice_premises_ownershipe').value=="Partially Owned") {
+    document.getElementById('partner_name_label').style.display = 'block';
+    document.getElementById('partner_name').style.display = 'block';
+    document.getElementById('partner_relation_label').style.display = 'block';
+    document.getElementById('partner_relation').style.display = 'block';
+    document.getElementById('percentge_of_ownership_label').style.display = 'block';
+    document.getElementById('percentge_of_ownership').style.display = 'block';
+    document.getElementById('rent_fees_label').style.display = 'none';
+    document.getElementById('rent_fees').style.display = 'none';
+    document.getElementById('rent_period_label').style.display = 'none';
+    document.getElementById('rent_period').style.display = 'none';
+    document.getElementById('rent_unit_label').style.display = 'none';
+    document.getElementById('rent_unit').style.display = 'none';
+
+ }
+  else {
+
+    if(document.getElementById('choice_premises_ownershipe').value=="Rented") {
+      document.getElementById('partner_name_label').style.display = 'none';
+      document.getElementById('partner_name').style.display = 'none';
+      document.getElementById('partner_relation_label').style.display = 'none';
+      document.getElementById('partner_relation').style.display = 'none';
+      document.getElementById('percentge_of_ownership_label').style.display = 'none';
+      document.getElementById('percentge_of_ownership').style.display = 'none';
+      document.getElementById('rent_fees_label').style.display = 'block';
+      document.getElementById('rent_fees').style.display = 'block';
+      document.getElementById('rent_period_label').style.display = 'block';
+      document.getElementById('rent_period').style.display = 'block';
+      document.getElementById('rent_unit_label').style.display = 'block';
+      document.getElementById('rent_unit').style.display = 'block';
+    }
+
+    else {
+    document.getElementById('partner_name_label').style.display = 'none';
+    document.getElementById('partner_name').style.display = 'none';
+    document.getElementById('partner_relation_label').style.display = 'none';
+    document.getElementById('partner_relation').style.display = 'none';
+    document.getElementById('percentge_of_ownership_label').style.display = 'none';
+    document.getElementById('percentge_of_ownership').style.display = 'none';
+    document.getElementById('rent_fees_label').style.display = 'none';
+    document.getElementById('rent_fees').style.display = 'none';
+    document.getElementById('rent_period_label').style.display = 'none';
+    document.getElementById('rent_period').style.display = 'none';
+    document.getElementById('rent_unit_label').style.display = 'none';
+    document.getElementById('rent_unit').style.display = 'none';
+    }
+  }
+};
+
+if (document.getElementById('choice_premise_nature')) {
+    var element = document.getElementById('choice_premise_nature');
+    const example = new Choices(element, {
+      searchEnabled: false,
+        removeItemButton: true
+    });
+  };
+
+  if (document.getElementById('choice_surroundings')) {
+      var element = document.getElementById('choice_surroundings');
+      const examples = new Choices(element, {
+        searchEnabled: false,
+        removeItemButton: true
+      });
+
+    };
+
+  if (document.getElementById('choice_premises_ownershipe')) {
+    var element = document.getElementById('choice_premises_ownershipe');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_partner_relation')) {
+    var element = document.getElementById('choice_partner_relation');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_rent_unit')) {
+    var element = document.getElementById('choice_rent_unit');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+
+
+
+
+
+
+
+
+
+    // Dropzone configuration
+Dropzone.autoDiscover = false;
+
+document.addEventListener("DOMContentLoaded", function() {
+  const myDropzone = new Dropzone("#myDropzone", {
+    url: "/upload/{{ bplan_id }}",
+    paramName: "file",
+    maxFilesize: 5, // MB
+    acceptedFiles: "image/*",
+    maxFiles: 10,
+    addRemoveLinks: false,
+    dictDefaultMessage: "{% if session.get('lang', 'en') == 'ar' %}اسحب الصور هنا أو انقر للرفع{% else %}Drop images here or click to upload{% endif %}",
+    init: function() {
+      this.on("success", function(file, response) {
+        // Refresh the photo gallery after successful upload
+        refreshPhotoGallery();
+      });
+      this.on("error", function(file, errorMessage) {
+        console.error("Upload error:", errorMessage);
+        alert("Upload failed: " + errorMessage);
+      });
+    }
+  });
+});
+
+// Function to refresh the photo gallery
+function refreshPhotoGallery() {
+  fetch(window.location.href)
+    .then(response => response.text())
+    .then(html => {
+      // Create a temporary DOM element to parse the response
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Find the updated photo gallery in the response
+      const newGallery = doc.querySelector('#photo-gallery');
+      if (newGallery) {
+        // Replace the current gallery with the updated one
+        const currentGallery = document.querySelector('#photo-gallery');
+        if (currentGallery) {
+          currentGallery.innerHTML = newGallery.innerHTML;
+        } else {
+          // If gallery doesn't exist yet (first upload), create it
+          const galleryContainer = document.querySelector('.row.mt-4 .col-12');
+          if (galleryContainer) {
+            galleryContainer.innerHTML = doc.querySelector('.row.mt-4 .col-12').innerHTML;
+          }
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error refreshing gallery:', error);
+      console.error('Error refreshing gallery:', error);
+      // Fallback: reload the page if AJAX fails
+      window.location.reload();
+    });
+}
+</script>
+
+
+<style>
+ /* Target Arabic language specifically */
+html[lang="ar"] .choices[data-type*="select-one"]:after {
+    display: none !important;
+}
+
+html[lang="ar"] select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+</style>
+
+<script>
+// ============================================
+// AJAX Photo & Document Deletion (No Page Reload)
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // ==================== PHOTO DELETION ====================
+  function setupPhotoDeleteForm() {
+    const photoDeleteForm = document.querySelector('form[name="delete_photo"]') ||
+                            document.querySelector('button[name="delete_photo"]')?.closest('form');
+
+    if (photoDeleteForm) {
+      const deleteButton = photoDeleteForm.querySelector('button[name="delete_photo"]');
+
+      deleteButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Get all checked photo checkboxes
+        const checkedPhotos = photoDeleteForm.querySelectorAll('input[name="photo_to_delete"]:checked');
+
+        if (checkedPhotos.length === 0) {
+          alert("{% if session.get('lang', 'en') == 'ar' %}الرجاء تحديد صورة واحدة على الأقل{% else %}Please select at least one photo{% endif %}");
+          return;
+        }
+
+        const confirmMessage = "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف الصور المحددة؟{% else %}Are you sure you want to delete the selected photos?{% endif %}";
+
+        if (!confirm(confirmMessage)) {
+          return;
+        }
+
+        // Disable button and show loading state
+        deleteButton.disabled = true;
+        const originalText = deleteButton.innerHTML;
+        deleteButton.innerHTML = '<i class="material-icons text-sm me-1">hourglass_empty</i> {% if session.get("lang", "en") == "ar" %}جاري الحذف...{% else %}Deleting...{% endif %}';
+
+        const formData = new FormData();
+        formData.append('delete_photo', 'true');
+
+        checkedPhotos.forEach(checkbox => {
+          formData.append('photo_to_delete', checkbox.value);
+        });
+
+        fetch(window.location.href, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (response.ok) {
+            // Remove deleted photo cards from DOM with animation
+            checkedPhotos.forEach(checkbox => {
+              const photoCard = checkbox.closest('.col-6, .col-md-4, .col-lg-3');
+              if (photoCard) {
+                photoCard.style.opacity = '0';
+                photoCard.style.transform = 'scale(0.8)';
+                photoCard.style.transition = 'all 0.3s ease';
+                setTimeout(() => photoCard.remove(), 300);
+              }
+            });
+
+            // Re-enable button
+            deleteButton.disabled = false;
+            deleteButton.innerHTML = originalText;
+
+            // Check if any photos remain
+            setTimeout(() => {
+              const remainingPhotos = document.querySelectorAll('#photo-gallery .col-6, #photo-gallery .col-md-4, #photo-gallery .col-lg-3');
+              if (remainingPhotos.length === 0) {
+                // Reload to show "no photos" message
+                window.location.reload();
+              }
+            }, 400);
+          } else {
+            throw new Error('Network response was not ok');
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting photos:', error);
+          alert('{% if session.get("lang", "en") == "ar" %}خطأ في الحذف{% else %}Error deleting photos{% endif %}');
+          deleteButton.disabled = false;
+          deleteButton.innerHTML = originalText;
+        });
+      });
+    }
+  }
+
+  // ==================== DOCUMENT DELETION ====================
+  function setupDocDeleteForm() {
+    const docDeleteButton = document.querySelector('button[name="delete_doc"]');
+
+    if (docDeleteButton) {
+      docDeleteButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const form = this.closest('form');
+        const checkedDocs = form.querySelectorAll('input[name="doc_to_delete"]:checked');
+
+        if (checkedDocs.length === 0) {
+          alert("{% if session.get('lang', 'en') == 'ar' %}الرجاء تحديد مستند واحد على الأقل{% else %}Please select at least one document{% endif %}");
+          return;
+        }
+
+        const confirmMessage = "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف المستندات المحددة؟{% else %}Are you sure you want to delete the selected documents?{% endif %}";
+
+        if (!confirm(confirmMessage)) {
+          return;
+        }
+
+        // Disable button and show loading state
+        docDeleteButton.disabled = true;
+        const originalText = docDeleteButton.innerHTML;
+        docDeleteButton.innerHTML = '<i class="material-icons text-sm me-1">hourglass_empty</i> {% if session.get("lang", "en") == "ar" %}جاري الحذف...{% else %}Deleting...{% endif %}';
+
+        const formData = new FormData();
+        formData.append('delete_doc', 'true');
+
+        checkedDocs.forEach(checkbox => {
+          formData.append('doc_to_delete', checkbox.value);
+        });
+
+        fetch(window.location.href, {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (response.ok) {
+            // Remove deleted document cards from DOM with animation
+            checkedDocs.forEach(checkbox => {
+              const docCard = checkbox.closest('.col-md-4');
+              if (docCard) {
+                docCard.style.opacity = '0';
+                docCard.style.transform = 'scale(0.8)';
+                docCard.style.transition = 'all 0.3s ease';
+                setTimeout(() => docCard.remove(), 300);
+              }
+            });
+
+            // Re-enable button
+            docDeleteButton.disabled = false;
+            docDeleteButton.innerHTML = originalText;
+
+            // Check if any documents remain
+            setTimeout(() => {
+              const remainingDocs = form.querySelectorAll('.col-md-4');
+              if (remainingDocs.length === 0) {
+                // Remove the entire documents section
+                const docsSection = form.closest('.row.mt-4');
+                if (docsSection) {
+                  docsSection.remove();
+                }
+              }
+            }, 400);
+          } else {
+            throw new Error('Network response was not ok');
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting documents:', error);
+          alert('{% if session.get("lang", "en") == "ar" %}خطأ في الحذف{% else %}Error deleting documents{% endif %}');
+          docDeleteButton.disabled = false;
+          docDeleteButton.innerHTML = originalText;
+        });
+      });
+    }
+  }
+
+  // ==================== INITIALIZE ====================
+  setupPhotoDeleteForm();
+  setupDocDeleteForm();
+
+}); // End of DOMContentLoaded
+
+</script>
+
+
+<!--select-->
+
+<style>
+/* Compact design that doesn't cover labels */
+.choices__inner {
+    background-color: white !important;
+    border: 2px solid #d2d6da !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    min-height: 42px !important; /* Shorter height */
+    max-height: 100px !important; /* Maximum height */
+    overflow-y: auto !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    transition: min-height 0.2s ease !important;
+}
+
+/* Auto-expand when needed */
+.choices__inner:focus-within,
+.choices__inner.has-items {
+    min-height: 65px !important; /* Slightly expand when focused/has items */
+}
+
+/* Even more compact items */
+.choices__item {
+    background-color: #4e73df !important;
+    border: 1px solid #4e73df !important;
+    border-radius: 4px !important;
+    color: white !important;
+    padding: 3px 8px !important;
+    margin: 1px 4px 1px 0 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+}
+
+/* Smaller remove button */
+.choices__button {
+    border-left: 1px solid rgba(255,255,255,0.3) !important;
+    color: white !important;
+    margin-left: 4px !important;
+    padding-left: 4px !important;
+    font-size: 0.7rem !important;
+}
+
+/* Hover and focus states */
+.choices__inner:hover {
+    border-color: #4e73df !important;
+}
+
+.choices__item:hover {
+    background-color: #2e59d9 !important;
+}
+
+.choices[data-type*="select-multiple"].is-focused .choices__inner {
+    border-color: #4e73df !important;
+    box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.25) !important;
+}
+
+/* Hide dropdown arrow */
+.choices[data-type*="select-multiple"]:after {
+    display: none !important;
+}
+</style>
+<style>
+/* Force dropdown to always open downwards */
+.choices__list--dropdown {
+    top: 100% !important;
+    bottom: auto !important;
+    margin-top: 4px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.choices__list--dropdown[aria-expanded="true"] {
+    transform: translateY(0) !important;
+}
+
+/* Hide the upward flip behavior */
+.choices__list--dropdown.is-active {
+    transform: none !important;
+}
+
+/* Ensure it doesn't flip upwards */
+.choices__list--dropdown .choices__list {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+</style>
+
+{% endblock javascripts %}
+
+

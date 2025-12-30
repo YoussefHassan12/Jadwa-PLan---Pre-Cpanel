@@ -1,0 +1,675 @@
+{% if session.get('lang', 'en') == 'ar' %}
+     {% extends "layouts/base-m-rtl.html" %}
+   {% else %}
+     {% extends "layouts/base-m.html" %}
+   {% endif %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    لوحة التحكم
+  {% else %}
+    Dashboard
+  {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stat-card {
+        border-radius: 12px;
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-icon.blue {
+        background: rgba(79, 125, 243, 0.15);
+        color: #4F7DF3;
+    }
+
+    .stat-icon.green {
+        background: rgba(76, 175, 80, 0.15);
+        color: #4CAF50;
+    }
+
+    .stat-icon.purple {
+        background: rgba(156, 39, 176, 0.15);
+        color: #9C27B0;
+    }
+
+    .stat-icon.orange {
+        background: rgba(255, 152, 0, 0.15);
+        color: #FF9800;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #344767;
+        margin: 12px 0 4px 0;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #7b809a;
+        margin: 0;
+    }
+
+    .stat-change {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-change.positive {
+        color: #4CAF50;
+    }
+
+    .stat-change.negative {
+        color: #F44336;
+    }
+
+    .content-card {
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        padding: 24px;
+        height: 100%;
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #344767;
+        margin: 0;
+    }
+
+    .btn-new-intake {
+        background: linear-gradient(135deg, #49a3f1 0%, #1A73E8 100%);
+        border: none;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .btn-new-intake:hover {
+        background: linear-gradient(135deg, #1A73E8 0%, #4F7DF3 100%);
+        color: #fff;
+    }
+
+    .activity-item {
+        padding: 16px 0;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .activity-time {
+        font-size: 13px;
+        color: #7b809a;
+        min-width: 70px;
+    }
+
+    .activity-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #344767;
+        margin: 0;
+    }
+
+    .activity-desc {
+        font-size: 13px;
+        color: #7b809a;
+        margin: 2px 0 0 0;
+    }
+
+    .pipeline-item {
+        margin-bottom: 20px;
+    }
+
+    .pipeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .pipeline-label {
+        font-size: 14px;
+        color: #344767;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .pipeline-count {
+        font-weight: 600;
+        color: #7b809a;
+    }
+
+    .pipeline-bar {
+        height: 10px;
+        border-radius: 5px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .pipeline-fill {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.3s ease;
+    }
+
+    .pipeline-fill.green {
+        background: linear-gradient(90deg, #66BB6A, #43A047);
+    }
+
+    .pipeline-fill.yellow {
+        background: linear-gradient(90deg, #FFCA28, #FFB300);
+    }
+
+    .pipeline-fill.orange {
+        background: linear-gradient(90deg, #FFA726, #FB8C00);
+    }
+
+    .alert-card {
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .alert-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .alert-card.warning {
+        background: rgba(255, 152, 0, 0.1);
+        border-left: 4px solid #FF9800;
+    }
+
+    .alert-card.success {
+        background: rgba(76, 175, 80, 0.1);
+        border-left: 4px solid #4CAF50;
+    }
+
+    .alert-card.info {
+        background: rgba(79, 125, 243, 0.1);
+        border-left: 4px solid #4F7DF3;
+    }
+
+    /* RTL support for alert cards */
+    [dir="rtl"] .alert-card.warning,
+    [dir="rtl"] .alert-card.success,
+    [dir="rtl"] .alert-card.info {
+        border-left: none;
+        border-right: 4px solid;
+    }
+
+    [dir="rtl"] .alert-card.warning {
+        border-right-color: #FF9800;
+    }
+
+    [dir="rtl"] .alert-card.success {
+        border-right-color: #4CAF50;
+    }
+
+    [dir="rtl"] .alert-card.info {
+        border-right-color: #4F7DF3;
+    }
+
+    .alert-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+    }
+
+    [dir="rtl"] .alert-icon {
+        margin-right: 0;
+        margin-left: 12px;
+    }
+
+    .alert-card.warning .alert-icon {
+        color: #FF9800;
+    }
+
+    .alert-card.success .alert-icon {
+        color: #4CAF50;
+    }
+
+    .alert-card.info .alert-icon {
+        color: #4F7DF3;
+    }
+
+    .alert-text {
+        font-size: 14px;
+        color: #344767;
+        flex: 1;
+    }
+
+    .alert-card.warning .alert-text {
+        color: #E65100;
+    }
+
+    .alert-card.success .alert-text {
+        color: #2E7D32;
+    }
+
+    .alert-card.info .alert-text {
+        color: #1565C0;
+    }
+
+    .alert-link {
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .alert-card.warning .alert-link {
+        color: #E65100;
+    }
+
+    .alert-card.success .alert-link {
+        color: #2E7D32;
+    }
+
+    .alert-card.info .alert-link {
+        color: #1565C0;
+    }
+
+    .alert-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="stat-icon blue">
+                        <i class="material-icons">groups</i>
+                    </div>
+                    <span class="stat-change positive">
+                        <i class="material-icons" style="font-size: 14px; vertical-align: middle;">arrow_upward</i>
+                        +3
+                    </span>
+                </div>
+                <p class="stat-value">6</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        إجمالي المشاريع المُقيَّمة
+                    {% else %}
+                        Total SMEs Assessed
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="stat-icon green">
+                        <i class="material-icons">trending_up</i>
+                    </div>
+                    <span class="stat-change positive">
+                        <i class="material-icons" style="font-size: 14px; vertical-align: middle;">arrow_upward</i>
+                        +5
+                    </span>
+                </div>
+                <p class="stat-value">72/100</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        متوسط الجاهزية المالية
+                    {% else %}
+                        Avg Finance Readiness
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="stat-icon purple">
+                        <i class="material-icons">check_circle</i>
+                    </div>
+                    <span class="stat-change positive">
+                        <i class="material-icons" style="font-size: 14px; vertical-align: middle;">arrow_upward</i>
+                        +2
+                    </span>
+                </div>
+                <p class="stat-value">2</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مشاريع مطابقة للتمويل
+                    {% else %}
+                        SMEs Matched to Funding
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="stat-icon orange">
+                        <i class="material-icons">schedule</i>
+                    </div>
+                    <span class="stat-change negative">
+                        <i class="material-icons" style="font-size: 14px; vertical-align: middle;">arrow_downward</i>
+                        -1
+                    </span>
+                </div>
+                <p class="stat-value">2</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        متابعات معلقة
+                    {% else %}
+                        Pending Follow-ups
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity and Pipeline Row -->
+    <div class="row mb-4">
+        <div class="col-lg-5 mb-lg-0 mb-4">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="card-title">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            نشاط اليوم
+                        {% else %}
+                            Today's Activity
+                        {% endif %}
+                    </h6>
+                    <button class="btn-new-intake">
+                        <i class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">add</i>
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            إضافة مشروع جديد
+                        {% else %}
+                            New SME Intake
+                        {% endif %}
+                    </button>
+                </div>
+
+                <div class="activity-list">
+                    <div class="activity-item d-flex">
+                        <span class="activity-time">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                10:00 ص
+                            {% else %}
+                                10:00 AM
+                            {% endif %}
+                        </span>
+                        <div class="ms-3">
+                            <p class="activity-title">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    تقييم: بوتيك الأزياء
+                                {% else %}
+                                    Assessment: Fashion Boutique
+                                {% endif %}
+                            </p>
+                            <p class="activity-desc">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    اجتماع أولي مع نور أمين
+                                {% else %}
+                                    Initial meeting with Nour Amin
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="activity-item d-flex">
+                        <span class="activity-time">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                2:00 م
+                            {% else %}
+                                2:00 PM
+                            {% endif %}
+                        </span>
+                        <div class="ms-3">
+                            <p class="activity-title">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    ورشة عمل: التخطيط المالي
+                                {% else %}
+                                    Workshop: Financial Planning
+                                {% endif %}
+                            </p>
+                            <p class="activity-desc">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    3 مشاريع مسجلة
+                                {% else %}
+                                    3 SMEs registered
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="activity-item d-flex">
+                        <span class="activity-time">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                4:00 م
+                            {% else %}
+                                4:00 PM
+                            {% endif %}
+                        </span>
+                        <div class="ms-3">
+                            <p class="activity-title">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    متابعة: سوق الأغذية الطازجة
+                                {% else %}
+                                    Follow-up: Fresh Foods Market
+                                {% endif %}
+                            </p>
+                            <p class="activity-desc">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مراجعة المستندات
+                                {% else %}
+                                    Document review
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="content-card">
+                <h6 class="card-title mb-4">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        نظرة عامة على المسار
+                    {% else %}
+                        Pipeline Snapshot
+                    {% endif %}
+                </h6>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-label">
+                        <span>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                مسجل
+                            {% else %}
+                                Registered
+                            {% endif %}
+                        </span>
+                        <span class="pipeline-count">6</span>
+                    </div>
+                    <div class="pipeline-bar">
+                        <div class="pipeline-fill green" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-label">
+                        <span>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                مُقيَّم
+                            {% else %}
+                                Assessed
+                            {% endif %}
+                        </span>
+                        <span class="pipeline-count">5</span>
+                    </div>
+                    <div class="pipeline-bar">
+                        <div class="pipeline-fill green" style="width: 83%;"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-label">
+                        <span>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                جاهز للتمويل
+                            {% else %}
+                                Ready for Funding
+                            {% endif %}
+                        </span>
+                        <span class="pipeline-count">2</span>
+                    </div>
+                    <div class="pipeline-bar">
+                        <div class="pipeline-fill yellow" style="width: 33%;"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-label">
+                        <span>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                مُقدَّم للشركاء
+                            {% else %}
+                                Submitted to Partners
+                            {% endif %}
+                        </span>
+                        <span class="pipeline-count">1</span>
+                    </div>
+                    <div class="pipeline-bar">
+                        <div class="pipeline-fill orange" style="width: 17%;"></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-item">
+                    <div class="pipeline-label">
+                        <span>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                مُموَّل
+                            {% else %}
+                                Funded
+                            {% endif %}
+                        </span>
+                        <span class="pipeline-count">1</span>
+                    </div>
+                    <div class="pipeline-bar">
+                        <div class="pipeline-fill green" style="width: 17%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="content-card">
+                <h6 class="card-title mb-3">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        التنبيهات والإشعارات
+                    {% else %}
+                        Alerts & Notifications
+                    {% endif %}
+                </h6>
+
+                <div class="alert-card warning">
+                    <div class="d-flex align-items-center">
+                        <div class="alert-icon">
+                            <i class="material-icons">error_outline</i>
+                        </div>
+                        <span class="alert-text">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                3 مشاريع تنقصها مستندات
+                            {% else %}
+                                3 SMEs missing documents
+                            {% endif %}
+                        </span>
+                    </div>
+                    <a href="#" class="alert-link">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            مراجعة الآن
+                        {% else %}
+                            Review now
+                        {% endif %}
+                    </a>
+                </div>
+
+                <div class="alert-card success">
+                    <div class="d-flex align-items-center">
+                        <div class="alert-icon">
+                            <i class="material-icons">info_outline</i>
+                        </div>
+                        <span class="alert-text">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                مشروعان حسّنا درجتهما بأكثر من 10 نقاط هذا الأسبوع
+                            {% else %}
+                                2 SMEs improved their score by >10 pts this week
+                            {% endif %}
+                        </span>
+                    </div>
+                    <a href="#" class="alert-link">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            عرض التفاصيل
+                        {% else %}
+                            View details
+                        {% endif %}
+                    </a>
+                </div>
+
+                <div class="alert-card info">
+                    <div class="d-flex align-items-center">
+                        <div class="alert-icon">
+                            <i class="material-icons">info_outline</i>
+                        </div>
+                        <span class="alert-text">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                برنامج تمويل جديد "صندوق رائدات الأعمال" أُضيف بواسطة MFI Alpha
+                            {% else %}
+                                New funding program "Women Entrepreneur Fund" added by MFI Alpha
+                            {% endif %}
+                        </span>
+                    </div>
+                    <a href="#" class="alert-link">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            اعرف المزيد
+                        {% else %}
+                            Learn more
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,2752 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    الجدوى
+  {% else %}
+    Feasibility
+  {% endif %}
+{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container-fluid pl-5 pt-3">
+
+  <!-- Success Toast Notification -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 11; margin-top: 60px;">
+    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="material-icons me-2">check_circle</i>
+          <span id="toastMessage">
+            {% if session.get('lang', 'en') == 'ar' %}
+              تم التحديث بنجاح!
+            {% else %}
+              Successfully updated!
+            {% endif %}
+          </span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-10">
+
+      <form role="form" method="POST" action="/feasibility/{{ bplan_id }}">
+
+        <div class="row px-8 pt-0 pb-3">
+          <span class="me-2 text-xxs font-weight-bold">{{ data_comp[0].completion }}%
+            {% if session.get('lang', 'en') == 'ar' %}
+              مكتمل
+            {% else %}
+              Completed
+            {% endif %}
+          </span>
+          <div class="progress">
+            {% if data_comp[0].completion == 100: %}
+            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% elif data_comp[0].completion >= 50: %}
+              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% else %}
+              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% endif %}
+          </div>
+        </div>
+
+              <!-- Title + Feasibility card -->
+              <div class="card my-3">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                  <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+
+                    <h5 class="text-white text-capitalize ps-3 mx-3">
+                      {% if session.get('lang', 'en') == 'ar' %}
+                        الجدوى
+                      {% else %}
+                        Feasibility
+                      {% endif %}
+                    </h5>
+
+                  </div>
+                </div>
+
+                <div class="card-body px-6 pt-2">
+                  <h5 class="font-weight-bolder text-info mt-4">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      المبيعات والأرباح
+                    {% else %}
+                      Sales & Profits
+                    {% endif %}
+                  </h5>
+
+                  <!-- ADD card body -->
+<form method="POST">
+    <div class="row">
+        <div class="col-12">
+            <!-- Modern Card with Tabs -->
+            <div class="card card-body bg-white shadow-lg border-0 px-0 py-0">
+
+                <!-- Step Indicator -->
+                <div class="bg-gradient-info px-4 py-3 rounded-top">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-white mb-0">
+                                <i class="material-icons me-2" style="vertical-align: middle;">assessment</i>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    إضافة بيانات المنتج
+                                {% else %}
+                                    Add Product Data
+                                {% endif %}
+                            </h6>
+                            <p class="text-white text-xs mb-0 opacity-8">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    أكمل جميع الحقول لإضافة منتج جديد إلى توقعاتك
+                                {% else %}
+                                    Complete all fields to add a new product to your projections
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge badge-sm bg-white text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    الخطوة 1 من 3
+                                {% else %}
+                                    Step 1 of 3
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-4 py-4">
+                    <!-- Section 1: Basic Product Information -->
+                    <div class="product-section mb-4">
+                        <div class="section-header mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-shape icon-sm bg-gradient-primary shadow text-center rounded-circle me-3">
+                                    <i class="material-icons opacity-10" style="font-size: 18px; line-height: 32px;">inventory_2</i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-dark">
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            معلومات المنتج الأساسية
+                                        {% else %}
+                                            Basic Product Information
+                                        {% endif %}
+                                    </h6>
+                                    <p class="text-xs text-muted mb-0">
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            حدد المنتج وأدخل التفاصيل المالية
+                                        {% else %}
+                                            Select product and enter financial details
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="material-icons me-1">label</i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            اسم المنتج
+                                        {% else %}
+                                            Product Name
+                                        {% endif %}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-control-modern" name="product_service_id" id="product_service_id" required>
+                                        <option value="" disabled selected>
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                اختر منتجاً...
+                                            {% else %}
+                                                Select a product...
+                                            {% endif %}
+                                        </option>
+                                        {% for product in data_bp %}
+                                            <option value="{{ product.product_service_id }}">{{ product.product_service_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="material-icons me-1">production_quantity_limits</i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            الكمية (الوحدات)
+                                        {% else %}
+                                            Quantity (Units)
+                                        {% endif %}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control-modern" name="unit"
+                                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: 1000{% else %}e.g., 1000{% endif %}"
+                                           min="0" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="material-icons me-1">attach_money</i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            السعر لكل وحدة
+                                        {% else %}
+                                            Price Per Unit
+                                        {% endif %}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control-modern" name="price"
+                                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: 50.00{% else %}e.g., 50.00{% endif %}"
+                                           step="0.01" min="0" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">
+                                        <i class="material-icons me-1">money_off</i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            التكلفة لكل وحدة
+                                        {% else %}
+                                            Cost Per Unit
+                                        {% endif %}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control-modern" name="cost"
+                                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: 30.00{% else %}e.g., 30.00{% endif %}"
+                                           step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="horizontal dark my-4">
+
+                    <!-- Section 2: Growth Projections -->
+                    <div class="product-section mb-4">
+                        <div class="section-header mb-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-shape icon-sm bg-gradient-success shadow text-center rounded-circle me-3">
+                                        <i class="material-icons opacity-10" style="font-size: 18px; line-height: 32px;">trending_up</i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 text-dark">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                توقعات النمو السنوي
+                                            {% else %}
+                                                Annual Growth Projections
+                                            {% endif %}
+                                        </h6>
+                                        <p class="text-xs text-muted mb-0">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                حدد نسبة النمو المتوقعة لكل سنة
+                                            {% else %}
+                                                Define expected growth percentage for each year
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="quickFillGrowth()">
+                                    <i class="material-icons me-1" style="font-size: 14px;">flash_on</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        تعبئة سريعة
+                                    {% else %}
+                                        Quick Fill
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="growth-cards-container">
+                            {% for year in range(1, 6) %}
+                            <div class="growth-year-card">
+                                <div class="year-badge">
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        السنة {{ year }}
+                                    {% else %}
+                                        Year {{ year }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group-modern mb-2">
+                                    <label class="form-label-modern-sm">
+                                        <i class="material-icons me-1" style="font-size: 14px;">percent</i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            نسبة النمو
+                                        {% else %}
+                                            Growth %
+                                        {% endif %}
+                                    </label>
+                                    <input type="number" class="form-control-modern-sm"
+                                           name="growth_prct_year{{ year }}"
+                                           id="growth_prct_year{{ year }}"
+                                           placeholder="0.00"
+                                           min="0"
+                                           max="99.99"
+                                           step="0.01">
+                                </div>
+
+                                <div class="form-group-modern mb-0">
+    <label class="form-label-modern-sm">
+        <i class="material-icons me-1" style="font-size: 14px;">lightbulb</i>
+        {% if session.get('lang', 'en') == 'ar' %}
+            أسباب النمو
+        {% else %}
+            Growth Drivers
+        {% endif %}
+    </label>
+
+    <div class="vertical-chip-list" id="vertical_year{{ year }}">
+        {% set items = [
+            ('Marketing Efforts', 'جهود التسويق', 'Marketing Efforts'),
+            ('Unfulfilled customer requests', 'طلبات العملاء غير الملباة', 'Unfulfilled Requests'),
+            ('New market entry', 'دخول سوق جديد', 'New Market Entry'),
+            ('Recruiting sales team', 'توظيف فريق المبيعات', 'Sales Team Expansion'),
+            ('Increased market need', 'زيادة الطلب في السوق', 'Market Demand'),
+            ('Improved product quality', 'تحسين جودة المنتج', 'Product Quality'),
+            ('Enhanced distribution channels', 'تعزيز قنوات التوزيع', 'Distribution Channels'),
+            ('Launching a new product', 'إطلاق منتج جديد', 'New Product Launch')
+        ] %}
+
+        {% for value, ar, en in items %}
+            <div class="v-chip" data-value="{{ value }}">
+                <span class="checkmark"></span>
+                <span class="text">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        {{ ar }}
+                    {% else %}
+                        {{ en }}
+                    {% endif %}
+                </span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <input type="hidden" id="vertical_hidden_{{ year }}" name="growth_reason_year{{ year }}">
+</div>
+
+
+
+
+
+
+
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                            <i class="material-icons me-1">refresh</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إعادة تعيين
+                            {% else %}
+                                Reset Form
+                            {% endif %}
+                        </button>
+
+                        <button type="button" class="btn btn-lg bg-gradient-info" id="product_add_btn" value="{{ bplan_id }}">
+                            <i class="material-icons me-2">add_circle</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إضافة المنتج إلى التوقعات
+                            {% else %}
+                                Add Product to Projections
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</form>
+
+<style>
+/* Modern Form Styling */
+.form-group-modern {
+    position: relative;
+}
+
+.form-label-modern {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #344767;
+    margin-bottom: 0.5rem;
+}
+
+.form-label-modern i {
+    font-size: 16px;
+    color: #5e72e4;
+}
+
+.form-label-modern-sm {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #344767;
+    margin-bottom: 0.375rem;
+}
+
+.form-control-modern,
+.form-control-modern-sm {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.form-control-modern-sm {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+}
+
+.form-control-modern:focus,
+.form-control-modern-sm:focus {
+    border-color: #5e72e4;
+    background-color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.1);
+    outline: none;
+}
+
+.form-control-modern::placeholder,
+.form-control-modern-sm::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* Section Headers */
+.section-header {
+    position: relative;
+}
+
+.icon-shape {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Growth Cards Grid */
+.growth-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 1400px) {
+    .growth-cards-container {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .growth-cards-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .growth-cards-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .growth-cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.growth-year-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.growth-year-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #5e72e4 0%, #825ee4 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.growth-year-card:hover {
+    border-color: #5e72e4;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(94, 114, 228, 0.15);
+}
+
+.growth-year-card:hover::before {
+    transform: scaleX(1);
+}
+
+.year-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* Multi-select Styling */
+.choices__inner {
+    background-color: #f8f9fa !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 10px !important;
+    min-height: 40px !important;
+    padding: 0.375rem 0.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.choices__inner:focus,
+.choices.is-focused .choices__inner {
+    border-color: #5e72e4 !important;
+    background-color: #fff !important;
+    box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.1) !important;
+}
+
+.choices__list--multiple .choices__item {
+    background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    padding: 0.25rem 0.5rem;
+    margin: 0.125rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.choices__list--multiple .choices__item:hover {
+    transform: scale(1.05);
+}
+
+.choices__button {
+    border-left: 1px solid rgba(255,255,255,0.3) !important;
+    padding-left: 0.375rem !important;
+    margin-left: 0.375rem !important;
+    opacity: 0.8;
+}
+
+.choices__button:hover {
+    opacity: 1;
+}
+
+.choices__list--dropdown .choices__item--selectable {
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.choices__list--dropdown .choices__item--selectable:hover {
+    background-color: #f0f2ff;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background-color: #5e72e4;
+    color: white;
+}
+/* Make dropdown wider than parent */
+.growth-year-card .choices__list--dropdown {
+    min-width: 300px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+/* Horizontal Rule */
+.horizontal.dark {
+    background-image: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+    height: 1px;
+    border: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .icon-shape {
+        width: 40px;
+        height: 40px;
+    }
+
+    .section-header h6 {
+        font-size: 0.9rem;
+    }
+
+    .growth-year-card {
+        padding: 0.75rem;
+    }
+}
+
+/* Animation for form load */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-section {
+    animation: slideInUp 0.5s ease;
+}
+
+.product-section:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+/* Button Hover Effects */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+#product_add_btn {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.75rem 2rem;
+}
+
+#product_add_btn:hover {
+    box-shadow: 0 10px 25px rgba(94, 114, 228, 0.3);
+}
+
+/* Fix for Choices.js Dropdown Width and Text Wrapping */
+.choices__list--dropdown {
+    width: 100% !important;
+    min-width: 250px !important;
+    max-width: 100% !important;
+    z-index: 1000 !important;
+}
+
+.choices__list--dropdown .choices__item {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Alternative: Allow wrapping but with better spacing */
+.choices__list--dropdown .choices__item--selectable {
+    padding: 0.75rem 1rem !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    min-height: auto !important;
+}
+
+/* Ensure dropdown appears above other elements */
+.choices[data-type*="select-multiple"] {
+    position: relative;
+    z-index: 100;
+}
+
+.choices__list--dropdown.is-active {
+    z-index: 1001 !important;
+}
+
+
+.growth-chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.growth-chip {
+    padding: 5px 10px;
+    background: #f1f1f1;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid #ddd;
+}
+
+.growth-chip.selected {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+
+
+
+
+
+
+.vertical-chip-list {
+    max-height: 120px; /* shows ~4 items */
+    overflow-y: auto;
+    padding-right: 4px;
+    scroll-behavior: smooth;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.vertical-chip-list::-webkit-scrollbar {
+    width: 6px;
+}
+.vertical-chip-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 6px;
+}
+
+.v-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin: 4px 0;
+    background: #f1f1f1;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border: 1px solid #ddd;
+}
+
+.v-chip.selected {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.v-chip .checkmark {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+    background: white;
+    transition: background 0.2s, border 0.2s;
+}
+
+.v-chip.selected .checkmark {
+    background: white;
+    border-color: white;
+}
+.v-chip {
+    padding: 6px 10px;
+}
+
+.v-chip .text {
+    font-size: 12px;
+}
+
+
+</style>
+
+<script>
+// Debug function to check if script is loaded
+console.log('=== PRODUCT FORM SCRIPT LOADED ===');
+
+// Initialize chip functionality
+function initializeChips() {
+    console.log('Initializing chips...');
+    document.querySelectorAll('.vertical-chip-list').forEach(list => {
+        let year = list.id.replace("vertical_year", "");
+        let hidden = document.getElementById("vertical_hidden_" + year);
+        console.log(`Found chip list for year ${year}, hidden input:`, hidden);
+
+        list.querySelectorAll('.v-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                console.log(`Chip clicked for year ${year}:`, chip.dataset.value);
+                chip.classList.toggle('selected');
+                updateHidden();
+            });
+        });
+
+        function updateHidden() {
+            const selectedValues = [...list.querySelectorAll('.v-chip.selected')]
+                .map(c => c.dataset.value);
+
+            console.log(`Year ${year} selected values:`, selectedValues);
+            hidden.value = selectedValues.join(',');
+            console.log(`Year ${year} hidden input value set to:`, hidden.value);
+        }
+
+        // Initialize hidden value
+        updateHidden();
+    });
+    console.log('Chips initialization complete');
+}
+
+// Quick Fill Growth Function
+function quickFillGrowth() {
+    console.log('quickFillGrowth called');
+    const value = prompt(
+        document.documentElement.lang === 'ar'
+            ? 'أدخل نسبة النمو لجميع السنوات:'
+            : 'Enter growth percentage for all years:'
+    );
+
+    if (value !== null && value !== '') {
+        for (let year = 1; year <= 5; year++) {
+            const input = document.getElementById(`growth_prct_year${year}`);
+            if (input) {
+                input.value = value;
+                console.log(`Set year ${year} growth to:`, value);
+            }
+        }
+    }
+}
+
+// Reset Form Function
+function resetForm() {
+    console.log('resetForm called');
+    if (confirm(
+        document.documentElement.lang === 'ar'
+            ? 'هل أنت متأكد من إعادة تعيين النموذج؟'
+            : 'Are you sure you want to reset the form?'
+    )) {
+        // Reset basic product info
+        document.querySelector('[name="product_service_id"]').value = '';
+        document.querySelector('[name="unit"]').value = '';
+        document.querySelector('[name="price"]').value = '';
+        document.querySelector('[name="cost"]').value = '';
+
+        // Reset growth percentages and chips
+        for (let year = 1; year <= 5; year++) {
+            const growthInput = document.getElementById(`growth_prct_year${year}`);
+            if (growthInput) growthInput.value = '';
+
+            // Reset chips
+            const chipList = document.getElementById(`vertical_year${year}`);
+            if (chipList) {
+                chipList.querySelectorAll('.v-chip').forEach(chip => {
+                    chip.classList.remove('selected');
+                });
+
+                // Update hidden input
+                const hidden = document.getElementById(`vertical_hidden_${year}`);
+                if (hidden) hidden.value = '';
+            }
+        }
+        console.log('Form reset complete');
+    }
+}
+
+// Debug function to check all form values
+function debugFormValues() {
+    console.log('=== DEBUG FORM VALUES ===');
+
+    // Basic fields
+    console.log('Product ID:', document.querySelector('[name="product_service_id"]').value);
+    console.log('Unit:', document.querySelector('[name="unit"]').value);
+    console.log('Price:', document.querySelector('[name="price"]').value);
+    console.log('Cost:', document.querySelector('[name="cost"]').value);
+
+    // Growth data
+    for (let year = 1; year <= 5; year++) {
+        const growthInput = document.getElementById(`growth_prct_year${year}`);
+        const reasonHidden = document.getElementById(`vertical_hidden_${year}`);
+        const chipList = document.getElementById(`vertical_year${year}`);
+
+        console.log(`Year ${year}:`);
+        console.log(`  Growth %:`, growthInput ? growthInput.value : 'NOT FOUND');
+        console.log(`  Hidden Reasons:`, reasonHidden ? reasonHidden.value : 'NOT FOUND');
+        console.log(`  Chip List:`, chipList ? 'FOUND' : 'NOT FOUND');
+
+        if (chipList) {
+            const selectedChips = chipList.querySelectorAll('.v-chip.selected');
+            console.log(`  Selected Chips:`, selectedChips.length);
+        }
+    }
+    console.log('=== END DEBUG ===');
+}
+
+// Add button event handler
+function setupAddButton() {
+    const addButton = document.getElementById('product_add_btn');
+    console.log('Add button found:', addButton);
+
+    if (!addButton) {
+        console.error('Add button not found!');
+        return;
+    }
+
+    addButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('=== ADD BUTTON CLICKED ===');
+
+        // Debug current form state
+        debugFormValues();
+
+        // Get business plan ID
+        const bplanId = this.value;
+        console.log('Business Plan ID:', bplanId);
+
+        // Basic validation
+        const productId = document.querySelector('[name="product_service_id"]').value;
+        const unit = document.querySelector('[name="unit"]').value;
+        const price = document.querySelector('[name="price"]').value;
+        const cost = document.querySelector('[name="cost"]').value;
+
+        console.log('Validation:', {
+            productId: !!productId,
+            unit: !!unit,
+            price: !!price,
+            cost: !!cost
+        });
+
+        if (!productId || !unit || !price || !cost) {
+            const errorMsg = document.documentElement.lang === 'ar'
+                ? 'يرجى ملء جميع الحقول الإلزامية (اسم المنتج، الكمية، السعر، التكلفة)'
+                : 'Please fill all required fields (Product Name, Quantity, Price, Cost)';
+            alert(errorMsg);
+            console.error('Validation failed:', errorMsg);
+            return;
+        }
+
+        console.log('Validation passed, preparing data...');
+
+        // Update all hidden inputs before processing
+        for (let year = 1; year <= 5; year++) {
+            const chipList = document.getElementById(`vertical_year${year}`);
+            const hidden = document.getElementById(`vertical_hidden_${year}`);
+
+            if (chipList && hidden) {
+                const selectedValues = [...chipList.querySelectorAll('.v-chip.selected')]
+                    .map(c => c.dataset.value);
+                hidden.value = selectedValues.join(',');
+                console.log(`Updated year ${year} hidden input:`, hidden.value);
+            }
+        }
+
+        // Prepare growth data
+        const growthData = [];
+        for (let year = 1; year <= 5; year++) {
+            const growthInput = document.getElementById(`growth_prct_year${year}`);
+            const reasonHidden = document.getElementById(`vertical_hidden_${year}`);
+
+            growthData.push({
+                year: year,
+                growth_prct: growthInput ? growthInput.value || '0' : '0',
+                growth_reason: reasonHidden ? reasonHidden.value : ''
+            });
+        }
+
+        // Prepare the data object
+        const productData = {
+            product_service_id: productId,
+            unit: unit,
+            price: price,
+            cost: cost,
+            growth_data: growthData,
+            bplan_id: bplanId
+        };
+
+        console.log('Final data to submit:', productData);
+
+        // Show loading state
+        const originalText = this.innerHTML;
+        this.innerHTML = document.documentElement.lang === 'ar'
+            ? '<i class="material-icons me-2">hourglass_empty</i>جاري الإضافة...'
+            : '<i class="material-icons me-2">hourglass_empty</i>Adding...';
+        this.disabled = true;
+
+        // SIMPLE FORM SUBMISSION (use this for testing)
+        console.log('Submitting form via traditional method...');
+        document.querySelector('form').submit();
+
+        // If you want AJAX instead, comment the line above and uncomment below:
+        /*
+        fetch('/add-product-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(productData)
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                alert('Product added successfully!');
+                resetForm();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            alert('Network error occurred.');
+        })
+        .finally(() => {
+            // Reset button state
+            this.innerHTML = originalText;
+            this.disabled = false;
+        });
+        */
+    });
+
+    console.log('Add button event listener attached');
+}
+
+// Initialize everything when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing product form...');
+    initializeChips();
+    setupAddButton();
+    console.log('Product form initialization complete');
+});
+
+// Also try initializing if DOM is already loaded
+if (document.readyState === 'loading') {
+    console.log('Document still loading, waiting for DOMContentLoaded');
+} else {
+    console.log('Document already ready, initializing now...');
+    initializeChips();
+    setupAddButton();
+}
+</script>
+
+
+                    <div><br></div>
+                    <!-- Products Table -->
+                    <div class="ajax-table-container" id="products-table-container">
+                        <div class="ajax-table-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 text-dark font-weight-bold">
+                                    <i class="material-icons me-2">inventory_2</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}المنتجات والخدمات{% else %}Products & Services{% endif %}
+                                </h6>
+                                <span class="badge bg-dark text-white">
+                                    {{ data_bp|length }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="ajax-table-body">
+                            <div class="table-responsive">
+                                <table class="table ajax-table align-items-center">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                                {% if session.get('lang', 'en') == 'ar' %}المنتج/الخدمة{% else %}Product/Service{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}الوحدة{% else %}Unit{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}التكلفة{% else %}Cost{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}السنة 1%{% else %}Year 1%{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}السنة 2%{% else %}Year 2%{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}السنة 3%{% else %}Year 3%{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}السنة 4%{% else %}Year 4%{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}السنة 5%{% else %}Year 5%{% endif %}
+                                            </th>
+<!--                                            <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">-->
+<!--                                                {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}-->
+<!--                                            </th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in data_bp %}
+                                        <tr>
+                                            <td class="ps-4 py-3">
+                                                <span class="badge bg-primary text-white">
+                                                    {{ product.product_service_name }}
+                                                </span>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <p class="text-sm text-dark mb-0">{{ product.unit }}</p>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <p class="text-sm font-weight-bold text-info mb-0">${{ "%.2f"|format(product.price|float) }}</p>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <p class="text-sm font-weight-bold text-warning mb-0">${{ "%.2f"|format(product.cost|float) }}</p>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <div class="growth-cell"
+                                                     data-bs-toggle="tooltip"
+                                                     data-bs-custom-class="growth-tooltip"
+                                                     data-bs-placement="top"
+                                                     data-bs-title="
+                                                        <div class='tooltip-content'>
+                                                            <h6 class='mb-2'>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                📈 نمو السنة الأولى
+                                                              {% else %}
+                                                                📈 Year 1 Growth
+                                                              {% endif %}
+                                                            </h6>
+                                                            <p class='mb-1'><strong>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                النسبة:
+                                                              {% else %}
+                                                                Percentage:
+                                                              {% endif %}
+                                                            </strong> {{ product.growth_prct_year1 }}%</p>
+                                                            <p class='mb-0'><strong>
+                                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                                الأسباب:
+                                                                              {% else %}
+                                                                                Reasons:
+                                                                              {% endif %}
+                                                                            </strong></p>
+                                                                            {% if product.reason_of_growth_year1 %}
+                                                                                {% set reasons = product.reason_of_growth_year1.split('|') %}
+                                                                                <ul class='mb-0 ps-3'>
+                                                                                    {% for reason in reasons %}
+                                                                                    <li>{{ reason }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            {% else %}
+                                                                                <em class='text-muted'>Not specified</em>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                     ">
+                                                    <span class="growth-badge {% if product.growth_prct_year1 and product.growth_prct_year1|float > 0 %}growth-positive{% elif product.growth_prct_year1 and product.growth_prct_year1|float < 0 %}growth-negative{% endif %}">
+                                                        {{ product.growth_prct_year1 }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <div class="growth-cell"
+                                                     data-bs-toggle="tooltip"
+                                                     data-bs-custom-class="growth-tooltip"
+                                                     data-bs-placement="top"
+                                                     data-bs-title="
+                                                        <div class='tooltip-content'>
+                                                            <h6 class='mb-2'>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                📈 نمو السنة الثانية
+                                                              {% else %}
+                                                                📈 Year 2 Growth
+                                                              {% endif %}
+                                                            </h6>
+                                                            <p class='mb-1'><strong>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                النسبة:
+                                                              {% else %}
+                                                                Percentage:
+                                                              {% endif %}
+                                                            </strong> {{ product.growth_prct_year2 }}%</p>
+                                                            <p class='mb-0'><strong>
+                                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                                الأسباب:
+                                                                              {% else %}
+                                                                                Reasons:
+                                                                              {% endif %}
+                                                                            </strong></p>
+                                                                            {% if product.reason_of_growth_year2 %}
+                                                                                {% set reasons = product.reason_of_growth_year2.split('|') %}
+                                                                                <ul class='mb-0 ps-3'>
+                                                                                    {% for reason in reasons %}
+                                                                                    <li>{{ reason }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            {% else %}
+                                                                                <em class='text-muted'>Not specified</em>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                     ">
+                                                    <span class="growth-badge {% if product.growth_prct_year2 and product.growth_prct_year2|float > 0 %}growth-positive{% elif product.growth_prct_year2 and product.growth_prct_year2|float < 0 %}growth-negative{% endif %}">
+                                                        {{ product.growth_prct_year2 }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <div class="growth-cell"
+                                                     data-bs-toggle="tooltip"
+                                                     data-bs-custom-class="growth-tooltip"
+                                                     data-bs-placement="top"
+                                                     data-bs-title="
+                                                        <div class='tooltip-content'>
+                                                            <h6 class='mb-2'>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                📈 نمو السنة الثالثة
+                                                              {% else %}
+                                                                📈 Year 3 Growth
+                                                              {% endif %}
+                                                            </h6>
+                                                            <p class='mb-1'><strong>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                النسبة:
+                                                              {% else %}
+                                                                Percentage:
+                                                              {% endif %}
+                                                            </strong> {{ product.growth_prct_year3 }}%</p>
+                                                            <p class='mb-0'><strong>
+                                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                                الأسباب:
+                                                                              {% else %}
+                                                                                Reasons:
+                                                                              {% endif %}
+                                                                            </strong></p>
+                                                                            {% if product.reason_of_growth_year3 %}
+                                                                                {% set reasons = product.reason_of_growth_year3.split('|') %}
+                                                                                <ul class='mb-0 ps-3'>
+                                                                                    {% for reason in reasons %}
+                                                                                    <li>{{ reason }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            {% else %}
+                                                                                <em class='text-muted'>Not specified</em>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                     ">
+                                                    <span class="growth-badge {% if product.growth_prct_year3 and product.growth_prct_year3|float > 0 %}growth-positive{% elif product.growth_prct_year3 and product.growth_prct_year3|float < 0 %}growth-negative{% endif %}">
+                                                        {{ product.growth_prct_year3 }}%
+                                                    </span>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <div class="growth-cell"
+                                                     data-bs-toggle="tooltip"
+                                                     data-bs-custom-class="growth-tooltip"
+                                                     data-bs-placement="top"
+                                                     data-bs-title="
+                                                        <div class='tooltip-content'>
+                                                            <h6 class='mb-2'>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                📈 نمو السنة الرابعة
+                                                              {% else %}
+                                                                📈 Year 4 Growth
+                                                              {% endif %}
+                                                            </h6>
+                                                            <p class='mb-1'><strong>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                النسبة:
+                                                              {% else %}
+                                                                Percentage:
+                                                              {% endif %}
+                                                            </strong> {{ product.growth_prct_year4 }}%</p>
+                                                            <p class='mb-0'><strong>
+                                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                                الأسباب:
+                                                                              {% else %}
+                                                                                Reasons:
+                                                                              {% endif %}
+                                                                            </strong></p>
+                                                                            {% if product.reason_of_growth_year4 %}
+                                                                                {% set reasons = product.reason_of_growth_year4.split('|') %}
+                                                                                <ul class='mb-0 ps-3'>
+                                                                                    {% for reason in reasons %}
+                                                                                    <li>{{ reason }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            {% else %}
+                                                                                <em class='text-muted'>Not specified</em>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                     ">
+                                                    <span class="growth-badge {% if product.growth_prct_year4 and product.growth_prct_year4|float > 0 %}growth-positive{% elif product.growth_prct_year4 and product.growth_prct_year4|float < 0 %}growth-negative{% endif %}">
+                                                        {{ product.growth_prct_year4 }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <div class="growth-cell"
+                                                     data-bs-toggle="tooltip"
+                                                     data-bs-custom-class="growth-tooltip"
+                                                     data-bs-placement="top"
+                                                     data-bs-title="
+                                                        <div class='tooltip-content'>
+                                                            <h6 class='mb-2'>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                📈 نمو السنة الخامسة
+                                                              {% else %}
+                                                                📈 Year 5 Growth
+                                                              {% endif %}
+                                                            </h6>
+                                                            <p class='mb-1'><strong>
+                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                النسبة:
+                                                              {% else %}
+                                                                Percentage:
+                                                              {% endif %}
+                                                            </strong> {{ product.growth_prct_year5 }}%</p>
+                                                            <p class='mb-0'><strong>
+                                                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                                                الأسباب:
+                                                                              {% else %}
+                                                                                Reasons:
+                                                                              {% endif %}
+                                                                            </strong></p>
+                                                                            {% if product.reason_of_growth_year5 %}
+                                                                                {% set reasons = product.reason_of_growth_year5.split('|') %}
+                                                                                <ul class='mb-0 ps-3'>
+                                                                                    {% for reason in reasons %}
+                                                                                    <li>{{ reason }}</li>
+                                                                                    {% endfor %}
+                                                                                </ul>
+                                                                            {% else %}
+                                                                                <em class='text-muted'>Not specified</em>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                     ">
+                                                    <span class="growth-badge {% if product.growth_prct_year5 and product.growth_prct_year5|float > 0 %}growth-positive{% elif product.growth_prct_year5 and product.growth_prct_year5|float < 0 %}growth-negative{% endif %}">
+                                                        {{ product.growth_prct_year5 }}%
+                                                    </span>
+                                                </div>
+                                            </td>
+<!--                                            <td class="text-center py-3">-->
+<!--                                                <button type="button" class="btn btn-sm btn-outline-danger delete-product-btn"-->
+<!--                                                        data-bs-toggle="tooltip"-->
+<!--                                                        data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المنتج{% else %}Delete Product{% endif %}"-->
+<!--                                                        data-product-id="{{ product.product_service_id }}">-->
+<!--                                                    <i class="material-icons text-xs">delete</i>-->
+<!--                                                </button>-->
+<!--                                            </td>-->
+                                        </tr>
+                                        {% endfor %}
+
+                                        <!-- Empty State -->
+                                        {% if data_bp|length == 0 %}
+                                        <tr>
+                                            <td colspan="10" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="material-icons display-4 text-gray-300 mb-2">inventory_2</i>
+                                                    <h6 class="text-gray-500 mb-1">
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            لا توجد منتجات مضافة
+                                                        {% else %}
+                                                            No products added
+                                                        {% endif %}
+                                                    </h6>
+                                                    <p class="text-xs text-gray-400 mb-0">
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            ابدأ بإضافة أول منتج
+                                                        {% else %}
+                                                            Start by adding your first product
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {% if data_bp|length > 0 %}
+                        <div class="ajax-table-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="text-sm text-muted mb-0">
+                                    <i class="material-icons text-xs me-1">calculate</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        إجمالي المنتجات: <strong class="text-success">{{ data_bp|length }}</strong>
+                                    {% else %}
+                                        Total Products: <strong class="text-success">{{ data_bp|length }}</strong>
+                                    {% endif %}
+                                </p>
+                                <div class="text-end">
+                                    <small class="text-muted">
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            💡 إذا كنت ترغب في حذف أو إضافة منتجات، ارجع إلى الملف التجاري
+                                        {% else %}
+                                            💡 If you want to delete or add products go back to business profile
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+                    <style>
+                    .growth-cell {
+                        cursor: pointer;
+                        padding: 4px 0;
+                        transition: all 0.2s ease;
+                    }
+
+                    .growth-cell:hover .growth-badge {
+                        transform: scale(1.05);
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    }
+
+                    .growth-badge {
+                        display: inline-block;
+                        padding: 4px 8px;
+                        border-radius: 12px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        font-weight: 600;
+                        font-size: 0.75rem;
+                        min-width: 50px;
+                        text-align: center;
+                        transition: all 0.3s ease;
+                        border: 2px solid transparent;
+                    }
+
+                    .growth-positive {
+                        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                    }
+
+                    .growth-negative {
+                        background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+                    }
+
+                    /* Custom tooltip styling */
+                    .growth-tooltip .tooltip-inner {
+                        background: white;
+                        color: #333;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                        border: 1px solid #e0e0e0;
+                        max-width: 300px;
+                        padding: 15px;
+                    }
+
+                    .tooltip-content h6 {
+                        color: #667eea;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                    }
+
+                    .tooltip-content p {
+                        font-size: 0.8rem;
+                        margin-bottom: 8px;
+                        line-height: 1.4;
+                    }
+
+                    .tooltip-content strong {
+                        color: #555;
+                    }
+
+                    /* Delete button hover effects */
+                    .delete-product-btn {
+                        transition: all 0.3s ease !important;
+                        border: 1px solid transparent;
+                    }
+
+                    .delete-product-btn:hover {
+                        transform: scale(1.15) !important;
+                        background-color: #dc3545 !important;
+                        border-color: #dc3545 !important;
+                        color: white !important;
+                        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+                    }
+                    </style>
+                </div>
+              </div>
+
+
+    </div>
+              <!-- Operating Expenses -->
+              <div class="card my-3">
+                <div class="card-body px-6 pt-2">
+                  <h5 class="font-weight-bolder text-info mt-3">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      المصاريف التشغيلية
+                    {% else %}
+                      Operating Expenses
+                    {% endif %}
+                  </h5>
+                    <!-- ADD card body -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="card card-body bg-gray-100 px-4 py-2">
+                                <!-- Expense Input Row -->
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group input-group-static mb-4">
+                                            <label class="form-label text-dark">
+                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                نوع المصروف
+                                              {% else %}
+                                                Expense Type
+                                              {% endif %}
+                                            </label>
+                                        </div>
+                                        <div class="input-group input-group-static mb-0">
+                                        <select class="multisteps-form__input form-control form-control-sm" name="expense_type" id="expense_type" required autocomplete="off">
+                                            <option value="" disabled selected>
+                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                اختر نوع المصروف
+                                              {% else %}
+                                                Select Expense Type
+                                              {% endif %}
+                                            </option>
+                                            <option value="Rent">
+                                              {% if session.get('lang', 'en') == 'ar' %}إيجار{% else %}Rent{% endif %}
+                                            </option>
+                                            <option value="Salaries">
+                                              {% if session.get('lang', 'en') == 'ar' %}رواتب{% else %}Salaries{% endif %}
+                                            </option>
+                                            <option value="Marketing">
+                                              {% if session.get('lang', 'en') == 'ar' %}تسويق{% else %}Marketing{% endif %}
+                                            </option>
+                                            <option value="Transport">
+                                              {% if session.get('lang', 'en') == 'ar' %}نقل{% else %}Transport{% endif %}
+                                            </option>
+                                            <option value="Travel">
+                                              {% if session.get('lang', 'en') == 'ar' %}سفر{% else %}Travel{% endif %}
+                                            </option>
+                                            <option value="Electricity">
+                                              {% if session.get('lang', 'en') == 'ar' %}كهرباء{% else %}Electricity{% endif %}
+                                            </option>
+                                            <option value="Generator">
+                                              {% if session.get('lang', 'en') == 'ar' %}مولد{% else %}Generator{% endif %}
+                                            </option>
+                                            <option value="Phone & Internet">
+                                              {% if session.get('lang', 'en') == 'ar' %}هاتف وإنترنت{% else %}Phone & Internet{% endif %}
+                                            </option>
+                                            <option value="Maintenance">
+                                              {% if session.get('lang', 'en') == 'ar' %}صيانة{% else %}Maintenance{% endif %}
+                                            </option>
+                                            <option value="Banks Fees">
+                                              {% if session.get('lang', 'en') == 'ar' %}رسوم بنكية{% else %}Banks Fees{% endif %}
+                                            </option>
+                                            <option value="Insurance">
+                                              {% if session.get('lang', 'en') == 'ar' %}تأمين{% else %}Insurance{% endif %}
+                                            </option>
+                                            <option value="Stationery">
+                                              {% if session.get('lang', 'en') == 'ar' %}قرطاسية{% else %}Stationery{% endif %}
+                                            </option>
+                                            <option value="Web Hosting">
+                                              {% if session.get('lang', 'en') == 'ar' %}استضافة ويب{% else %}Web Hosting{% endif %}
+                                            </option>
+                                            <option value="R&D">
+                                              {% if session.get('lang', 'en') == 'ar' %}بحث وتطوير{% else %}R&D{% endif %}
+                                            </option>
+                                            <option value="Cleaning">
+                                              {% if session.get('lang', 'en') == 'ar' %}تنظيف{% else %}Cleaning{% endif %}
+                                            </option>
+                                            <option value="Tax & Legal Fees">
+                                              {% if session.get('lang', 'en') == 'ar' %}ضرائب ورسوم قانونية{% else %}Tax & Legal Fees{% endif %}
+                                            </option>
+                                        </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="input-group input-group-static mb-4">
+                                            <label class="form-label text-dark">
+                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                الكمية
+                                              {% else %}
+                                                Quantity
+                                              {% endif %}
+                                            </label>
+                                        </div>
+                                        <div class="input-group input-group-static mb-0">
+                                            <input class="form-control" type="number" name="unit_quantity" id="unit_quantity" min="0" step="1" placeholder="" required autocomplete="off"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="input-group input-group-static mb-4">
+                                            <label class="form-label text-dark">
+                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                التكلفة
+                                              {% else %}
+                                                Cost
+                                              {% endif %}
+                                            </label>
+                                        </div>
+                                        <div class="input-group input-group-static mb-0">
+                                            <input class="form-control" type="number" name="price" id="price" min="0" step="0.01" placeholder="" required autocomplete="off"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-1 align-self-end">
+                            <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip"
+                                    data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}"
+                                    type="button" id="expense_add_btn" value="{{ bplan_id }}">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  إضافة
+                                {% else %}
+                                  add
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+
+                    <br>
+                    <!-- Expenses Table -->
+                    <div class="ajax-table-container" id="expenses-table-container">
+                        <div class="ajax-table-body">
+                            <div class="table-responsive">
+                                <table class="table ajax-table align-items-center">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                                {% if session.get('lang', 'en') == 'ar' %}نوع المصروف{% else %}Expense Type{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}الكمية{% else %}Quantity{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}التكلفة{% else %}Cost{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}الإجمالي{% else %}Total{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
+                                                {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for expense in data_expenses %}
+                                        <tr>
+                                                <td class="ps-4 py-3">
+                                                    <span class="badge {% if expense.type == 'Potential Loan Repayment' %}loan-repayment-badge{% else %}bg-primary{% endif %} text-white"
+                                                          {% if expense.type == 'Potential Loan Repayment' %}
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-custom-class="loan-repayment-tooltip"
+                                                          data-bs-placement="top"
+                                                          data-bs-title="{% if session.get('lang', 'en') == 'ar' %}⚠️ إذا كنت تريد تعديل أو حذف سداد القرض المحتمل، يرجى الرجوع إلى قسم التمويل المطلوب{% else %}⚠️ If you want to edit or delete Potential Loan Repayment, please go back to Requested Fund{% endif %}"
+                                                          {% endif %}>
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            {% if expense.type == 'Potential Loan Repayment' %}سداد القرض المحتمل
+                                                            {% elif expense.type == 'Rent' %}إيجار
+                                                            {% elif expense.type == 'Salaries' %}رواتب
+                                                            {% elif expense.type == 'Marketing' %}تسويق
+                                                            {% elif expense.type == 'Transport' %}نقل
+                                                            {% elif expense.type == 'Travel' %}سفر
+                                                            {% elif expense.type == 'Electricity' %}كهرباء
+                                                            {% elif expense.type == 'Generator' %}مولد
+                                                            {% elif expense.type == 'Phone & Internet' %}هاتف وإنترنت
+                                                            {% elif expense.type == 'Maintenance' %}صيانة
+                                                            {% elif expense.type == 'Banks Fees' %}رسوم بنكية
+                                                            {% elif expense.type == 'Insurance' %}تأمين
+                                                            {% elif expense.type == 'Stationery' %}قرطاسية
+                                                            {% elif expense.type == 'Web Hosting' %}استضافة ويب
+                                                            {% elif expense.type == 'R&D' %}بحث وتطوير
+                                                            {% elif expense.type == 'Cleaning' %}تنظيف
+                                                            {% elif expense.type == 'Tax & Legal Fees' %}ضرائب ورسوم قانونية
+                                                            {% else %}{{ expense.type }}{% endif %}
+                                                        {% else %}
+                                                            {{ expense.type }}
+                                                        {% endif %}
+                                                    </span>
+                                                </td>
+                                            <td class="ps-3 py-3">
+                                                <p class="text-sm text-dark mb-0">{{ expense.unit_quantity }}</p>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <p class="text-sm font-weight-bold text-info mb-0">{{ "%.2f"|format(expense.price) }}</p>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <p class="text-sm font-weight-bold text-success mb-0">
+                                                    {{ "%.2f"|format(expense.unit_quantity * expense.price) }}
+                                                </p>
+                                            </td>
+                                            <td class="text-center py-3">
+                                                {% if expense.type == 'Potential Loan Repayment' %}
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}غير مسموح بالحذف - الرجوع إلى التمويل المطلوب{% else %}Delete not allowed - Go to Requested Fund{% endif %}"
+                                                            disabled>
+                                                        <i class="material-icons text-xs">block</i>
+                                                    </button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-expense-btn"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المصروف{% else %}Delete Expense{% endif %}"
+                                                            data-expense-id="{{ expense.id }}">
+                                                        <i class="material-icons text-xs">delete</i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+
+                                        <!-- Empty State -->
+                                        {% if data_expenses|length == 0 %}
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="material-icons display-4 text-gray-300 mb-2">receipt</i>
+                                                    <h6 class="text-gray-500 mb-1">
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            لا توجد مصروفات مضافة
+                                                        {% else %}
+                                                            No expenses added
+                                                        {% endif %}
+                                                    </h6>
+                                                    <p class="text-xs text-gray-400 mb-0">
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            ابدأ بإضافة أول مصروف
+                                                        {% else %}
+                                                            Start by adding your first expense
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {% if data_expenses|length > 0 %}
+                        <div class="ajax-table-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="text-sm text-muted mb-0">
+                                    <i class="material-icons text-xs me-1">calculate</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        إجمالي المصروفات: <strong class="text-success">
+                                        {# Calculate total expenses #}
+                                        {% set total_expenses = [] %}
+                                        {% for expense in data_expenses %}
+                                            {% set _ = total_expenses.append(expense.unit_quantity * expense.price) %}
+                                        {% endfor %}
+                                        {{ "%.2f"|format(total_expenses|sum) }}
+                                        </strong>
+                                    {% else %}
+                                        Total Expenses: <strong class="text-success">
+                                        {# Calculate total expenses #}
+                                        {% set total_expenses = [] %}
+                                        {% for expense in data_expenses %}
+                                            {% set _ = total_expenses.append(expense.unit_quantity * expense.price) %}
+                                        {% endfor %}
+                                        {{ "%.2f"|format(total_expenses|sum) }}
+                                        </strong>
+                                    {% endif %}
+                                </p>
+                                <div class="text-end">
+                                    <small class="text-muted">
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            💡 انقر على أيقونة الحذف للإزالة
+                                        {% else %}
+                                            💡 Click delete icon to remove
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <style>
+                    /* EXPENSES TABLE SPECIFIC STYLES */
+                    .ajax-table-container {
+                        background: #fff;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                        margin-bottom: 1.5rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    .ajax-table-container:hover {
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                    }
+
+                    .ajax-table-header {
+                        background: #f8f9fa;
+                        border-bottom: 1px solid #e2e8f0;
+                        padding: 1rem 1.5rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    .ajax-table-body {
+                        padding: 0;
+                    }
+
+                    .ajax-table-footer {
+                        background: #f8f9fa;
+                        border-top: 1px solid #e2e8f0;
+                        padding: 0.75rem 1.5rem;
+                    }
+
+                    .ajax-table {
+                        margin-bottom: 0;
+                    }
+
+                    .ajax-table thead {
+                        background: #f1f5f9;
+                    }
+
+                    /* Enhanced row hover effects */
+                    .ajax-table tbody tr {
+                        transition: all 0.3s ease;
+                        border-left: 3px solid transparent;
+                    }
+
+                    .ajax-table tbody tr:hover {
+                        background-color: rgba(0, 123, 255, 0.04) !important;
+                        border-left: 3px solid #007bff;
+                        transform: translateX(2px);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                    }
+
+                    /* Delete button hover effects */
+                    .delete-expense-btn {
+                        transition: all 0.3s ease !important;
+                        border: 1px solid transparent;
+                    }
+
+                    .delete-expense-btn:hover {
+                        transform: scale(1.15) !important;
+                        background-color: #dc3545 !important;
+                        border-color: #dc3545 !important;
+                        color: white !important;
+                        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+                    }
+
+                    /* Badge hover effects */
+                    .ajax-table .badge {
+                        transition: all 0.3s ease;
+                    }
+
+                    .ajax-table .badge:hover {
+                        transform: translateY(-1px);
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    }
+
+                    /* Add button styling */
+                    #expense_add_btn {
+                        transition: all 0.3s ease;
+                    }
+
+                    #expense_add_btn:hover {
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+                    }
+
+                        /* Loan Repayment Tooltip Styles */
+                        .loan-repayment-tooltip .tooltip-inner {
+                            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+                            color: white;
+                            border-radius: 12px;
+                            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+                            border: 1px solid #ff6b6b;
+                            max-width: 300px;
+                            padding: 15px;
+                            font-weight: 500;
+                        }
+
+                        .loan-repayment-tooltip .tooltip-arrow::before {
+                            border-top-color: #ff6b6b !important;
+                        }
+
+                        .loan-repayment-badge {
+                            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
+                            position: relative;
+                        }
+
+                        .loan-repayment-badge::after {
+                            content: '!';
+                            position: absolute;
+                            top: -5px;
+                            right: -5px;
+                            background: #ff3838;
+                            color: white;
+                            border-radius: 50%;
+                            width: 18px;
+                            height: 18px;
+                            font-size: 12px;
+                            font-weight: bold;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            animation: pulse 2s infinite;
+                        }
+
+                        @keyframes pulse {
+                            0% { transform: scale(1); }
+                            50% { transform: scale(1.1); }
+                            100% { transform: scale(1); }
+                        }
+                    </style>
+                    </div>
+                </div>
+
+          <div><br></div>
+
+            <!-- Combined Financial Projections Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                                <h6 class="text-white text-capitalize ps-3">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    التوقعات المالية
+                                  {% else %}
+                                    Financial Projections
+                                  {% endif %}
+                                </h6>
+                                <p class="text-white text-sm ps-3 mb-0">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    بما في ذلك ضوابط التضخم والتوقعات لـ 6 سنوات
+                                  {% else %}
+                                    Including inflation controls and 6-year projections
+                                  {% endif %}
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <div class="card-body">
+                            <!-- Inflation Rate Control Section -->
+                            <div class="px-6 pt-2">
+                                <h5 class="font-weight-bolder text-info mt-3">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    ضوابط التضخم
+                                  {% else %}
+                                    Inflation Controls
+                                  {% endif %}
+                                </h5>
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="update_inflation">
+                                    <div class="d-flex align-items-center gap-3 mb-4">
+                                        <!-- Label and Percentage Group -->
+                                        <div class="d-flex align-items-center" style="min-width: 180px">
+                                            <span class="text-dark font-weight-bold me-2" style="font-size: 0.9rem;">
+                                              {% if session.get('lang', 'en') == 'ar' %}
+                                                معدل التضخم السنوي:
+                                              {% else %}
+                                                Annual Inflation Rate:
+                                              {% endif %}
+                                            </span>
+                                            <span class="badge bg-gradient-info fs-6 px-2" id="inflationRateValue">
+                                                {{ current_inflation_rate|default(3, true) }}%
+                                            </span>
+                                        </div>
+
+                                        <!-- Slider -->
+                                        <input type="range"
+                                               class="form-range flex-grow-1 mx-2"
+                                               name="assumptions_inflation_rate"
+                                               id="inflationRateSlider"
+                                               min="0"
+                                               max="20"
+                                               step="0.5"
+                                               value="{{ current_inflation_rate|default(3, true) }}"
+                                               oninput="document.getElementById('inflationRateValue').innerText = this.value + '%'">
+
+                                        <!-- Update Button -->
+                                        <button type="submit"
+                                                class="btn bg-gradient-info btn-sm"
+                                                style="min-width: 80px">
+                                          {% if session.get('lang', 'en') == 'ar' %}
+                                            تحديث
+                                          {% else %}
+                                            Update
+                                          {% endif %}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Projections Table Section -->
+                            <div class="px-0 pb-2">
+                                <div class="table-responsive p-0">
+                                    <table class="table align-items-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                  {% if session.get('lang', 'en') == 'ar' %}
+                                                    البند
+                                                  {% else %}
+                                                    Item
+                                                  {% endif %}
+                                                </th>
+                                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                                  {% if session.get('lang', 'en') == 'ar' %}
+                                                    التفاصيل
+                                                  {% else %}
+                                                    Details
+                                                  {% endif %}
+                                                </th>
+                                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-center">
+                                                  {% if session.get('lang', 'en') == 'ar' %}
+                                                    الحالي
+                                                  {% else %}
+                                                    Current
+                                                  {% endif %}
+                                                </th>
+                                                {% for year in range(1, 6) %}
+                                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 text-center">
+                                                  {% if session.get('lang', 'en') == 'ar' %}
+                                                    السنة {{ year }}
+                                                  {% else %}
+                                                    Year {{ year }}
+                                                  {% endif %}
+                                                </th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Products Section -->
+                                            {% for product in data_projections if product.type == 'product' %}
+                                            <tr>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">{{ product.name }}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        الكمية
+                                                      {% else %}
+                                                        Quantity
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in product.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-secondary text-xs font-weight-bold">{{ year.quantity|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Price Per Unit -->
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        السعر لكل وحدة
+                                                      {% else %}
+                                                        Price Per Unit
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in product.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-info text-xs font-weight-bold">${{ year.price_per_unit|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Cost Per Unit -->
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        التكلفة لكل وحدة
+                                                      {% else %}
+                                                        Cost Per Unit
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in product.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-warning text-xs font-weight-bold">${{ year.cost_per_unit|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Per-Product Revenue -->
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        الإيرادات
+                                                      {% else %}
+                                                        Revenue
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in product.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-success text-xs font-weight-bold">${{ year.revenue|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Per-Product Cost -->
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        التكلفة
+                                                      {% else %}
+                                                        Cost
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in product.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-danger text-xs font-weight-bold">${{ year.cost|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Per-Product Total Row -->
+                                            <tr class="bg-gray-50">
+                                                <td colspan="2">
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        الإجمالي ({{ product.name }})
+                                                      {% else %}
+                                                        Total ({{ product.name }})
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in product.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-success text-xs font-weight-bold">${{ year.revenue|round(2) }}</span>
+                                                    <span class="text-danger text-xs font-weight-bold d-block">${{ year.cost|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+
+                                            <!-- Grand Totals Before Expenses -->
+                                            <tr class="bg-gray-100">
+                                                <td colspan="2">
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        إجمالي إيرادات المنتجات
+                                                      {% else %}
+                                                        TOTAL PRODUCT REVENUE
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in data_total_projections.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-success text-xs font-weight-bold">${{ year.grand_total_revenue|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr class="bg-gray-100">
+                                                <td colspan="2">
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        إجمالي تكلفة المنتجات
+                                                      {% else %}
+                                                        TOTAL PRODUCT COST
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in data_total_projections.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-danger text-xs font-weight-bold">${{ year.grand_total_cost|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Operating Expenses Separator -->
+                                            <tr>
+                                                <td colspan="{{ 2 + 6 }}" class="bg-white">
+                                                    <p class="text-xs font-weight-bold text-uppercase text-center my-2 text-dark">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        المصاريف التشغيلية
+                                                      {% else %}
+                                                        OPERATING EXPENSES
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Individual Expenses -->
+                                            {% for expense in data_projections if expense.type == 'expense' and expense.name != 'Total Operating Expenses' %}
+                                            <tr>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">{{ expense.name }}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="text-xs font-weight-bold mb-0">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        التكلفة
+                                                      {% else %}
+                                                        Cost
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in expense.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-warning text-xs font-weight-bold">${{ year.amount|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% endfor %}
+
+                                            <!-- Total Operating Expenses -->
+                                            <tr class="bg-gray-100">
+                                                <td colspan="2">
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        إجمالي المصاريف التشغيلية
+                                                      {% else %}
+                                                        TOTAL OPERATING EXPENSES
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for expense in data_projections if expense.type == 'expense_total' %}
+                                                {% for year in expense.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-warning text-xs font-weight-bold">${{ year.amount|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                                {% endfor %}
+                                            </tr>
+
+                                            <!-- Final Totals -->
+                                            <tr class="bg-gray-200">
+                                                <td colspan="2">
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        صافي الربح الإجمالي
+                                                      {% else %}
+                                                        TOTAL NET PROFIT
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in data_total_projections.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-dark text-xs font-weight-bold">${{ year.profit|round(2) }}</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr class="bg-gray-200">
+                                                <td colspan="2">
+                                                    <p class="text-xs font-weight-bold mb-0 ps-3">
+                                                      {% if session.get('lang', 'en') == 'ar' %}
+                                                        هامش الربح
+                                                      {% else %}
+                                                        PROFIT MARGIN
+                                                      {% endif %}
+                                                    </p>
+                                                </td>
+                                                {% for year in data_total_projections.years %}
+                                                <td class="align-middle text-center">
+                                                    <span class="text-info text-xs font-weight-bold">{{ year.margin|round(1) }}%</span>
+                                                </td>
+                                                {% endfor %}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <form method="POST">
+                                <div class="button-row d-flex mt-4">
+                                    <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}"
+                                            type="submit" name="action" value="save">
+                                      {% if session.get('lang', 'en') == 'ar' %}
+                                        حفظ
+                                      {% else %}
+                                        Save
+                                      {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+<script>
+// COMBINED SCRIPT - ALL FUNCTIONS IN ONE PLACE
+
+// Set the language attribute for JavaScript detection
+document.documentElement.lang = "{{ session.get('lang', 'en') }}";
+
+// ✅ SUCCESS TOAST HELPER FUNCTION
+function showSuccessToast(message) {
+    const toastEl = document.getElementById('successToast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    // Set custom message if provided
+    if (message) {
+        const icon = '<i class="material-icons me-2">check_circle</i>';
+        toastMessage.innerHTML = icon + message;
+    }
+
+    const toast = new bootstrap.Toast(toastEl, {
+        delay: 3000 // 3 seconds
+    });
+    toast.show();
+}
+
+// PRODUCTS AJAX FIX - STANDALONE SCRIPT
+class ProductsAjaxManager {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupProductsListeners();
+        this.initializeTooltips();
+    }
+
+    setupProductsListeners() {
+        // Setup products add button
+        const productAddButton = document.getElementById('product_add_btn');
+        if (productAddButton) {
+            // Remove any existing listeners to prevent duplicates
+            productAddButton.replaceWith(productAddButton.cloneNode(true));
+            const newButton = document.getElementById('product_add_btn');
+
+            newButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleProductAdd();
+            });
+        }
+
+        // Setup products delete buttons
+        this.attachProductDeleteListeners();
+    }
+
+    async handleProductAdd() {
+        const formData = new FormData();
+
+        // Get all product form values
+        const productServiceId = document.getElementById('product_service_id');
+        const unit = document.querySelector('[name="unit"]');
+        const price = document.querySelector('[name="price"]');
+        const cost = document.querySelector('[name="cost"]');
+        const addButton = document.getElementById('product_add_btn');
+
+        console.log('Product Form values:', {
+            product_service_id: productServiceId?.value,
+            unit: unit?.value,
+            price: price?.value,
+            cost: cost?.value
+        });
+
+        // Validate required fields
+        if (!productServiceId?.value || productServiceId.value === "" ||
+            !unit?.value || unit.value === "" ||
+            !price?.value || price.value === "" ||
+            !cost?.value || cost.value === "") {
+            this.showError("{% if session.get('lang', 'en') == 'ar' %}يرجى ملء جميع الحقول المطلوبة{% else %}Please fill all required fields{% endif %}");
+            return;
+        }
+
+        // Add fields to formData
+        formData.append('product_add', addButton.value);
+        formData.append('product_service_id', productServiceId.value);
+        formData.append('unit', unit.value);
+        formData.append('price', price.value);
+        formData.append('cost', cost.value);
+
+        // Add growth percentages and reasons
+// Add growth percentages and reasons
+// Add growth percentages and reasons
+for (let year = 1; year <= 5; year++) {
+    const growthPercent = document.querySelector(`[name="growth_prct_year${year}"]`);
+
+    // Get reasons from hidden input (chip system)
+    const reasonHidden = document.getElementById(`vertical_hidden_${year}`);
+
+    // Always send growth percentage (default to 0 if empty)
+    formData.append(`growth_prct_year${year}`, growthPercent?.value || '0');
+
+    // Only send reasons if any are selected, otherwise send empty string
+    if (reasonHidden && reasonHidden.value && reasonHidden.value.trim() !== '') {
+        const selectedReasons = reasonHidden.value.split(',').filter(val => val.trim() !== '');
+        selectedReasons.forEach(reason => {
+            formData.append(`growth_reason_year${year}`, reason);
+        });
+    } else {
+        formData.append(`growth_reason_year${year}`, '');
+    }
+}
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                this.clearProductForm();
+                await this.refreshProductsTable();
+
+                // ✅ Show success message
+                const lang = document.documentElement.lang;
+                const message = lang === 'ar'
+                    ? 'تم إضافة المنتج بنجاح!'
+                    : 'Added successfully!';
+                showSuccessToast(message);
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Error adding product:', error);
+            this.showError("{% if session.get('lang', 'en') == 'ar' %}خطأ في إضافة المنتج{% else %}Error adding product{% endif %}");
+        }
+    }
+
+    async handleProductDelete(productId) {
+        const confirmMessage = "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المنتج؟{% else %}Are you sure you want to delete this product?{% endif %}";
+
+        if (confirm(confirmMessage)) {
+            const formData = new FormData();
+            formData.append('product_delete', productId);
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.refreshProductsTable();
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                this.showError("{% if session.get('lang', 'en') == 'ar' %}خطأ في حذف المنتج{% else %}Error deleting product{% endif %}");
+            }
+        }
+    }
+
+    async refreshProductsTable() {
+        try {
+            const response = await fetch(window.location.href);
+            const html = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const newContainer = doc.querySelector('#products-table-container');
+            if (newContainer) {
+                const currentContainer = document.querySelector('#products-table-container');
+                currentContainer.innerHTML = newContainer.innerHTML;
+                this.attachProductDeleteListeners();
+                this.initializeTooltips();
+            }
+        } catch (error) {
+            console.error('Error refreshing products table:', error);
+            window.location.reload();
+        }
+    }
+
+    attachProductDeleteListeners() {
+        document.querySelectorAll('.delete-product-btn').forEach(button => {
+            // Remove any existing listeners
+            button.replaceWith(button.cloneNode(true));
+            const newButton = document.querySelector(`[data-product-id="${button.getAttribute('data-product-id')}"]`);
+
+            newButton.addEventListener('click', () => {
+                const productId = newButton.getAttribute('data-product-id');
+                this.handleProductDelete(productId);
+            });
+        });
+    }
+
+    clearProductForm() {
+        const unit = document.querySelector('[name="unit"]');
+        const price = document.querySelector('[name="price"]');
+        const cost = document.querySelector('[name="cost"]');
+
+        if (unit) unit.value = '';
+        if (price) price.value = '';
+        if (cost) cost.value = '';
+
+        for (let year = 1; year <= 5; year++) {
+            const growthPercent = document.querySelector(`[name="growth_prct_year${year}"]`);
+            if (growthPercent) growthPercent.value = '';
+
+            // Clear multi-select using Choices.js API
+            const reasonSelect = document.getElementById(`growth_reason_year${year}`);
+            if (reasonSelect && reasonSelect.choices) {
+                reasonSelect.choices.removeActiveItems();
+            }
+        }
+    }
+
+    initializeTooltips() {
+        // Reinitialize tooltips for growth percentages
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('.growth-cell'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            // Remove existing tooltip if any
+            const existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+            if (existingTooltip) {
+                existingTooltip.dispose();
+            }
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'hover',
+                delay: {show: 300, hide: 100},
+                html: true
+            });
+        });
+    }
+
+    showError(message) {
+        alert(message);
+    }
+}
+
+// CORRECTED EXPENSES AJAX MANAGEMENT WITH TOOLTIPS
+class ExpensesManager {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupExpensesListeners();
+        this.initializeTooltips();
+    }
+
+    setupExpensesListeners() {
+        const addButton = document.getElementById('expense_add_btn');
+        if (addButton) {
+            addButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleExpenseAdd();
+            });
+        }
+        this.attachExpenseDeleteListeners();
+    }
+
+    async handleExpenseAdd() {
+        const formData = new FormData();
+        const expenseType = document.getElementById('expense_type');
+        const unitQuantity = document.getElementById('unit_quantity');
+        const price = document.getElementById('price');
+        const addButton = document.getElementById('expense_add_btn');
+
+        if (!expenseType?.value || expenseType.value === "" ||
+            !unitQuantity?.value || unitQuantity.value === "" ||
+            !price?.value || price.value === "") {
+            this.showError("{% if session.get('lang', 'en') == 'ar' %}يرجى ملء جميع الحقول المطلوبة{% else %}Please fill all required fields{% endif %}");
+            return;
+        }
+
+        formData.append('expense_add', addButton.value);
+        formData.append('expense_type', expenseType.value);
+        formData.append('unit_quantity', unitQuantity.value);
+        formData.append('price', price.value);
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                this.clearExpenseForm();
+                await this.refreshExpensesTable();
+
+                // ✅ Show success message
+                const lang = document.documentElement.lang;
+                const message = lang === 'ar'
+                    ? 'تم إضافة المصروف بنجاح!'
+                    : 'Expense added successfully!';
+                showSuccessToast(message);
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('Error adding expense:', error);
+            this.showError("{% if session.get('lang', 'en') == 'ar' %}خطأ في إضافة المصروف{% else %}Error adding expense{% endif %}");
+        }
+    }
+
+    async handleExpenseDelete(expenseId) {
+        const confirmMessage = "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المصروف؟{% else %}Are you sure you want to delete this expense?{% endif %}";
+
+        if (confirm(confirmMessage)) {
+            const formData = new FormData();
+            formData.append('expense_delete', expenseId);
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.refreshExpensesTable();
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error deleting expense:', error);
+                this.showError("{% if session.get('lang', 'en') == 'ar' %}خطأ في حذف المصروف{% else %}Error deleting expense{% endif %}");
+            }
+        }
+    }
+
+    async refreshExpensesTable() {
+        try {
+            const response = await fetch(window.location.href);
+            const html = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const newContainer = doc.querySelector('#expenses-table-container');
+            if (newContainer) {
+                const currentContainer = document.querySelector('#expenses-table-container');
+                currentContainer.innerHTML = newContainer.innerHTML;
+                this.attachExpenseDeleteListeners();
+                this.initializeTooltips();
+            }
+        } catch (error) {
+            console.error('Error refreshing expenses table:', error);
+            window.location.reload();
+        }
+    }
+
+    attachExpenseDeleteListeners() {
+        document.querySelectorAll('.delete-expense-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const expenseId = button.getAttribute('data-expense-id');
+                this.handleExpenseDelete(expenseId);
+            });
+        });
+    }
+
+    initializeTooltips() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('.growth-cell'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'hover',
+                delay: {show: 300, hide: 100},
+                html: true
+            });
+        });
+
+        var loanTooltipTriggerList = [].slice.call(document.querySelectorAll('.loan-repayment-badge'));
+        var loanTooltipList = loanTooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                trigger: 'hover',
+                delay: {show: 300, hide: 100},
+                html: true
+            });
+        });
+    }
+
+    clearExpenseForm() {
+        const expenseType = document.getElementById('expense_type');
+        const unitQuantity = document.getElementById('unit_quantity');
+        const price = document.getElementById('price');
+
+        if (expenseType) expenseType.selectedIndex = 0;
+        if (unitQuantity) unitQuantity.value = '';
+        if (price) price.value = '';
+    }
+
+    showError(message) {
+        alert(message);
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize multi-select for growth reasons
+    for (let year = 1; year <= 5; year++) {
+        const element = document.getElementById(`growth_reason_year${year}`);
+        if (element) {
+            const choicesInstance = new Choices(element, {
+                removeItemButton: true,
+                searchEnabled: true,
+                placeholderValue: document.documentElement.lang === 'ar'
+                    ? 'اختر الأسباب'
+                    : 'Select reasons',
+                noResultsText: document.documentElement.lang === 'ar'
+                    ? 'لا توجد نتائج'
+                    : 'No results found',
+                itemSelectText: document.documentElement.lang === 'ar'
+                    ? 'اضغط للاختيار'
+                    : 'Press to select',
+            });
+
+            // Store the Choices instance on the element for later access
+            element.choices = choicesInstance;
+        }
+    }
+
+    // Initialize managers
+    if (document.getElementById('product_add_btn')) {
+        window.productsAjaxManager = new ProductsAjaxManager();
+    }
+    window.expensesManager = new ExpensesManager();
+});
+</script>
+
+
+<style>
+ /* Target Arabic language specifically */
+html[lang="ar"] .choices[data-type*="select-one"]:after {
+    display: none !important;
+}
+
+html[lang="ar"] select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+</style>
+
+
+{% endblock javascripts %}

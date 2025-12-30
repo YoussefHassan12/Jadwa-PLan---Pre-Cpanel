@@ -1,0 +1,178 @@
+<!-- Navbar -->
+<nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" navbar-scroll="true">
+  <div class="container-fluid py-1 px-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+        <li class="breadcrumb-item text-sm">
+          <a class="text-secondary" href="/global-dashboard">
+            <i class="material-icons text-secondary" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">home</i>
+            Home
+          </a>
+        </li>
+        {% if segment == 'index' %}
+        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Business Plans</li>
+        {% elif segment == 'global_dashboard' %}
+        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Dashboard</li>
+        {% elif segment == 'assessments' %}
+        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Assessments</li>
+        {% elif segment == 'reports' %}
+        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Reports & Analytics</li>
+        {% else %}
+        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">{{ segment|default('Page')|title }}</li>
+        {% endif %}
+      </ol>
+
+      {% if segment == 'index' %}
+      <h6 class="font-weight-bolder mb-0" style="color: #344767;">Business Plans</h6>
+      {% elif segment == 'global_dashboard' %}
+      <h6 class="font-weight-bolder mb-0" style="color: #344767;">Dashboard</h6>
+      {% elif segment == 'assessments' %}
+      <h6 class="font-weight-bolder mb-0" style="color: #344767;">Assessments</h6>
+      {% elif segment == 'reports' %}
+      <h6 class="font-weight-bolder mb-0" style="color: #344767;">Reports & Analytics</h6>
+      {% else %}
+      <h6 class="font-weight-bolder mb-0" style="color: #344767;">{{ segment|default('Page')|title }}</h6>
+      {% endif %}
+    </nav>
+
+    <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+      <!-- Search Bar -->
+      <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+        <div class="input-group input-group-outline" style="border-radius: 8px; overflow: hidden;">
+          <span class="input-group-text bg-white border-end-0" style="border-color: #e0e0e0;">
+            <i class="material-icons text-secondary" style="font-size: 18px;">search</i>
+          </span>
+          <input type="text" class="form-control border-start-0 ps-0" placeholder="Search..." style="border-color: #e0e0e0;">
+        </div>
+      </div>
+
+      <!-- Language Switcher -->
+      <div class="language-switcher d-flex align-items-center mx-3">
+        <a href="{{ url_for('home_blueprint.set_language', lang='en') }}"
+           class="lang-btn {% if session.get('lang', 'en') == 'en' %}active{% endif %}">
+          EN
+        </a>
+        <a href="{{ url_for('home_blueprint.set_language', lang='ar') }}"
+           class="lang-btn {% if session.get('lang', 'en') == 'ar' %}active{% endif %}">
+          AR
+        </a>
+      </div>
+
+      <!-- Navbar Actions -->
+      <ul class="navbar-nav justify-content-end align-items-center">
+
+        <!-- User Profile -->
+        <li class="nav-item dropdown ps-2">
+          <a href="javascript:;" class="nav-link p-0 d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="user-avatar">
+              <span>{{ session.get('username', 'U')[0:2]|upper }}</span>
+            </div>
+            <div class="d-none d-sm-block ms-2">
+              <span class="user-name">{{ session.get('username', 'User') }}</span>
+              <i class="material-icons" style="font-size: 18px; vertical-align: middle; color: #7b809a;">expand_more</i>
+            </div>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end px-2 py-3" aria-labelledby="userDropdown" style="min-width: 200px; border-radius: 12px; box-shadow: 0 8px 26px rgba(0,0,0,0.1);">
+            <li>
+              <a class="dropdown-item border-radius-md py-2" href="{{ url_for('authentication_blueprint.logout') }}">
+                <i class="material-icons me-2" style="font-size: 18px; color: #F44336;">logout</i>
+                <span style="color: #F44336;">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- End Navbar -->
+
+<style>
+  /* Search Bar Enhancement */
+  .input-group-outline .form-control:focus {
+    border-color: #4F7DF3 !important;
+    box-shadow: 0 0 0 2px rgba(79, 125, 243, 0.1) !important;
+  }
+
+  .input-group-outline .input-group-text {
+    border-radius: 8px 0 0 8px !important;
+  }
+
+  .input-group-outline .form-control {
+    border-radius: 0 8px 8px 0 !important;
+  }
+
+  /* Language Switcher */
+  .language-switcher {
+    background: #f0f2f5;
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7b809a;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .lang-btn:hover {
+    color: #4F7DF3;
+  }
+
+  .lang-btn.active {
+    background: linear-gradient(135deg, #49a3f1 0%, #1A73E8 100%);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(79, 125, 243, 0.3);
+  }
+
+  .lang-btn.active:hover {
+    color: #fff;
+  }
+
+  /* User Avatar */
+  .user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #49a3f1 0%, #1A73E8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(79, 125, 243, 0.3);
+  }
+
+  /* User Name */
+  .user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #344767;
+  }
+
+  /* Dropdown Enhancements */
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(79, 125, 243, 0.08);
+  }
+
+  /* Breadcrumb Link Hover */
+  .breadcrumb-item a:hover {
+    color: #4F7DF3 !important;
+  }
+</style>

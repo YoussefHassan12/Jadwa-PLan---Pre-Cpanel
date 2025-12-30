@@ -1,0 +1,132 @@
+c{% extends "layouts/base-m.html" %}
+
+{% block title %} Businss Plans {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<section>
+  <div class="container px-5 py-0">
+    <form role="form" method="post" action="/new_plan" class="text-start">
+        <div class="row justify-space-between text-right py-2">
+            <button type="submit" class="btn bg-gradient-primary w-auto me-2">
+              <i class="material-icons me-2" aria-hidden="true">settings</i>
+              Adding Business Plan</button>
+        </div>
+    </form>
+  </div>
+</section>
+
+<section>
+  <div class="container-fluid pl-5 py-1">
+    <div class="row">
+      <div class="col-11">
+        <div class="card my-4 shadow-dark">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+              <h5 class="text-white text-capitalize ps-3 mx-3">Project List</h5>
+            </div>
+          </div>
+          <!-- <div class="card-body mx-5 my-0"> -->
+            <div class="table-responsive mx-5 my-0">
+              <table class="border" id="datatable-search">
+              <!-- <table class="display compact border table-striped" id="datatable-search"> -->
+                <thead class="bg-light">
+                  <tr>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder">Name</th>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Industry</th>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Currency</th>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Creation Date</th>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder">Status</th>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder">Completion</th>
+                    <th class="text-uppercase text-dark text-xs font-weight-bolder">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in data %}
+                  <tr>
+                    <td>
+                      
+                    </td>
+                    <td class="align-middle">
+                     
+                      
+                    </td>
+                    <td class="align-middle">
+                      
+                    </td>
+                    <td>
+                      
+                    </td>
+                    <td class="align-middle text-sm">
+                      
+                    </td>
+                    <td class="align-middle">
+                      
+                    </td>
+
+                    <td class="text-sm">
+                      <a href="/clientprofile/{{ row.bplan_id }}" class="mx-0" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                        <i class="material-icons text-secondary position-relative text-lg">drive_file_rename_outline</i>
+                      </a>
+                      <!-- <a href="javascript:;" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                        <i class="material-icons text-secondary position-relative text-lg">delete</i>
+                      </a> -->
+                    </td>
+                  </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+          <!-- </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer px-3 py-1">
+  <div class="container-fluid">
+    <div class="row align-items-center justify-content-lg-between">
+      <div class="col-lg-6 mb-lg-0 mb-4">
+        <div class="copyright text-center text-sm text-muted text-lg-start">
+          © <script>
+            document.write(new Date().getFullYear())
+          </script> -
+          made with <i class="fa fa-heart"></i> 
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+          <li class="nav-item">
+            <a href="/" class="nav-link text-muted">JadwaPro</a>
+          </li>
+          <li class="nav-item">
+            <a href="/" class="nav-link text-muted">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a href="/" class="nav-link pe-0 text-muted">License</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script>
+ const dataTableSearch = new simpleDatatables.DataTable("#datatable-search", {
+    searchable: true,
+    fixedHeight: true
+  });
+</script>
+
+{% endblock javascripts %}

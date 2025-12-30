@@ -1,0 +1,1719 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    الملف التعريفي للأعمال
+  {% else %}
+    Business Profile
+  {% endif %}
+{% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container-fluid pl-5 pt-3">
+  <div class="row">
+    <div class="col-10">
+      <form role="form" method="POST" action="/business_profile/{{ bplan_id }}">
+
+        <!-- Progress Bar -->
+        <div class="row px-8 pt-0 pb-3">
+          <span class="me-2 text-xxs font-weight-bold">
+            {% if session.get('lang', 'en') == 'ar' %}
+              تم الإكمال بنسبة
+            {% endif %}
+            {{ data_comp[0].completion }}%
+            {% if session.get('lang', 'en') == 'ar' %}
+              من الملف
+            {% else %}
+              Completed
+            {% endif %}
+          </span>
+          <div class="progress">
+            {% if data_comp[0].completion == 100: %}
+            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% elif data_comp[0].completion >= 50: %}
+              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% else %}
+              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Business Information Card -->
+        <div class="card my-3">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+              <h5 class="text-white text-capitalize ps-3 mx-3">
+                {% if session.get('lang', 'en') == 'ar' %}
+                  الملف التعريفي للأعمال
+                {% else %}
+                  Business Profile
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-4">
+              {% if session.get('lang', 'en') == 'ar' %}
+                معلومات العمل
+              {% else %}
+                Business Information
+              {% endif %}
+            </h5>
+
+            <!-- 1st Row -->
+            <div class="row">
+              <div class="col">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      العنوان
+                    {% else %}
+                      Address
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <input class="form-control" type="text" name="buz_address" value="{{ data_bi[0].buz_address }}" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="col">
+                <div class="input-group input-group-static mb-3">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      تاريخ التأسيس
+                    {% else %}
+                      Establishment Date
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <input class="multisteps-form__input form-control" type="date" name="buz_est_date" value="{{ data_bi[0].buz_est_date.strftime('%Y-%m-%d') }}"/>
+                </div>
+              </div>
+
+              <div class="col">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      الوضع القانوني
+                    {% else %}
+                      Legal Status
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <select class="multisteps-form__input form-control" name="choice_legal_status" id="choice_legal_status">
+                    <option value="1" {% if data_bi[0].buz_legal_status == 1 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}ملكية فردية{% else %}Sole proprietorship{% endif %}
+                    </option>
+                    <option value="2" {% if data_bi[0].buz_legal_status == 2 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}شركة ذات مسؤولية محدودة{% else %}Limited Liability Company{% endif %}
+                    </option>
+                    <option value="3" {% if data_bi[0].buz_legal_status == 3 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}شركة مساهمة{% else %}Joint Stock Company{% endif %}
+                    </option>
+                    <option value="4" {% if data_bi[0].buz_legal_status == 4 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}شركة خارجية{% else %}OffShore{% endif %}
+                    </option>
+                    <option value="5" {% if data_bi[0].buz_legal_status == 5 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}مؤسسة اجتماعية{% else %}Social Enterprise{% endif %}
+                    </option>
+                    <option value="6" {% if data_bi[0].buz_legal_status == 6 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}غير ربحي{% else %}Non Profit{% endif %}
+                    </option>
+                    <option value="7" {% if data_bi[0].buz_legal_status == 7 %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}غير مسجل{% else %}Non-Registered{% endif %}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2nd Row -->
+            <div class="row">
+              <div class="col-8">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      نموذج عمل عملائك
+                    {% else %}
+                      Your clients business model
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <select class="multisteps-form__input form-control" name="choice_business_model" id="choice_business_model" multiple>
+                    <option value="1" {% if "1" in data_bi[0].buz_model %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}عمل لعميل{% else %}Business to Client{% endif %}
+                    </option>
+                    <option value="2" {% if "2" in data_bi[0].buz_model %} selected {% endif %}>
+                      {% if session.get('lang', 'en') == 'ar' %}عمل لعمل{% else %}Business to Business{% endif %}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products & Services Card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">
+              {% if session.get('lang', 'en') == 'ar' %}
+                المنتجات والخدمات
+              {% else %}
+                Products & Services
+              {% endif %}
+            </h5>
+
+            <!-- Add Product/Service Form -->
+            <div class="row">
+              <div class="col">
+                <div class="card card-body bg-gray-100 px-4 py-2">
+                  <!-- 1st Row -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            اسم المنتج/الخدمة
+                          {% else %}
+                            Product/Service Name
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="multisteps-form__input form-control"
+                               type="text"
+                               name="product_service_name"
+                               placeholder=""
+                               autocomplete="off">
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            الوصف
+                          {% else %}
+                            Description
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="multisteps-form__input form-control"
+                               type="text"
+                               name="product_service_description"
+                               placeholder=""
+                               autocomplete="off">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-1 align-self-end">
+                <button class="btn bg-gradient-info btn-sm"
+                        data-bs-toggle="tooltip"
+                        type="submit"
+                        name="product_service_add"
+                        value="{{ bplan_id }}"
+                        title="{% if session.get('lang', 'en') == 'ar' %}إضافة منتج/خدمة{% else %}Add Product/Service{% endif %}">
+                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                </button>
+              </div>
+            </div>
+
+            <br>
+              <!-- Display Existing Product/Services -->
+            <!-- Products & Services Table -->
+            <div class="ajax-table-container" id="products-services-table-container">
+                <div class="ajax-table-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-dark font-weight-bold">
+                            <i class="material-icons me-2">inventory_2</i>
+                            {% if session.get('lang', 'en') == 'ar' %}قائمة المنتجات والخدمات{% else %}Products & Services List{% endif %}
+                        </h6>
+                        <span class="badge bg-dark text-white">{{ data_bps|length }}</span>
+                    </div>
+                </div>
+
+                <div class="ajax-table-body">
+                    <div class="table-responsive">
+                        <table class="table ajax-table align-items-center">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                        {% if session.get('lang', 'en') == 'ar' %}المنتج/الخدمة{% else %}Product/Service{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}الوصف{% else %}Description{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
+                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in data_bps %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <h6 class="mb-0 text-sm text-dark font-weight-bold">{{ row.product_service_name }}</h6>
+                                        </div>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <p class="mb-0 text-sm text-muted">{{ row.product_service_description }}</p>
+                                    </td>
+                                    <td class="text-center py-3">
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-product-service-btn"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المنتج/الخدمة{% else %}Delete Product/Service{% endif %}"
+                                                data-item-id="{{ row.product_service_id }}">
+                                            <i class="material-icons text-xs">delete</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                                {% if not data_bps %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="material-icons display-4 text-gray-300 mb-2">inventory_2</i>
+                                            <h6 class="text-gray-500 mb-1">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    لا توجد منتجات أو خدمات مضافة
+                                                {% else %}
+                                                    No products or services added
+                                                {% endif %}
+                                            </h6>
+                                            <p class="text-xs text-gray-400 mb-0">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    ابدأ بإضافة منتجك أو خدمتك الأولى
+                                                {% else %}
+                                                    Start by adding your first product or service
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if data_bps %}
+                <div class="ajax-table-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="text-sm text-muted mb-0">
+                            <i class="material-icons text-xs me-1">info</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إجمالي المنتجات والخدمات: <strong>{{ data_bps|length }}</strong>
+                            {% else %}
+                                Total products & services: <strong>{{ data_bps|length }}</strong>
+                            {% endif %}
+                        </p>
+                        <small class="text-muted">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                💡 انقر على أيقونة الحذف للإزالة
+                            {% else %}
+                                💡 Click delete icon to remove
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff Card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">
+              {% if session.get('lang', 'en') == 'ar' %}
+                قائمة الموظفين الحاليين
+              {% else %}
+                List your existing staff
+              {% endif %}
+            </h5>
+
+            <!-- Add Staff Form -->
+            <div class="row">
+              <div class="col">
+                <div class="card card-body bg-gray-100 px-4 py-2">
+                  <!-- 1st Row -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            المنصب
+                          {% else %}
+                            Position
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="text" name="staff_position" placeholder="" autocomplete="off">
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            وقت العمل
+                          {% else %}
+                            Work Time
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="multisteps-form__input form-control" name="choice_work_time" id="choice_work_time">
+                          <option value="Full time" selected>
+                            {% if session.get('lang', 'en') == 'ar' %}دوام كامل{% else %}Full time{% endif %}
+                          </option>
+                          <option value="Part time">
+                            {% if session.get('lang', 'en') == 'ar' %}دوام جزئي{% else %}Part time{% endif %}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            الراتب الشهري (دولار)
+                          {% else %}
+                            Monthly Salary (USD)
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="multisteps-form__input form-control" type="number" name="staff_salary" placeholder="" autocomplete="off">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-1 align-self-end">
+                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="staff_add" value="{{ bplan_id }}">
+                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                </button>
+              </div>
+            </div>
+            <br>
+            <!-- Staff Table -->
+            <div class="ajax-table-container" id="staff-table-container">
+                <div class="ajax-table-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-dark font-weight-bold">
+                            <i class="material-icons me-2">groups</i>
+                            {% if session.get('lang', 'en') == 'ar' %}قائمة الموظفين{% else %}Staff List{% endif %}
+                        </h6>
+                        <span class="badge bg-dark text-white">{{ data_bs|length }}</span>
+                    </div>
+                </div>
+
+                <div class="ajax-table-body">
+                    <div class="table-responsive">
+                        <table class="table ajax-table align-items-center">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                        {% if session.get('lang', 'en') == 'ar' %}المنصب{% else %}Position{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}وقت العمل{% else %}Work Time{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}الراتب الشهري{% else %}Monthly Salary{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}المجموع (سنوي){% else %}Total (Yearly){% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
+                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in data_bs %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <h6 class="mb-0 text-sm text-dark">{{ row.staff_position }}</h6>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <span class="badge {% if row.work_time == 'Full time' %}bg-info{% else %}bg-warning{% endif %} text-white">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                {% if row.work_time == 'Full time' %}دوام كامل
+                                                {% elif row.work_time == 'Part time' %}دوام جزئي
+                                                {% else %}{{ row.work_time }}{% endif %}
+                                            {% else %}
+                                                {{ row.work_time }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <p class="text-sm font-weight-bold text-dark mb-0">{{ "${:,}".format(row.staff_salary) }}</p>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <p class="text-sm font-weight-bold text-success mb-0">{{ "${:,}".format(row.total_salary) }}</p>
+                                    </td>
+                                    <td class="text-center py-3">
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-staff-btn"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف الموظف{% else %}Delete Staff{% endif %}"
+                                                data-item-id="{{ row.staff_id }}">
+                                            <i class="material-icons text-xs">delete</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                                {% if not data_bs %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="material-icons display-4 text-gray-300 mb-2">groups</i>
+                                            <h6 class="text-gray-500 mb-1">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    لا توجد موظفين مضافين
+                                                {% else %}
+                                                    No staff members added
+                                                {% endif %}
+                                            </h6>
+                                            <p class="text-xs text-gray-400 mb-0">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    ابدأ بإضافة موظفك الأول
+                                                {% else %}
+                                                    Start by adding your first staff member
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if data_bs %}
+                <div class="ajax-table-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="text-sm text-muted mb-0">
+                            <i class="material-icons text-xs me-1">calculate</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إجمالي الرواتب السنوية: <strong class="text-success">{{ "${:,}".format(data_bs_total) }}</strong>
+                            {% else %}
+                                Total yearly salaries: <strong class="text-success">{{ "${:,}".format(data_bs_total) }}</strong>
+                            {% endif %}
+                        </p>
+                        <small class="text-muted">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                💡 انقر على أيقونة الحذف للإزالة
+                            {% else %}
+                                💡 Click delete icon to remove
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Resources Card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">
+              {% if session.get('lang', 'en') == 'ar' %}
+                قائمة الموارد الحالية
+              {% else %}
+                List your existing resources
+              {% endif %}
+            </h5>
+
+            <!-- Add Resource Form -->
+            <div class="row">
+              <div class="col">
+                <div class="card card-body bg-gray-100 px-4 py-2">
+                  <!-- 1st Row -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            النوع
+                          {% else %}
+                            Type
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="multisteps-form__input form-control" name="choice_type" id="choice_type" onchange="populate(this.id,'choice_subtype')">
+                          <option value="" disabled selected>
+                            {% if session.get('lang', 'en') == 'ar' %}-- اختر الصنف --{% else %}-- Choose Industry --{% endif %}
+                          </option>
+                          <option value="Assets">
+                            {% if session.get('lang', 'en') == 'ar' %}الأصول{% else %}Assets{% endif %}
+                          </option>
+                          <option value="Human Resouces">
+                            {% if session.get('lang', 'en') == 'ar' %}الموارد البشرية{% else %}Human Resources{% endif %}
+                          </option>
+                          <option value="Financial Resources">
+                            {% if session.get('lang', 'en') == 'ar' %}الموارد المالية{% else %}Financial Resources{% endif %}
+                          </option>
+                          <option value="Intellectual Property">
+                            {% if session.get('lang', 'en') == 'ar' %}الملكية الفكرية{% else %}Intellectual Property{% endif %}
+                          </option>
+                          <option value="Information Technology">
+                            {% if session.get('lang', 'en') == 'ar' %}تكنولوجيا المعلومات{% else %}Information Technology{% endif %}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            النوع الفرعي
+                          {% else %}
+                            Subtype
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="form-control" name="choice_subtype" id="choice_subtype">
+                          <option value=""></option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            قيمة المورد
+                          {% else %}
+                            Resource Value
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="number" name="resource_value" placeholder="" autocomplete="off">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-1 align-self-end">
+                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="resource_add" value="{{ bplan_id }}">
+                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                </button>
+              </div>
+            </div>
+
+            <br>
+            <!-- Resources Table -->
+            <div class="ajax-table-container" id="resources-table-container">
+                <div class="ajax-table-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-dark font-weight-bold">
+                            <i class="material-icons me-2">business_center</i>
+                            {% if session.get('lang', 'en') == 'ar' %}قائمة الموارد{% else %}Resources List{% endif %}
+                        </h6>
+                        <span class="badge bg-dark text-white">{{ data_br|length }}</span>
+                    </div>
+                </div>
+
+                <div class="ajax-table-body">
+                    <div class="table-responsive">
+                        <table class="table ajax-table align-items-center">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                        {% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}النوع الفرعي{% else %}Subtype{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}قيمة المورد{% else %}Resource Value{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
+                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in data_br %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <h6 class="mb-0 text-sm text-dark">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                {% if row.resource_type == 'Assets' %}الأصول
+                                                {% elif row.resource_type == 'Human Resouces' %}الموارد البشرية
+                                                {% elif row.resource_type == 'Financial Resources' %}الموارد المالية
+                                                {% elif row.resource_type == 'Intellectual Property' %}الملكية الفكرية
+                                                {% elif row.resource_type == 'Information Technology' %}تكنولوجيا المعلومات
+                                                {% else %}{{ row.resource_type }}{% endif %}
+                                            {% else %}
+                                                {{ row.resource_type }}
+                                            {% endif %}
+                                        </h6>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <h6 class="mb-0 text-sm text-dark">
+                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                {% if row.resource_subtype == 'Cash' %}نقد
+                                                {% elif row.resource_subtype == 'Bank Account' %}حساب بنكي
+                                                {% elif row.resource_subtype == 'Investments' %}استثمارات
+                                                {% elif row.resource_subtype == 'Real Estate' %}عقارات
+                                                {% elif row.resource_subtype == 'Vehicles' %}مركبات
+                                                {% elif row.resource_subtype == 'Equipment' %}معدات
+                                                {% elif row.resource_subtype == 'Employees' %}موظفين
+                                                {% elif row.resource_subtype == 'Consultants' %}مستشارين
+                                                {% elif row.resource_subtype == 'Patents' %}براءات اختراع
+                                                {% elif row.resource_subtype == 'Trademarks' %}علامات تجارية
+                                                {% elif row.resource_subtype == 'Software' %}برمجيات
+                                                {% elif row.resource_subtype == 'Hardware' %}أجهزة
+                                                {% else %}{{ row.resource_subtype }}{% endif %}
+                                            {% else %}
+                                                {{ row.resource_subtype }}
+                                            {% endif %}
+                                        </h6>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <p class="text-sm font-weight-bold text-success mb-0">{{ "${:,}".format(row.resource_value) }}</p>
+                                    </td>
+                                    <td class="text-center py-3">
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-resource-btn"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المورد{% else %}Delete Resource{% endif %}"
+                                                data-item-id="{{ row.resource_id }}">
+                                            <i class="material-icons text-xs">delete</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                                {% if not data_br %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="material-icons display-4 text-gray-300 mb-2">business_center</i>
+                                            <h6 class="text-gray-500 mb-1">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    لا توجد موارد مضافة
+                                                {% else %}
+                                                    No resources added
+                                                {% endif %}
+                                            </h6>
+                                            <p class="text-xs text-gray-400 mb-0">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    ابدأ بإضافة موردك الأول
+                                                {% else %}
+                                                    Start by adding your first resource
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if data_br %}
+                <div class="ajax-table-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="text-sm text-muted mb-0">
+                            <i class="material-icons text-xs me-1">calculate</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                القيمة الإجمالية: <strong class="text-success">{{ "${:,}".format(data_br_total) }}</strong>
+                            {% else %}
+                                Total value: <strong class="text-success">{{ "${:,}".format(data_br_total) }}</strong>
+                            {% endif %}
+                        </p>
+                        <small class="text-muted">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                💡 انقر على أيقونة الحذف للإزالة
+                            {% else %}
+                                💡 Click delete icon to remove
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial History Card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">
+              {% if session.get('lang', 'en') == 'ar' %}
+                السجل المالي
+              {% else %}
+                Financial History
+              {% endif %}
+            </h5>
+
+            <!-- Add Financial History Form -->
+            <div class="row">
+              <div class="col">
+                <div class="card card-body bg-gray-100 px-4 py-2">
+                  <!-- 1st Row -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            السنة
+                          {% else %}
+                            Year
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="text" name="financial_year" placeholder="" autocomplete="off">
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            المبيعات
+                          {% else %}
+                            Sales
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="number" name="financial_sales" placeholder="" autocomplete="off">
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            الربح
+                          {% else %}
+                            Profit
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="number" name="financial_profit" placeholder="" autocomplete="off">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-1 align-self-end">
+                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="financial_add" value="{{ bplan_id }}">
+                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                </button>
+              </div>
+            </div>
+
+            <br>
+            <!-- Financial History Table -->
+            <div class="ajax-table-container" id="financial-history-table-container">
+                <div class="ajax-table-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-dark font-weight-bold">
+                            <i class="material-icons me-2">trending_up</i>
+                            {% if session.get('lang', 'en') == 'ar' %}السجل المالي{% else %}Financial History{% endif %}
+                        </h6>
+                        <span class="badge bg-dark text-white">{{ data_fin|length }}</span>
+                    </div>
+                </div>
+
+                <div class="ajax-table-body">
+                    <div class="table-responsive">
+                        <table class="table ajax-table align-items-center">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                        {% if session.get('lang', 'en') == 'ar' %}السنة{% else %}Year{% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}المبيعات (دولار){% else %}Sales (USD){% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                        {% if session.get('lang', 'en') == 'ar' %}الربح (دولار){% else %}Profit (USD){% endif %}
+                                    </th>
+                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
+                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in data_fin %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <h6 class="mb-0 text-sm text-dark font-weight-bold">{{ row.financial_year }}</h6>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <p class="text-sm font-weight-bold text-info mb-0">{{ "${:,}".format(row.financial_sales) }}</p>
+                                    </td>
+                                    <td class="ps-3 py-3">
+                                        <p class="text-sm font-weight-bold text-success mb-0">{{ "${:,}".format(row.financial_profit) }}</p>
+                                    </td>
+                                    <td class="text-center py-3">
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-financial-btn"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف السجل المالي{% else %}Delete Financial Record{% endif %}"
+                                                data-item-id="{{ row.financial_id }}">
+                                            <i class="material-icons text-xs">delete</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                                {% if not data_fin %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="material-icons display-4 text-gray-300 mb-2">trending_up</i>
+                                            <h6 class="text-gray-500 mb-1">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    لا توجد سجلات مالية
+                                                {% else %}
+                                                    No financial records
+                                                {% endif %}
+                                            </h6>
+                                            <p class="text-xs text-gray-400 mb-0">
+                                                {% if session.get('lang', 'en') == 'ar' %}
+                                                    ابدأ بإضافة سجلك المالي الأول
+                                                {% else %}
+                                                    Start by adding your first financial record
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {% if data_fin %}
+                <div class="ajax-table-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="text-sm text-muted mb-0">
+                            <i class="material-icons text-xs me-1">history</i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                إجمالي السجلات: <strong>{{ data_fin|length }}</strong>
+                            {% else %}
+                                Total records: <strong>{{ data_fin|length }}</strong>
+                            {% endif %}
+                        </p>
+                        <small class="text-muted">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                💡 انقر على أيقونة الحذف للإزالة
+                            {% else %}
+                                💡 Click delete icon to remove
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Source of Fundings Card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">
+              {% if session.get('lang', 'en') == 'ar' %}
+                مصادر التمويل
+              {% else %}
+                Source of Fundings
+              {% endif %}
+            </h5>
+
+            <!-- Source of Funds Toggle -->
+            <div class="row">
+              <div class="col mt-3">
+                <div class="form-check form-switch">
+                    {% if data_bor: %}
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheck_funds" name="flexSwitchCheck_funds" data-bs-toggle="collapse" data-bs-target="#collapseFund" aria-expanded="false" checked autocomplete="off">
+                    {% else %}
+                        <input class="form-check-input" type="checkbox" id="flexSwitchCheck_funds" name="flexSwitchCheck_funds" data-bs-toggle="collapse" data-bs-target="#collapseFund" aria-expanded="false" autocomplete="off">
+                    {% endif %}
+                  <label class="form-check-label" for="flexSwitchCheck_funds">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      مصادر تمويل أخرى؟
+                    {% else %}
+                      Other source of funds?
+                    {% endif %}
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-8 mt-3">
+                {% if data_bor: %}
+                    <div class="collapse show" id="collapseFund">
+                {% else %}
+                    <div class="collapse" id="collapseFund">
+                {% endif %}
+                  <div class="card card-body px-4 py-2">
+                    <!-- Add Funding Source Form -->
+                    <div class="row">
+                      <div class="col">
+                        <div class="input-group input-group-static mb-4">
+                          <label class="form-label text-dark">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              مصدر الأموال؟
+                            {% else %}
+                              Source of the funds?
+                            {% endif %}
+                          </label>
+                        </div>
+                        <div class="input-group input-group-static mb-0">
+                          <select class="form-control" name="choice_fund" id="choice_fund">
+                            <option value="Loan">
+                              {% if session.get('lang', 'en') == 'ar' %}قرض{% else %}Loan{% endif %}
+                            </option>
+                            <option value="Grant">
+                              {% if session.get('lang', 'en') == 'ar' %}منحة{% else %}Grant{% endif %}
+                            </option>
+                            <option value="Investment">
+                              {% if session.get('lang', 'en') == 'ar' %}استثمار{% else %}Investment{% endif %}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col">
+                        <div class="input-group input-group-static mb-4">
+                          <label class="form-label text-dark">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              نسبة المساهمة
+                            {% else %}
+                              % of contribution
+                            {% endif %}
+                          </label>
+                        </div>
+                        <div class="input-group input-group-static mb-0">
+                          <input class="form-control" type="number" name="fund_contribution" autocomplete="off">
+                        </div>
+                      </div>
+
+                      <div class="col-2 align-self-end">
+                        <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="fund_add" value="{{ bplan_id }}">
+                          {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                        </button>
+                      </div>
+                    </div>
+
+                    <br>
+                    <!-- Funding Sources Table -->
+                    <!-- Funding Sources Table -->
+                    <div class="ajax-table-container" id="funding-sources-table-container">
+                        <div class="ajax-table-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 text-dark font-weight-bold">
+                                    <i class="material-icons me-2">savings</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}مصادر التمويل{% else %}Funding Sources{% endif %}
+                                </h6>
+                                <span class="badge bg-dark text-white">{{ data_bor|length }}</span>
+                            </div>
+                        </div>
+
+                        <div class="ajax-table-body">
+                            <div class="table-responsive">
+                                <table class="table ajax-table align-items-center">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
+                                                {% if session.get('lang', 'en') == 'ar' %}المصدر{% else %}Source{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
+                                                {% if session.get('lang', 'en') == 'ar' %}المساهمة{% else %}Contribution{% endif %}
+                                            </th>
+                                            <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
+                                                {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in data_bor %}
+                                        <tr>
+                                            <td class="ps-4 py-3">
+                                                <h6 class="mb-0 text-sm text-dark">
+                                                    {% if session.get('lang', 'en') == 'ar' %}
+                                                        {% if row.funds == 'Loan' %}قرض
+                                                        {% elif row.funds == 'Grant' %}منحة
+                                                        {% elif row.funds == 'Investment' %}استثمار
+                                                        {% else %}{{ row.funds }}{% endif %}
+                                                    {% else %}
+                                                        {{ row.funds }}
+                                                    {% endif %}
+                                                </h6>
+                                            </td>
+                                            <td class="ps-3 py-3">
+                                                <span class="badge bg-info text-white">
+                                                    {{ row.contribution }}%
+                                                </span>
+                                            </td>
+                                            <td class="text-center py-3">
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-fund-btn"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف مصدر التمويل{% else %}Delete Funding Source{% endif %}"
+                                                        data-item-id="{{ row.other_resource_id }}">
+                                                    <i class="material-icons text-xs">delete</i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+
+                                        {% if not data_bor %}
+                                        <tr>
+                                            <td colspan="3" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="material-icons display-4 text-gray-300 mb-2">savings</i>
+                                                    <h6 class="text-gray-500 mb-1">
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            لا توجد مصادر تمويل
+                                                        {% else %}
+                                                            No funding sources
+                                                        {% endif %}
+                                                    </h6>
+                                                    <p class="text-xs text-gray-400 mb-0">
+                                                        {% if session.get('lang', 'en') == 'ar' %}
+                                                            ابدأ بإضافة مصدر تمويلك الأول
+                                                        {% else %}
+                                                            Start by adding your first funding source
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {% if data_bor %}
+                        <div class="ajax-table-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="text-sm text-muted mb-0">
+                                    <i class="material-icons text-xs me-1">info</i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        إجمالي مصادر التمويل: <strong>{{ data_bor|length }}</strong>
+                                    {% else %}
+                                        Total funding sources: <strong>{{ data_bor|length }}</strong>
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        💡 انقر على أيقونة الحذف للإزالة
+                                    {% else %}
+                                        💡 Click delete icon to remove
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="button-row d-flex mt-4">
+              <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}" type="submit" name="action" value="save">
+                {% if session.get('lang', 'en') == 'ar' %}
+                  حفظ
+                {% else %}
+                  Save
+                {% endif %}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}
+
+<script type="text/javascript">
+  function populate(s1, s2) {
+    var s1 = document.getElementById(s1);
+    var s2 = document.getElementById(s2);
+    s2.innerHTML = "";
+
+    if (s1.value == "Assets") {
+      var optionArray = [
+        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
+        '1|{% if session.get("lang", "en") == "ar" %}أرض{% else %}Land{% endif %}',
+        '2|{% if session.get("lang", "en") == "ar" %}مبنى{% else %}Building{% endif %}',
+        '3|{% if session.get("lang", "en") == "ar" %}هنغار{% else %}Hangar{% endif %}',
+        '4|{% if session.get("lang", "en") == "ar" %}آلات{% else %}Machinery{% endif %}',
+        '5|{% if session.get("lang", "en") == "ar" %}معدات{% else %}Equipment{% endif %}',
+        '6|{% if session.get("lang", "en") == "ar" %}مركبات{% else %}Vehicles{% endif %}',
+        '7|{% if session.get("lang", "en") == "ar" %}مخزون{% else %}Inventory{% endif %}',
+        '8|{% if session.get("lang", "en") == "ar" %}أثاث{% else %}Furniture{% endif %}',
+        '9|{% if session.get("lang", "en") == "ar" %}ذمم مدينة{% else %}Accounts Receivables{% endif %}',
+        '10|{% if session.get("lang", "en") == "ar" %}حظيرة{% else %}Barn{% endif %}',
+        '11|{% if session.get("lang", "en") == "ar" %}بيوت بلاستيكية{% else %}Greenhouses{% endif %}',
+        '12|{% if session.get("lang", "en") == "ar" %}نظام ري{% else %}Irrigation System{% endif %}',
+        '13|{% if session.get("lang", "en") == "ar" %}علف{% else %}Feed{% endif %}'
+      ];
+    } else if(s1.value == "Human Resouces") {
+      var optionArray = [
+        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
+        '1|{% if session.get("lang", "en") == "ar" %}موظفون{% else %}Employees{% endif %}',
+        '2|{% if session.get("lang", "en") == "ar" %}عمال{% else %}Workers{% endif %}',
+        '3|{% if session.get("lang", "en") == "ar" %}مدراء تنفيذيون{% else %}Executives{% endif %}'
+      ];
+    } else if(s1.value == "Financial Resources") {
+      var optionArray = [
+        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
+        '1|{% if session.get("lang", "en") == "ar" %}نقد{% else %}Cash{% endif %}',
+        '2|{% if session.get("lang", "en") == "ar" %}حساب بنكي{% else %}Bank Account{% endif %}',
+        '3|{% if session.get("lang", "en") == "ar" %}استثمار{% else %}Investment{% endif %}'
+      ];
+    } else if(s1.value == "Intellectual Property") {
+      var optionArray = [
+        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
+        '1|{% if session.get("lang", "en") == "ar" %}براءة اختراع{% else %}Patent{% endif %}',
+        '2|{% if session.get("lang", "en") == "ar" %}علامة تجارية{% else %}Trademark{% endif %}',
+        '3|{% if session.get("lang", "en") == "ar" %}حقوق نشر{% else %}Copyright{% endif %}',
+        '4|{% if session.get("lang", "en") == "ar" %}سر تجاري{% else %}Trade Secret{% endif %}',
+        '5|{% if session.get("lang", "en") == "ar" %}ترخيص{% else %}License{% endif %}'
+      ];
+    } else if(s1.value == "Information Technology") {
+      var optionArray = [
+        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
+        '1|{% if session.get("lang", "en") == "ar" %}برمجيات{% else %}Software{% endif %}',
+        '2|{% if session.get("lang", "en") == "ar" %}حواسيب{% else %}Computers{% endif %}',
+        '3|{% if session.get("lang", "en") == "ar" %}بنية تحتية تكنولوجية{% else %}Technology Infrastructure{% endif %}',
+        '4|{% if session.get("lang", "en") == "ar" %}خوادم{% else %}Servers{% endif %}'
+      ];
+    }
+
+    for (var option in optionArray) {
+      var pair = optionArray[option].split("|");
+      var newoption = document.createElement("option");
+      newoption.value = pair[1];
+      newoption.innerHTML = pair[1];
+      s2.options.add(newoption);
+    }
+  }
+</script>
+
+<script>
+  // Initialize Choices.js for select elements
+  if (document.getElementById('choice_legal_status')) {
+    var tags = document.getElementById('choice_legal_status');
+    const examples = new Choices(tags, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_business_model')) {
+    var tags = document.getElementById('choice_business_model');
+    const examples = new Choices(tags, {
+      searchEnabled: false,
+      removeItemButton: true
+    });
+  };
+
+  if (document.getElementById('choice_position')) {
+    var element = document.getElementById('choice_position');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_work_time')) {
+    var element = document.getElementById('choice_work_time');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_type')) {
+    var element = document.getElementById('choice_type');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_fund')) {
+    var element = document.getElementById('choice_fund');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+</script>
+
+
+
+<!--Tables-->
+<style>
+/* UNIFIED TABLE STYLES - Only affects tables with these classes */
+.ajax-table-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease; /* Added container hover */
+}
+
+.ajax-table-container:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.ajax-table-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease; /* Added header transition */
+}
+
+.ajax-table-body {
+    padding: 0;
+}
+
+.ajax-table-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.75rem 1.5rem;
+}
+
+.ajax-table {
+    margin-bottom: 0;
+}
+
+.ajax-table thead {
+    background: #f1f5f9;
+}
+
+/* Enhanced row hover effects */
+.ajax-table tbody tr {
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.ajax-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.04) !important;
+    border-left: 3px solid #007bff;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Delete button hover effects */
+.delete-experience-btn,
+.delete-partner-btn,
+.delete-expense-btn {
+    transition: all 0.3s ease !important;
+    border: 1px solid transparent;
+}
+
+.delete-experience-btn:hover,
+.delete-partner-btn:hover,
+.delete-expense-btn:hover {
+    transform: scale(1.15) !important;
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Badge hover effects */
+.ajax-table .badge {
+    transition: all 0.3s ease;
+}
+
+.ajax-table .badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header badge hover */
+.ajax-table-header .badge {
+    transition: all 0.3s ease;
+}
+
+.ajax-table-header .badge:hover {
+    transform: scale(1.05);
+}
+
+/* Empty state styling */
+.ajax-table-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+/* Table header hover effects */
+.ajax-table thead th {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.ajax-table thead th:hover {
+    background-color: #e9ecef;
+    color: #0056b3;
+}
+
+.ajax-table thead th:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+}
+
+/* Footer hover effects */
+.ajax-table-footer {
+    transition: all 0.3s ease;
+}
+
+.ajax-table-footer:hover {
+    background-color: #e9ecef;
+}
+
+/* Number cells hover */
+.ajax-table td:has(.text-success):hover {
+    background-color: rgba(40, 167, 69, 0.05) !important;
+}
+
+/* Smooth transitions for all interactive elements */
+.ajax-table-container * {
+    transition: all 0.2s ease;
+}
+
+/* Badge styles for tables */
+.table-badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.table-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+</style>
+<script>
+// UNIVERSAL AJAX TABLE MANAGEMENT SYSTEM FOR BUSINESS PROFILE
+class BusinessProfileTableManager {
+    constructor() {
+        this.tables = {};
+        this.init();
+    }
+
+    init() {
+        this.registerAllTables();
+        this.setupGlobalListeners();
+    }
+
+    // Register all tables on the page
+    registerAllTables() {
+        // Products & Services Table
+        this.registerTable('products_services', {
+            container: '#products-services-table-container',
+            addButton: 'button[name="product_service_add"]',
+            deleteButton: '.delete-product-service-btn',
+            formFields: [
+                'product_service_name',
+                'product_service_description'
+            ],
+            deleteField: 'product_service_delete'
+        });
+
+        // Staff Table
+        this.registerTable('staff', {
+            container: '#staff-table-container',
+            addButton: 'button[name="staff_add"]',
+            deleteButton: '.delete-staff-btn',
+            formFields: [
+                'staff_position',
+                'choice_work_time',
+                'staff_salary'
+            ],
+            deleteField: 'staff_delete'
+        });
+
+        // Resources Table
+        this.registerTable('resources', {
+            container: '#resources-table-container',
+            addButton: 'button[name="resource_add"]',
+            deleteButton: '.delete-resource-btn',
+            formFields: [
+                'choice_type',
+                'choice_subtype',
+                'resource_value'
+            ],
+            deleteField: 'resource_delete'
+        });
+
+        // Financial History Table
+        this.registerTable('financial_history', {
+            container: '#financial-history-table-container',
+            addButton: 'button[name="financial_add"]',
+            deleteButton: '.delete-financial-btn',
+            formFields: [
+                'financial_year',
+                'financial_sales',
+                'financial_profit'
+            ],
+            deleteField: 'financial_delete'
+        });
+
+        // Funding Sources Table
+        this.registerTable('funding_sources', {
+            container: '#funding-sources-table-container',
+            addButton: 'button[name="fund_add"]',
+            deleteButton: '.delete-fund-btn',
+            formFields: [
+                'choice_fund',
+                'fund_contribution'
+            ],
+            deleteField: 'fund_delete'
+        });
+    }
+
+    registerTable(name, config) {
+        this.tables[name] = config;
+        this.setupTable(name);
+    }
+
+    setupTable(tableName) {
+        const table = this.tables[tableName];
+
+        // Setup add button
+        const addButton = document.querySelector(table.addButton);
+        if (addButton) {
+            addButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleAdd(tableName);
+            });
+        }
+
+        // Setup delete buttons
+        this.attachDeleteListeners(tableName);
+    }
+
+    // Universal refresh function for any table
+    async refreshTable(tableName) {
+        const table = this.tables[tableName];
+
+        try {
+            const response = await fetch(window.location.href);
+            const html = await response.text();
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const newContainer = doc.querySelector(table.container);
+            if (newContainer) {
+                const currentContainer = document.querySelector(table.container);
+                currentContainer.innerHTML = newContainer.innerHTML;
+                this.attachDeleteListeners(tableName);
+
+                // Reinitialize any dynamic functionality
+                if (tableName === 'resources') {
+                    this.reinitializeResourceDropdowns();
+                }
+            }
+        } catch (error) {
+            console.error(`Error refreshing ${tableName} table:`, error);
+            window.location.reload();
+        }
+    }
+
+    // Universal add handler
+    async handleAdd(tableName) {
+        const table = this.tables[tableName];
+        const formData = new FormData();
+
+        // Add the main action
+        const addButton = document.querySelector(table.addButton);
+        formData.append(table.addButton.replace('button[name="', '').replace('"]', ''), addButton.value);
+
+        // Add all form fields
+        table.formFields.forEach(fieldName => {
+            const element = document.querySelector(`[name="${fieldName}"]`);
+            if (element && element.value) {
+                if (element.type === 'select-multiple') {
+                    Array.from(element.selectedOptions).forEach(option => {
+                        formData.append(fieldName, option.value);
+                    });
+                } else {
+                    formData.append(fieldName, element.value);
+                }
+            }
+        });
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                this.clearFormFields(table.formFields);
+                await this.refreshTable(tableName);
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error(`Error adding to ${tableName}:`, error);
+            this.showError(`Error adding ${tableName}. Please try again.`);
+        }
+    }
+
+    // Universal delete handler
+    async handleDelete(tableName, itemId) {
+        const table = this.tables[tableName];
+        const confirmMessage = this.getDeleteMessage(tableName);
+
+        if (confirm(confirmMessage)) {
+            const formData = new FormData();
+            formData.append(table.deleteField, itemId);
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    await this.refreshTable(tableName);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error(`Error deleting from ${tableName}:`, error);
+                this.showError(`Error deleting ${tableName}. Please try again.`);
+            }
+        }
+    }
+
+    // Attach delete listeners to a specific table
+    attachDeleteListeners(tableName) {
+        const table = this.tables[tableName];
+        document.querySelectorAll(table.deleteButton).forEach(button => {
+            button.addEventListener('click', () => {
+                const itemId = button.getAttribute('data-item-id');
+                this.handleDelete(tableName, itemId);
+            });
+        });
+    }
+
+    // Utility functions
+    clearFormFields(fieldNames) {
+        fieldNames.forEach(fieldName => {
+            const element = document.querySelector(`[name="${fieldName}"]`);
+            if (element) {
+                if (element.type === 'select-multiple') {
+                    element.selectedIndex = -1;
+                } else if (element.type === 'number') {
+                    element.value = '';
+                } else {
+                    element.value = '';
+                }
+            }
+        });
+    }
+
+    reinitializeResourceDropdowns() {
+        // Reinitialize the resource dropdown functionality
+        if (typeof populate === 'function') {
+            // Reattach the populate function if needed
+            const typeSelect = document.getElementById('choice_type');
+            const subtypeSelect = document.getElementById('choice_subtype');
+            if (typeSelect && subtypeSelect) {
+                typeSelect.onchange = function() {
+                    populate('choice_type', 'choice_subtype');
+                };
+            }
+        }
+    }
+
+    getDeleteMessage(tableName) {
+        const messages = {
+            products_services: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المنتج/الخدمة؟{% else %}Are you sure you want to delete this product/service?{% endif %}",
+            staff: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا الموظف؟{% else %}Are you sure you want to delete this staff member?{% endif %}",
+            resources: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المورد؟{% else %}Are you sure you want to delete this resource?{% endif %}",
+            financial_history: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا السجل المالي؟{% else %}Are you sure you want to delete this financial record?{% endif %}",
+            funding_sources: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف مصدر التمويل هذا؟{% else %}Are you sure you want to delete this funding source?{% endif %}"
+        };
+        return messages[tableName] || "Are you sure you want to delete this item?";
+    }
+
+    showError(message) {
+        alert(message);
+    }
+
+    setupGlobalListeners() {
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+        });
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    window.businessTableManager = new BusinessProfileTableManager();
+});
+</script>
+
+
+<style>
+ /* Target Arabic language specifically */
+html[lang="ar"] .choices[data-type*="select-one"]:after {
+    display: none !important;
+}
+
+html[lang="ar"] select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+</style>
+
+{% endblock javascripts %}

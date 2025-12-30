@@ -1,0 +1,1592 @@
+{% extends "layouts/base-m.html" %}
+
+{% block title %}
+  {% if current_lang == 'ar' %}
+    خطة عمل جديدة
+  {% else %}
+    New Business Plan
+  {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #4F7DF3 0%, #1A73E8 100%);
+  --primary-color: #4F7DF3;
+  --primary-dark: #1A73E8;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --surface-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* Page Container */
+.plan-creator-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #F0F4FF 0%, #FFFFFF 100%);
+  padding: 2rem 0;
+}
+
+/* Progress Stepper */
+.progress-stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2.5rem;
+  padding: 0 1rem;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.step-circle.active {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.4);
+}
+
+.step-circle.completed {
+  background: var(--success-color);
+  color: white;
+}
+
+.step-circle.pending {
+  background: white;
+  color: var(--text-secondary);
+  border: 2px solid var(--border-color);
+}
+
+.step-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .step-label {
+    display: block;
+  }
+}
+
+.step-connector {
+  width: 60px;
+  height: 3px;
+  background: var(--border-color);
+  margin: 0 0.5rem;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.step-connector.completed {
+  background: var(--success-color);
+}
+
+/* Main Card */
+.plan-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Card Header */
+.plan-card-header {
+  background: var(--primary-gradient);
+  padding: 2rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-card-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.plan-card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.header-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.header-icon i {
+  font-size: 28px;
+  color: white;
+}
+
+.plan-card-header h1 {
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.plan-card-header p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Card Body */
+.plan-card-body {
+  padding: 2.5rem;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, rgba(79, 125, 243, 0.1) 0%, rgba(26, 115, 232, 0.1) 100%);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.section-icon i {
+  font-size: 20px;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.form-label .required {
+  color: var(--danger-color);
+  margin-left: 2px;
+}
+
+.form-control-modern {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.form-control-modern:hover {
+  border-color: #CBD5E1;
+}
+
+.form-control-modern:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15);
+}
+
+.form-control-modern::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-hint {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 0.375rem;
+}
+
+/* Select Styling */
+select.form-control-modern {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+html[dir="rtl"] select.form-control-modern {
+  background-position: left 1rem center;
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+}
+
+/* Objectives Section */
+.objectives-container {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.objective-card {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.objective-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.objective-card:last-child {
+  margin-bottom: 0;
+}
+
+.objective-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.objective-number {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.objective-badge {
+  width: 28px;
+  height: 28px;
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.objective-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+}
+
+.btn-remove-objective {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: #FEE2E2;
+  color: var(--danger-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-remove-objective:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.btn-remove-objective:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.objective-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .objective-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.objective-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .objective-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Add Objective Button */
+.btn-add-objective {
+  width: 100%;
+  padding: 1rem;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.btn-add-objective:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: rgba(79, 125, 243, 0.05);
+}
+
+.btn-add-objective:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-add-objective i {
+  font-size: 20px;
+}
+
+/* Max objectives notice */
+.objectives-limit-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #FEF3C7;
+  border-radius: var(--radius-sm);
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  color: #92400E;
+}
+
+.objectives-limit-notice i {
+  font-size: 18px;
+}
+
+/* Action Buttons */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+.btn-modern {
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary-modern {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.btn-primary-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45);
+}
+
+.btn-secondary-modern {
+  background: white;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-color);
+}
+
+.btn-secondary-modern:hover {
+  background: var(--surface-color);
+  color: var(--text-primary);
+}
+
+.btn-danger-modern {
+  background: white;
+  color: var(--danger-color);
+  border: 1.5px solid #FECACA;
+}
+
+.btn-danger-modern:hover {
+  background: #FEF2F2;
+}
+
+.btn-modern i {
+  font-size: 20px;
+}
+
+/* Input Group with Suffix */
+.input-with-suffix {
+  position: relative;
+}
+
+.input-with-suffix .form-control-modern {
+  padding-right: 3rem;
+}
+
+html[dir="rtl"] .input-with-suffix .form-control-modern {
+  padding-right: 1rem;
+  padding-left: 3rem;
+}
+
+.input-suffix {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+html[dir="rtl"] .input-suffix {
+  right: auto;
+  left: 1rem;
+}
+
+/* Validation States */
+.form-control-modern.is-invalid {
+  border-color: var(--danger-color);
+}
+
+.form-control-modern.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.invalid-feedback {
+  color: var(--danger-color);
+  font-size: 0.8125rem;
+  margin-top: 0.375rem;
+  display: none;
+}
+
+.was-validated .form-control-modern:invalid ~ .invalid-feedback {
+  display: block;
+}
+
+/* RTL Adjustments */
+html[dir="rtl"] .section-header {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .objective-header {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .objective-number {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .btn-modern {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .form-actions {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .btn-add-objective {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .objectives-limit-notice {
+  flex-direction: row-reverse;
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.objective-card {
+  animation: slideIn 0.3s ease;
+}
+
+/* Disabled state for objective fields */
+.form-control-modern:disabled {
+  background: var(--surface-color);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+/* Modal Styling Override */
+.modal-content {
+  border-radius: var(--radius-lg);
+  border: none;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  gap: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .plan-card-body {
+    padding: 1.5rem;
+  }
+
+  .plan-card-header {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  html[dir="rtl"] .form-actions {
+    flex-direction: column;
+  }
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="plan-creator-container">
+  <div class="container">
+    <!-- Progress Stepper -->
+    <div class="progress-stepper">
+      <div class="step-item">
+        <div class="step-circle active">1</div>
+        <span class="step-label">{% if current_lang == 'ar' %}المعلومات الأساسية{% else %}Basic Info{% endif %}</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-circle pending">2</div>
+        <span class="step-label">{% if current_lang == 'ar' %}ملف العميل{% else %}Client Profile{% endif %}</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-circle pending">3</div>
+        <span class="step-label">{% if current_lang == 'ar' %}تحليل السوق{% else %}Market Analysis{% endif %}</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-circle pending">4</div>
+        <span class="step-label">{% if current_lang == 'ar' %}إنشاء{% else %}Generate{% endif %}</span>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="plan-card">
+      <!-- Header -->
+      <div class="plan-card-header">
+        <div class="header-content">
+          <div class="header-icon">
+            <i class="material-icons">rocket_launch</i>
+          </div>
+          <h1>{% if current_lang == 'ar' %}إنشاء خطة عمل جديدة{% else %}Create New Business Plan{% endif %}</h1>
+          <p>{% if current_lang == 'ar' %}لنبدأ بتحديد رؤيتك وأهداف عملك{% else %}Let's start by defining your vision and business objectives{% endif %}</p>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="plan-card-body">
+        <form role="form" method="POST" action="/new_plan" id="business-plan-form" novalidate>
+
+          <!-- Brand Information Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="material-icons">storefront</i>
+              </div>
+              <h2 class="section-title">{% if current_lang == 'ar' %}معلومات العلامة التجارية{% else %}Brand Information{% endif %}</h2>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">
+                    {% if current_lang == 'ar' %}اسم العلامة التجارية{% else %}Brand Name{% endif %}
+                    <span class="required">*</span>
+                  </label>
+                  <input
+                    class="form-control-modern"
+                    type="text"
+                    name="brand_name"
+                    placeholder="{% if current_lang == 'ar' %}أدخل اسم علامتك التجارية{% else %}Enter your brand name{% endif %}"
+                    required>
+                  <div class="invalid-feedback">
+                    {% if current_lang == 'ar' %}يرجى إدخال اسم العلامة التجارية{% else %}Please enter a brand name{% endif %}
+                  </div>
+                  <p class="form-hint">{% if current_lang == 'ar' %}سيكون هذا الاسم الرسمي لعملك{% else %}This will be the official name of your business{% endif %}</p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">
+                    {% if current_lang == 'ar' %}عملة المشروع{% else %}Project Currency{% endif %}
+                    <span class="required">*</span>
+                  </label>
+                  <select class="form-control-modern" name="choices_currency" id="choices_currency" required>
+                    <option value="" disabled selected>{% if current_lang == 'ar' %}اختر العملة{% else %}Select Currency{% endif %}</option>
+                    <option value="USD">USD - {% if current_lang == 'ar' %}الدولار الأمريكي{% else %}US Dollar{% endif %}</option>
+                    <option value="EUR">EUR - {% if current_lang == 'ar' %}يورو{% else %}Euro{% endif %}</option>
+                    <option value="GBP">GBP - {% if current_lang == 'ar' %}الجنيه الإسترليني{% else %}British Pound{% endif %}</option>
+                    <option value="SAR">SAR - {% if current_lang == 'ar' %}الريال السعودي{% else %}Saudi Riyal{% endif %}</option>
+                    <option value="AED">AED - {% if current_lang == 'ar' %}الدرهم الإماراتي{% else %}UAE Dirham{% endif %}</option>
+                    <option value="EGP">EGP - {% if current_lang == 'ar' %}الجنيه المصري{% else %}Egyptian Pound{% endif %}</option>
+                    <option value="JPY">JPY - {% if current_lang == 'ar' %}الين الياباني{% else %}Japanese Yen{% endif %}</option>
+                    <option value="CAD">CAD - {% if current_lang == 'ar' %}الدولار الكندي{% else %}Canadian Dollar{% endif %}</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    {% if current_lang == 'ar' %}يرجى اختيار العملة{% else %}Please select a currency{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Industry Classification Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="material-icons">category</i>
+              </div>
+              <h2 class="section-title">{% if current_lang == 'ar' %}تصنيف الصناعة{% else %}Industry Classification{% endif %}</h2>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">
+                    {% if current_lang == 'ar' %}الصناعة{% else %}Industry{% endif %}
+                    <span class="required">*</span>
+                  </label>
+                  <select class="form-control-modern" name="choices_industry" id="choices_industry" onchange="populate(this.id,'choices_sector')" required>
+                    <option value="" disabled selected>{% if current_lang == 'ar' %}اختر الصناعة{% else %}Select Industry{% endif %}</option>
+                    {% if current_lang == 'ar' %}
+                      {% for row in lst_industries %}
+                        <option value="{{ row.industry_id }}">{{ row.industry_ar }}</option>
+                      {% endfor %}
+                    {% else %}
+                      {% for row in lst_industries %}
+                        <option value="{{ row.industry_id }}">{{ row.industry }}</option>
+                      {% endfor %}
+                    {% endif %}
+                  </select>
+                  <div class="invalid-feedback">
+                    {% if current_lang == 'ar' %}يرجى اختيار الصناعة{% else %}Please select an industry{% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">
+                    {% if current_lang == 'ar' %}قطاع الأعمال{% else %}Business Sector{% endif %}
+                    <span class="required">*</span>
+                  </label>
+                  <select class="form-control-modern" name="choices_sector" id="choices_sector" onchange="populate2(this.id,'choices_subsector')" required>
+                    <option value="" disabled selected>{% if current_lang == 'ar' %}اختر الصناعة أولاً{% else %}Select industry first{% endif %}</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    {% if current_lang == 'ar' %}يرجى اختيار القطاع{% else %}Please select a sector{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">{% if current_lang == 'ar' %}القطاع الفرعي{% else %}Sub Sector{% endif %}</label>
+                  <select class="form-control-modern" name="choices_subsector" id="choices_subsector">
+                    <option value="" selected>{% if current_lang == 'ar' %}اختر القطاع الفرعي (اختياري){% else %}Select sub-sector (optional){% endif %}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">
+                    {% if current_lang == 'ar' %}حالة المشروع{% else %}Project Status{% endif %}
+                    <span class="required">*</span>
+                  </label>
+                  <select class="form-control-modern" name="choices_status" id="choices_status" required>
+                    <option value="" disabled selected>{% if current_lang == 'ar' %}اختر الحالة{% else %}Select Status{% endif %}</option>
+                    <option value="1">{% if current_lang == 'ar' %}عمل جديد{% else %}New Business{% endif %}</option>
+                    <option value="2">{% if current_lang == 'ar' %}عمل قائم{% else %}Existing Business{% endif %}</option>
+                    <option value="3">{% if current_lang == 'ar' %}توسعة{% else %}Expansion{% endif %}</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    {% if current_lang == 'ar' %}يرجى اختيار حالة المشروع{% else %}Please select project status{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Objectives Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <div class="section-icon">
+                <i class="material-icons">flag</i>
+              </div>
+              <h2 class="section-title">{% if current_lang == 'ar' %}أهداف العمل{% else %}Business Objectives{% endif %}</h2>
+            </div>
+
+            <div class="objectives-container">
+              <div id="objectives-list">
+                <!-- Objective cards will be added here dynamically -->
+              </div>
+
+              <button type="button" class="btn-add-objective" id="add-objective-btn" onclick="addObjective()">
+                <i class="material-icons">add_circle_outline</i>
+                <span>{% if current_lang == 'ar' %}إضافة هدف{% else %}Add Objective{% endif %}</span>
+              </button>
+
+              <div class="objectives-limit-notice" id="objectives-limit-notice" style="display: none;">
+                <i class="material-icons">info</i>
+                <span>{% if current_lang == 'ar' %}الحد الأقصى 5 أهداف{% else %}Maximum 5 objectives allowed{% endif %}</span>
+              </div>
+            </div>
+
+            <!-- Hidden input to store objectives JSON -->
+            <input type="hidden" name="objectives_json" id="objectives-json">
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn-modern btn-secondary-modern" onclick="window.history.back()">
+              <i class="material-icons">{% if current_lang == 'ar' %}arrow_forward{% else %}arrow_back{% endif %}</i>
+              <span>{% if current_lang == 'ar' %}رجوع{% else %}Back{% endif %}</span>
+            </button>
+
+            <div class="d-flex gap-2">
+              <button type="button" class="btn-modern btn-danger-modern" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                <i class="material-icons">close</i>
+                <span>{% if current_lang == 'ar' %}إلغاء{% else %}Cancel{% endif %}</span>
+              </button>
+              <button type="submit" class="btn-modern btn-primary-modern" name="option" value="create">
+                <span>{% if current_lang == 'ar' %}إنشاء خطة العمل{% else %}Create Business Plan{% endif %}</span>
+                <i class="material-icons">{% if current_lang == 'ar' %}arrow_back{% else %}arrow_forward{% endif %}</i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelModalLabel">
+          <i class="material-icons text-danger me-2" style="vertical-align: middle;">warning</i>
+          {% if current_lang == 'ar' %}إلغاء خطة العمل{% else %}Cancel Business Plan{% endif %}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">
+          {% if current_lang == 'ar' %}
+            هل أنت متأكد أنك تريد الإلغاء؟ سيتم فقدان جميع المعلومات المدخلة.
+          {% else %}
+            Are you sure you want to cancel? All entered information will be lost.
+          {% endif %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modern btn-secondary-modern" data-bs-dismiss="modal">
+          {% if current_lang == 'ar' %}متابعة التعديل{% else %}Continue Editing{% endif %}
+        </button>
+        <button type="submit" form="business-plan-form" class="btn-modern btn-danger-modern" name="option" value="cancel">
+          {% if current_lang == 'ar' %}نعم، إلغاء{% else %}Yes, Cancel{% endif %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+// ==========================================
+// Language and Localization
+// ==========================================
+const currentLang = '{{ current_lang }}';
+const isArabic = currentLang === 'ar';
+
+// Translations
+const translations = {
+  en: {
+    objectiveLabel: 'Objective',
+    selectObjectiveType: 'Select Objective Type',
+    selectStrategy: 'Select Strategy',
+    selectStrategyFirst: 'Select objective type first',
+    target: 'Target',
+    timeline: 'Timeline',
+    timeUnit: 'Time Unit',
+    selectTimeUnit: 'Select time unit',
+    notRequired: 'Not required',
+    percentageImprovement: 'Percentage improvement',
+    numberOfTimeUnits: 'Number of time units',
+    week: 'Week',
+    month: 'Month',
+    year: 'Year',
+    removeObjective: 'Remove objective',
+    objectiveTypes: {
+      'Increase profitability': 'Increase profitability',
+      'Increase sales': 'Increase sales',
+      'Enhance Production Capacity': 'Enhance Production Capacity',
+      'Increase market share': 'Increase market share',
+      'Enhance customer satisfaction': 'Enhance customer satisfaction'
+    }
+  },
+  ar: {
+    objectiveLabel: 'الهدف',
+    selectObjectiveType: 'اختر نوع الهدف',
+    selectStrategy: 'اختر الاستراتيجية',
+    selectStrategyFirst: 'اختر نوع الهدف أولاً',
+    target: 'الهدف المستهدف',
+    timeline: 'الجدول الزمني',
+    timeUnit: 'وحدة الوقت',
+    selectTimeUnit: 'اختر وحدة الوقت',
+    notRequired: 'غير مطلوب',
+    percentageImprovement: 'النسبة المئوية للتحسين',
+    numberOfTimeUnits: 'عدد الوحدات الزمنية',
+    week: 'أسبوع',
+    month: 'شهر',
+    year: 'سنة',
+    removeObjective: 'حذف الهدف',
+    objectiveTypes: {
+      'Increase profitability': 'زيادة الربحية',
+      'Increase sales': 'زيادة المبيعات',
+      'Enhance Production Capacity': 'تعزيز الطاقة الإنتاجية',
+      'Increase market share': 'زيادة الحصة السوقية',
+      'Enhance customer satisfaction': 'تعزيز رضا العملاء'
+    }
+  }
+};
+
+const t = translations[currentLang] || translations.en;
+
+// ==========================================
+// Objective Strategies Data
+// ==========================================
+const objectiveStrategies = {
+  'Increase profitability': {
+    en: [
+      'Reducing production cost',
+      'Reducing overhead cost',
+      'Reducing Waste',
+      'Increase raw material inventory',
+      'Improving supply chain efficiency',
+      'Implement Automation',
+      'Improving pricing strategy'
+    ],
+    ar: [
+      'تقليل تكلفة الإنتاج',
+      'تقليل التكاليف العامة',
+      'تقليل الهدر',
+      'زيادة مخزون المواد الخام',
+      'تحسين كفاءة سلسلة التوريد',
+      'تنفيذ الأتمتة',
+      'تحسين استراتيجية التسعير'
+    ]
+  },
+  'Increase sales': {
+    en: [
+      'Geographic expansion',
+      'Expand e-commerce reach',
+      'Franchising',
+      'Introduce new products and services',
+      'Expand customer segments',
+      'Improve marketing & sales strategies',
+      'Enhance customer retention',
+      'Adjust pricing strategies',
+      'Enter new distribution channels'
+    ],
+    ar: [
+      'التوسع الجغرافي',
+      'توسيع نطاق التجارة الإلكترونية',
+      'التفرع',
+      'تقديم منتجات وخدمات جديدة',
+      'توسيع شرائح العملاء',
+      'تحسين استراتيجيات التسويق والمبيعات',
+      'تعزيز استبقاء العملاء',
+      'تعديل استراتيجيات التسعير',
+      'الدخول في قنوات توزيع جديدة'
+    ]
+  },
+  'Enhance Production Capacity': {
+    en: [
+      'Upgrading machinery and equipment',
+      'Expand Physical facilities',
+      'Outsource part of production',
+      'Hire Additional Staff',
+      'Implement process automation',
+      'Increase raw material inventory'
+    ],
+    ar: [
+      'ترقية الآلات والمعدات',
+      'توسيع المرافق المادية',
+      'استعانة خارجية بجزء من الإنتاج',
+      'توظيف موظفين إضافيين',
+      'تنفيذ أتمتة العمليات',
+      'زيادة مخزون المواد الخام'
+    ]
+  },
+  'Increase market share': {
+    en: [
+      'Aggressive Marketing Campaigns',
+      'Launch new products',
+      'Improve customer retention',
+      'Expand distribution channel',
+      'Enhance product differentiation',
+      'Increase brand awareness'
+    ],
+    ar: [
+      'حملات تسويقية عدوانية',
+      'إطلاق منتجات جديدة',
+      'تحسين استبقاء العملاء',
+      'توسيع قنوات التوزيع',
+      'تعزيز تمايز المنتج',
+      'زيادة الوعي بالعلامة التجارية'
+    ]
+  },
+  'Enhance customer satisfaction': {
+    en: [
+      'Improve customer service quality',
+      'Enhance product quality',
+      'Improve delivery speed',
+      'Enhance after-sale support',
+      'Improve website/app usability',
+      'Enhance instore experience'
+    ],
+    ar: [
+      'تحسين جودة خدمة العملاء',
+      'تعزيز جودة المنتج',
+      'تحسين سرعة التسليم',
+      'تعزيز الدعم بعد البيع',
+      'تحسين سهولة استخدام الموقع/التطبيق',
+      'تعزيز تجربة المتجر'
+    ]
+  }
+};
+
+// ==========================================
+// Objectives Management
+// ==========================================
+let objectives = [];
+const MAX_OBJECTIVES = 5;
+
+function generateObjectiveId() {
+  return 'obj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function addObjective() {
+  if (objectives.length >= MAX_OBJECTIVES) {
+    return;
+  }
+
+  const objective = {
+    id: generateObjectiveId(),
+    type: '',
+    strategy: '',
+    target: '',
+    timeline: '',
+    unit: ''
+  };
+
+  objectives.push(objective);
+  renderObjectives();
+  updateAddButton();
+  updateObjectivesJson();
+}
+
+function removeObjective(id) {
+  objectives = objectives.filter(obj => obj.id !== id);
+  renderObjectives();
+  updateAddButton();
+  updateObjectivesJson();
+}
+
+function updateObjective(id, field, value) {
+  const objective = objectives.find(obj => obj.id === id);
+  if (objective) {
+    objective[field] = value;
+
+    // If type changed, reset strategy
+    if (field === 'type') {
+      objective.strategy = '';
+      updateStrategyOptions(id, value);
+      updateMetricsState(id, value);
+    }
+
+    updateObjectivesJson();
+  }
+}
+
+function updateStrategyOptions(objectiveId, objectiveType) {
+  const strategySelect = document.getElementById(`strategy_${objectiveId}`);
+  if (!strategySelect) return;
+
+  strategySelect.innerHTML = '';
+
+  // Add default option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.disabled = true;
+  defaultOption.selected = true;
+  defaultOption.textContent = objectiveType ? t.selectStrategy : t.selectStrategyFirst;
+  strategySelect.appendChild(defaultOption);
+
+  if (objectiveType && objectiveStrategies[objectiveType]) {
+    const strategies = objectiveStrategies[objectiveType][currentLang] || objectiveStrategies[objectiveType].en;
+    const strategiesEn = objectiveStrategies[objectiveType].en;
+
+    strategies.forEach((strategy, index) => {
+      const option = document.createElement('option');
+      // Store English value for backend consistency
+      option.value = strategiesEn[index];
+      option.textContent = strategy;
+      strategySelect.appendChild(option);
+    });
+
+    strategySelect.disabled = false;
+  } else {
+    strategySelect.disabled = true;
+  }
+}
+
+function updateMetricsState(objectiveId, objectiveType) {
+  const targetInput = document.getElementById(`target_${objectiveId}`);
+  const timelineInput = document.getElementById(`timeline_${objectiveId}`);
+  const unitSelect = document.getElementById(`unit_${objectiveId}`);
+
+  if (!targetInput || !timelineInput || !unitSelect) return;
+
+  const isCustomerSatisfaction = objectiveType === 'Enhance customer satisfaction';
+
+  targetInput.disabled = isCustomerSatisfaction;
+  timelineInput.disabled = isCustomerSatisfaction;
+  unitSelect.disabled = isCustomerSatisfaction;
+
+  if (isCustomerSatisfaction) {
+    targetInput.value = '';
+    timelineInput.value = '';
+    unitSelect.value = '';
+    targetInput.placeholder = t.notRequired;
+    timelineInput.placeholder = t.notRequired;
+  } else {
+    targetInput.placeholder = '0';
+    timelineInput.placeholder = '0';
+  }
+}
+
+function updateAddButton() {
+  const addBtn = document.getElementById('add-objective-btn');
+  const limitNotice = document.getElementById('objectives-limit-notice');
+
+  if (objectives.length >= MAX_OBJECTIVES) {
+    addBtn.style.display = 'none';
+    limitNotice.style.display = 'flex';
+  } else {
+    addBtn.style.display = 'flex';
+    limitNotice.style.display = 'none';
+  }
+}
+
+function updateObjectivesJson() {
+  const jsonInput = document.getElementById('objectives-json');
+  if (jsonInput) {
+    jsonInput.value = JSON.stringify(objectives);
+  }
+}
+
+function renderObjectives() {
+  const container = document.getElementById('objectives-list');
+  container.innerHTML = '';
+
+  objectives.forEach((objective, index) => {
+    const card = createObjectiveCard(objective, index);
+    container.appendChild(card);
+  });
+}
+
+function createObjectiveCard(objective, index) {
+  const card = document.createElement('div');
+  card.className = 'objective-card';
+  card.id = `card_${objective.id}`;
+
+  const objectiveTypeOptions = Object.keys(objectiveStrategies).map(type => {
+    const displayText = isArabic ? t.objectiveTypes[type] : type;
+    const selected = objective.type === type ? 'selected' : '';
+    return `<option value="${type}" ${selected}>${displayText}</option>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="objective-header">
+      <div class="objective-number">
+        <span class="objective-badge">${index + 1}</span>
+        <span class="objective-label">${t.objectiveLabel} ${index + 1}</span>
+      </div>
+      <button type="button" class="btn-remove-objective" onclick="removeObjective('${objective.id}')"
+              title="${t.removeObjective}" ${objectives.length === 1 ? 'disabled' : ''}>
+        <i class="material-icons">delete_outline</i>
+      </button>
+    </div>
+
+    <div class="objective-fields">
+      <div class="form-group">
+        <label class="form-label">${isArabic ? 'نوع الهدف' : 'Objective Type'}<span class="required">*</span></label>
+        <select class="form-control-modern" id="type_${objective.id}"
+                onchange="updateObjective('${objective.id}', 'type', this.value)" required>
+          <option value="" disabled ${!objective.type ? 'selected' : ''}>${t.selectObjectiveType}</option>
+          ${objectiveTypeOptions}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">${isArabic ? 'الاستراتيجية' : 'Strategy'}<span class="required">*</span></label>
+        <select class="form-control-modern" id="strategy_${objective.id}"
+                onchange="updateObjective('${objective.id}', 'strategy', this.value)"
+                ${!objective.type ? 'disabled' : ''} required>
+          <option value="" disabled selected>${objective.type ? t.selectStrategy : t.selectStrategyFirst}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="objective-metrics">
+      <div class="form-group">
+        <label class="form-label">${t.target}</label>
+        <div class="input-with-suffix">
+          <input class="form-control-modern" type="number" id="target_${objective.id}"
+                 value="${objective.target}"
+                 placeholder="0" min="0" max="100" step="0.5"
+                 onchange="updateObjective('${objective.id}', 'target', this.value)"
+                 oninput="validateTargetInput(this)">
+          <span class="input-suffix">%</span>
+        </div>
+        <p class="form-hint">${t.percentageImprovement}</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">${t.timeline}</label>
+        <input class="form-control-modern" type="number" id="timeline_${objective.id}"
+               value="${objective.timeline}"
+               placeholder="0" min="0"
+               onchange="updateObjective('${objective.id}', 'timeline', this.value)">
+        <p class="form-hint">${t.numberOfTimeUnits}</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">${t.timeUnit}</label>
+        <select class="form-control-modern" id="unit_${objective.id}"
+                onchange="updateObjective('${objective.id}', 'unit', this.value)">
+          <option value="" disabled ${!objective.unit ? 'selected' : ''}>${t.selectTimeUnit}</option>
+          <option value="Week" ${objective.unit === 'Week' ? 'selected' : ''}>${t.week}</option>
+          <option value="Month" ${objective.unit === 'Month' ? 'selected' : ''}>${t.month}</option>
+          <option value="Year" ${objective.unit === 'Year' ? 'selected' : ''}>${t.year}</option>
+        </select>
+      </div>
+    </div>
+  `;
+
+  // After creating the card, populate strategy options if type is already set
+  if (objective.type) {
+    setTimeout(() => {
+      updateStrategyOptions(objective.id, objective.type);
+      // Set the strategy value if it exists
+      if (objective.strategy) {
+        const strategySelect = document.getElementById(`strategy_${objective.id}`);
+        if (strategySelect) {
+          strategySelect.value = objective.strategy;
+        }
+      }
+      updateMetricsState(objective.id, objective.type);
+    }, 0);
+  }
+
+  return card;
+}
+
+function validateTargetInput(input) {
+  let value = parseFloat(input.value);
+  if (isNaN(value)) {
+    return;
+  }
+  if (value < 0) {
+    input.value = 0;
+  } else if (value > 100) {
+    input.value = 100;
+  }
+}
+
+// ==========================================
+// Industry/Sector Population (from original)
+// ==========================================
+function populate(s1, s2) {
+  var s1 = document.getElementById(s1);
+  var s2 = document.getElementById(s2);
+  s2.innerHTML = "";
+
+  var optionArray = [];
+
+  if (s1.value == "1") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `1|${isArabic ? 'إنتاج المحاصيل' : 'Crop Production'}`,
+      `2|${isArabic ? 'تربية الماشية' : 'Livestock Farming'}`,
+      `3|${isArabic ? 'البستنة' : 'Horticulture'}`,
+      `4|${isArabic ? 'الأعمال الزراعية' : 'Agribusiness'}`
+    ];
+  } else if (s1.value == "2") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `0|${isArabic ? 'تصنيع الإلكترونيات' : 'Electronics Manufacturing'}`,
+      `0|${isArabic ? 'الكيماويات والمستحضرات الصيدلانية' : 'Chemical & Pharmaceutical'}`,
+      `0|${isArabic ? 'الطعام والشراب' : 'Food & Beverage'}`,
+      `0|${isArabic ? 'المنسوجات والملابس' : 'Textile & Apparel'}`,
+      `0|${isArabic ? 'الآلات والمعدات' : 'Machinery & Equipment'}`,
+      `0|${isArabic ? 'المعادن والصلب' : 'Metal & Steel'}`,
+      `0|${isArabic ? 'البلاستيك والمطاط' : 'Plastics & Rubber'}`,
+      `0|${isArabic ? 'الأثاث ومنتجات الخشب' : 'Furniture & Wood Products'}`,
+      `0|${isArabic ? 'الورق والطباعة' : 'Paper & Printing'}`,
+      `0|${isArabic ? 'معدات الطاقة وتوليد الطاقة' : 'Energy & Power Generation Equipment'}`,
+      `0|${isArabic ? 'الأجهزة الطبية' : 'Medical Device'}`,
+      `0|${isArabic ? 'الكيماويات والمواد' : 'Chemicals & Materials'}`,
+      `0|${isArabic ? 'السلع الاستهلاكية' : 'Consumer Goods'}`,
+      `0|${isArabic ? 'مواد البناء' : 'Construction Materials'}`,
+      `0|${isArabic ? 'إنتاج الديزل الحيوي' : 'Biodiesel Production'}`
+    ];
+  } else if (s1.value == "3") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `0|${isArabic ? 'تطوير البرمجيات' : 'Software Development'}`,
+      `0|${isArabic ? 'تطوير الأجهزة' : 'Hardware Development'}`,
+      `0|${isArabic ? 'خدمات تكنولوجيا المعلومات' : 'Information Technology Services'}`,
+      `0|${isArabic ? 'الإنترنت وخدمات الويب' : 'Internet & Web Services'}`,
+      `0|${isArabic ? 'الاتصالات' : 'Telecommunications'}`,
+      `0|${isArabic ? 'الإلكترونيات وأشباه الموصلات' : 'Electronics & Semiconductors'}`,
+      `0|${isArabic ? 'الذكاء الاصطناعي والتعلم الآلي' : 'Artificial Intelligence & Machine Learning'}`,
+      `0|${isArabic ? 'التكنولوجيا الحيوية وعلوم الحياة' : 'Biotechnology & Life Sciences'}`,
+      `0|${isArabic ? 'الروبوتات والأتمتة' : 'Robotics & Automation'}`,
+      `0|${isArabic ? 'تكنولوجيا الألعاب والترفيه' : 'Gaming & Entertainment Technology'}`,
+      `0|${isArabic ? 'التكنولوجيا المالية' : 'Financial Technology'}`,
+      `0|${isArabic ? 'تكنولوجيا الصحة' : 'HealthTech'}`
+    ];
+  } else if (s1.value == "4") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `0|${isArabic ? 'الحرف النسيجية' : 'Textile Crafts'}`,
+      `0|${isArabic ? 'الفخار والسيراميك' : 'Pottery & Ceramics'}`,
+      `0|${isArabic ? 'النجارة' : 'Woodworking'}`,
+      `0|${isArabic ? 'تشغيل المعادن' : 'Metalworking'}`,
+      `0|${isArabic ? 'الحرف الزجاجية' : 'Glass Crafts'}`,
+      `0|${isArabic ? 'الحرف الورقية' : 'Paper Crafts'}`,
+      `0|${isArabic ? 'صناعة الجلود' : 'Leatherworking'}`,
+      `0|${isArabic ? 'صناعة المجوهرات' : 'Jewelry Making'}`,
+      `0|${isArabic ? 'صناعة الشموع والصابون' : 'Candle & Soap Making'}`,
+      `0|${isArabic ? 'صناعة السلال' : 'Basketry'}`,
+      `0|${isArabic ? 'تجليد الكتب' : 'Bookbinding'}`,
+      `0|${isArabic ? 'صناعة الدمى' : 'Dollmaking'}`,
+      `0|${isArabic ? 'النحت' : 'Sculpture'}`,
+      `0|${isArabic ? 'التصميم الزهري' : 'Floral Design'}`,
+      `0|${isArabic ? 'الخط' : 'Calligraphy'}`,
+      `0|${isArabic ? 'أعمال الخرز' : 'Beadwork'}`,
+      `0|${isArabic ? 'فن الدمى' : 'Puppetry'}`,
+      `0|${isArabic ? 'الرسم' : 'Painting'}`,
+      `0|${isArabic ? 'منتجات التجميل' : 'Beauty Products'}`
+    ];
+  } else if (s1.value == "5") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `5|${isArabic ? 'الإقامة' : 'Lodging'}`,
+      `6|${isArabic ? 'الطعام والشراب' : 'Food & Beverages'}`,
+      `7|${isArabic ? 'الترفيه والترويح' : 'Recreation & Entertainment'}`
+    ];
+  } else if (s1.value == "6") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `0|${isArabic ? 'التعليم' : 'Education'}`,
+      `0|${isArabic ? 'الخدمات المصرفية والمالية' : 'Banking & Finance'}`,
+      `0|${isArabic ? 'التأمين' : 'Insurance'}`,
+      `0|${isArabic ? 'الاستشارات' : 'Consulting'}`,
+      `0|${isArabic ? 'الاتصالات' : 'Telecommunications'}`,
+      `0|${isArabic ? 'إدارة المستشفيات' : 'Hospital Management'}`,
+      `0|${isArabic ? 'الخدمات البيئية' : 'Environmental Services'}`,
+      `0|${isArabic ? 'الخدمات القانونية' : 'Legal Services'}`,
+      `0|${isArabic ? 'المحاسبة والمراجعة' : 'Accounting & Audit'}`,
+      `0|${isArabic ? 'العلاقات العامة' : 'Public Relations'}`,
+      `0|${isArabic ? 'التسويق والإعلان' : 'Marketing & Advertising'}`,
+      `0|${isArabic ? 'التصوير والتصميم' : 'Photography & Design'}`,
+      `0|${isArabic ? 'الرياضة المحترفة' : 'Professional Sports'}`,
+      `0|${isArabic ? 'السفر والسياحة' : 'Travel & Tourism'}`,
+      `0|${isArabic ? 'الصيانة والإصلاح' : 'Maintenance & Repair'}`,
+      `0|${isArabic ? 'النقل والخدمات اللوجستية' : 'Transportation & Logistics'}`,
+      `0|${isArabic ? 'التغذية' : 'Nutrition'}`,
+      `0|${isArabic ? 'الفعاليات والمعارض' : 'Events & Expos'}`,
+      `0|${isArabic ? 'خدمات الأمن' : 'Security Services'}`,
+      `0|${isArabic ? 'الهندسة المدنية' : 'Civil Engineering'}`,
+      `0|${isArabic ? 'هندسة العمارة' : 'Architecture Engineering'}`,
+      `0|${isArabic ? 'الهندسة الميكانيكية' : 'Mechanial Engineering'}`,
+      `0|${isArabic ? 'الهندسة الكهربائية' : 'Electrical Engineering'}`,
+      `0|${isArabic ? 'الهندسة الطبية الحيوية' : 'Biomedical Engineering'}`,
+      `0|${isArabic ? 'هندسة البرمجيات' : 'Software Engineering'}`,
+      `0|${isArabic ? 'هندسة الاتصالات' : 'Telecommunications Engineering'}`,
+      `0|${isArabic ? 'المستحضرات الصيدلانية' : 'Pharmaceuticals'}`,
+      `0|${isArabic ? 'الطب' : 'Medical Doctor'}`,
+      `0|${isArabic ? 'طب الأسنان' : 'Dentistry'}`,
+      `0|${isArabic ? 'التجميل والعناية' : 'Beauty & Care'}`
+    ];
+  } else if (s1.value == "7") {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع --' : '-- Choose Sector --'}`,
+      `0|${isArabic ? 'التجارة بالتجزئة' : 'Retail Trade'}`,
+      `0|${isArabic ? 'التجارة بالجملة' : 'Wholesale Trade'}`,
+      `0|${isArabic ? 'التجارة الدولية' : 'International Trade'}`,
+      `0|${isArabic ? 'التجارة الإلكترونية' : 'E-Commerce'}`,
+      `0|${isArabic ? 'تداول السلع' : 'Commodity Trading'}`,
+      `0|${isArabic ? 'المزادات' : 'Auctions'}`,
+      `0|${isArabic ? 'الاستيراد والتصدير' : 'Import & Export'}`
+    ];
+  } else {
+    optionArray = ['0|'];
+  }
+
+  for (var option in optionArray) {
+    var pair = optionArray[option].split("|");
+    var newoption = document.createElement("option");
+    newoption.value = pair[1];
+    newoption.innerHTML = pair[1];
+    s2.options.add(newoption);
+  }
+}
+
+function populate2(s1, s2) {
+  var s1 = document.getElementById(s1);
+  var s2 = document.getElementById(s2);
+  s2.innerHTML = "";
+
+  var selectedSector = s1.options[s1.selectedIndex].text;
+  var optionArray = [];
+
+  if (selectedSector.includes("Crop Production") || selectedSector.includes("إنتاج المحاصيل")) {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع الفرعي --' : '-- Choose sub-sector --'}`,
+      `1|${isArabic ? 'الحبوب' : 'Grains'}`,
+      `2|${isArabic ? 'الفواكه' : 'Fruits'}`,
+      `3|${isArabic ? 'الخضروات' : 'Vegetables'}`,
+      `4|${isArabic ? 'البذور' : 'Seeds'}`,
+      `5|${isArabic ? 'الأعشاب' : 'Herbs'}`,
+      `6|${isArabic ? 'الأشجار' : 'Trees'}`,
+      `7|${isArabic ? 'محاصيل العلف' : 'Forage crops'}`,
+      `8|${isArabic ? 'محاصيل الألياف' : 'Fiber crops'}`
+    ];
+  } else if (selectedSector.includes("Livestock Farming") || selectedSector.includes("تربية الماشية")) {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع الفرعي --' : '-- Choose sub-sector --'}`,
+      `9|${isArabic ? 'تربية الأبقار الحلوب' : 'Dairy Farming'}`,
+      `10|${isArabic ? 'تربية أبقار اللحم' : 'Beef Cattle Ranching'}`,
+      `11|${isArabic ? 'تربية الدواجن - تربية الطيور' : 'Poultry Farming - Rearing of birds'}`,
+      `12|${isArabic ? 'تربية الدواجن - إنتاج البيض' : 'Poultry Farming - Layers'}`,
+      `13|${isArabic ? 'تربية الخنازير' : 'Pig Farming'}`,
+      `14|${isArabic ? 'تربية الأغنام' : 'Sheep Farming'}`,
+      `15|${isArabic ? 'تربية الماعز' : 'Goat Farming'}`,
+      `16|${isArabic ? 'تربية الأسماك' : 'Fish Farming'}`,
+      `17|${isArabic ? 'تربية النحل' : 'Beekeeping'}`,
+      `18|${isArabic ? 'تربية الأرانب' : 'Rabbit Farming'}`,
+      `19|${isArabic ? 'تربية القواقع' : 'Snail Farming'}`,
+      `20|${isArabic ? 'تربية الديدان' : 'Worm Farming'}`
+    ];
+  } else if (selectedSector.includes("Horticulture") || selectedSector.includes("البستنة")) {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع الفرعي --' : '-- Choose sub-sector --'}`,
+      `21|${isArabic ? 'إنتاج المشاتل' : 'Nursery Production'}`,
+      `22|${isArabic ? 'البستنة الحضرية' : 'Urban Horticulture'}`,
+      `23|${isArabic ? 'الزراعة المائية' : 'Hydroponics'}`,
+      `24|${isArabic ? 'بستنة المناظر الطبيعية' : 'Landscape Horticulture'}`,
+      `25|${isArabic ? 'الزراعة المائية المتكاملة' : 'Acquaponics'}`,
+      `26|${isArabic ? 'الأعشاب' : 'Herbs'}`
+    ];
+  } else if (selectedSector.includes("Agribusiness") || selectedSector.includes("الأعمال الزراعية")) {
+    optionArray = [
+      `0|${isArabic ? '-- اختر القطاع الفرعي --' : '-- Choose sub-sector --'}`,
+      `27|${isArabic ? 'معالجة وحفظ الأغذية' : 'Food processing & preservation'}`,
+      `28|${isArabic ? 'إنتاج المشروبات' : 'Beverage production'}`,
+      `29|${isArabic ? 'معالجة الألبان' : 'Dairy processing'}`,
+      `30|${isArabic ? 'معالجة وتعبئة اللحوم' : 'Meat processing & packaging'}`,
+      `31|${isArabic ? 'طحن الدقيق ومعالجة الحبوب' : 'Flour milling & grain processing'}`,
+      `32|${isArabic ? 'المدخلات والإمدادات الزراعية' : 'Agri-inputs & Supply'}`,
+      `33|${isArabic ? 'الكيماويات الزراعية' : 'Agrochemicals'}`
+    ];
+  } else {
+    optionArray = ['0|'];
+  }
+
+  for (var option in optionArray) {
+    var pair = optionArray[option].split("|");
+    var newoption = document.createElement("option");
+    newoption.value = pair[1];
+    newoption.innerHTML = pair[1];
+    s2.options.add(newoption);
+  }
+}
+
+// ==========================================
+// Form Initialization and Validation
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+  // Set RTL for Arabic
+  if (isArabic) {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  } else {
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.documentElement.setAttribute('lang', 'en');
+  }
+
+  // Add first objective by default
+  addObjective();
+
+  // Form validation
+  const form = document.getElementById('business-plan-form');
+  form.addEventListener('submit', function(event) {
+    // Update objectives JSON before submit
+    updateObjectivesJson();
+
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  }, false);
+});
+</script>
+{% endblock javascripts %}

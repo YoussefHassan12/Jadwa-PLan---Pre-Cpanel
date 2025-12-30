@@ -1,0 +1,2756 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    تحليل السوق
+  {% else %}
+    Market Analysis
+  {% endif %}
+{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<div class="container-fluid pl-5 pt-3">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 80%; max-width: 600px;">
+          {% for category, message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show shadow auto-dismiss" role="alert"
+                 style="text-align:center; background-color: #dc3545; color: white; border-color: #dc3545; position: relative; overflow: hidden;"
+                 data-dismiss-time="3000">
+              <!-- Progress bar for countdown -->
+              <div class="alert-progress" style="position: absolute; bottom: 0; left: 0; height: 3px; background-color: rgba(255,255,255,0.5); width: 100%; transform-origin: left; animation: progressCountdown 5s linear;"></div>
+
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="filter: invert(1);"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <style>
+    @keyframes progressCountdown {
+      from {
+        transform: scaleX(1);
+      }
+      to {
+        transform: scaleX(0);
+      }
+    }
+
+    .alert-progress {
+      animation: progressCountdown 5s linear;
+    }
+    </style>
+
+    <script>
+    // Auto-dismiss flash messages with progress bar
+    document.addEventListener('DOMContentLoaded', function() {
+        const autoDismissAlerts = document.querySelectorAll('.auto-dismiss');
+
+        autoDismissAlerts.forEach(alert => {
+            const dismissTime = alert.getAttribute('data-dismiss-time') || 5000; // Default 5 seconds
+
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, parseInt(dismissTime));
+        });
+    });
+    </script>
+
+  <div class="row">
+    <div class="col-10">
+      <form role="form" method="POST" action="/market_analysis/{{ bplan_id }}">
+
+        <div class="row px-8 pt-0 pb-3">
+          <span class="me-2 text-xxs font-weight-bold">
+            {% if session.get('lang', 'en') == 'ar' %}
+              تم الإكمال بنسبة
+            {% endif %}
+            {{ data_comp[0].completion }}%
+            {% if session.get('lang', 'en') == 'ar' %}
+              من الملف
+            {% else %}
+              Completed
+            {% endif %}
+          </span>
+          <div class="progress">
+            {% if data_comp[0].completion == 100: %}
+            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% elif data_comp[0].completion >= 50: %}
+              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% else %}
+              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Title + Market Analysis card -->
+        <div class="card my-3">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+
+              <div class="d-lg-flex">
+                <div>
+                  <h5 class="text-white text-capitalize ps-3 mx-3">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      تحليل السوق
+                    {% else %}
+                      Market Analysis
+                    {% endif %}
+                  </h5>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        <div class="row px-3 pt-2">
+          {% for row in data_mkt_segments %}
+            <div class="col-2 text-center mb-4">
+              <div class="segment-donut position-relative bg-white rounded-3 p-3 shadow-sm border"
+                   onclick="this.querySelector('button').click()"
+                   style="cursor: pointer; width: 120px; height: 140px; margin: 0 auto; transition: all 0.3s ease;">
+
+                <!-- SVG Donut Chart Container -->
+                <div class="position-relative" style="height: 80px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="80" height="80" viewBox="0 0 42 42" class="donut">
+                    <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#e0e0e0" stroke-width="3"></circle>
+                    <circle cx="21" cy="21" r="15.9155" fill="transparent"
+                            stroke="#1A73E8"
+                            stroke-width="3"
+                            stroke-dasharray="{{ row.segment_percentage }} {{ 100 - row.segment_percentage }}"
+                            stroke-dashoffset="25"
+                            class="donut-segment">
+                      <animate attributeName="stroke-dasharray" from="0 100" to="{{ row.segment_percentage }} {{ 100 - row.segment_percentage }}" dur="1s" fill="freeze" />
+                    </circle>
+                  </svg>
+
+                  <!-- Percentage in center -->
+                  <div class="position-absolute top-50 start-50 translate-middle text-center">
+                    <strong class="h6 mb-0 text-dark">{{ "%.1f"|format(row.segment_percentage|float) }}%</strong>
+                  </div>
+                </div>
+
+                <!-- Segment Name with more padding -->
+                <div class="mt-3 pb-2">
+                  <small class="text-truncate d-block text-dark" style="font-size: 0.8rem; font-weight: 500; line-height: 1.2;">
+                    {{ row.segment_name if row.segment_name != "<name>" else ("قطاع جديد" if session.get("lang", "en") == "ar" else "New Segment") }}
+                  </small>
+                </div>
+
+
+                <!-- Hidden Button -->
+                <button type="submit" name="select_segment" value="{{ row.segment_id }}"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0;">
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <style>
+        .segment-donut {
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .segment-donut:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          border-color: #1A73E8 !important;
+          background-color: #f0f7ff !important;
+        }
+
+        .segment-donut:active {
+          transform: translateY(-1px);
+        }
+
+        /* Optional: Add a hand cursor on all interactive elements */
+        .segment-donut, .segment-donut * {
+          cursor: pointer;
+        }
+
+        /* Active state for selected segment */
+        .segment-donut.active {
+          border: 2px solid #1A73E8 !important;
+          background-color: #e8f0fe !important;
+        }
+
+        /* Ensure donut is properly centered */
+        .donut-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 80px;
+        }
+        </style>
+
+          <!-- Market Segments card -->
+          <div class="card-body px-6 pt-2">
+              <div class="row">
+                <div class="col">
+                  <h5 class="font-weight-bolder text-info mt-3">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      قطاعات السوق
+                    {% else %}
+                      Market Segments
+                    {% endif %}
+                  </h5>
+                </div>
+                <div class="col-2 text-end">
+                  <input class="form-control" type="text" name="mkt_segment_id" value="{{ segment_id }}" hidden autocomplete="off" />
+                </div>
+              </div>
+
+              <!-- Total Percentage Display -->
+                <div class="row mb-3">
+                  <div class="col-12">
+                    <div class="card border-0 shadow-sm" id="totalPercentageAlert">
+                      <div class="card-body py-3">
+                        <!-- Progress Bar -->
+                        <div class="progress mb-3" style="height: 8px;">
+                          <div class="progress-bar" id="totalProgressBar"
+                               role="progressbar"
+                               style="width: {{ data_mkt_analysis[0].segment_percentage|default(0) }}%; transition: width 0.5s ease;"
+                               aria-valuenow="{{ data_mkt_analysis[0].segment_percentage|default(0) }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100">
+                          </div>
+                        </div>
+
+                        <!-- Info Row -->
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div class="d-flex align-items-center">
+                            <i class="fas fa-chart-pie text-info me-2"></i>
+                            <span class="fw-medium">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                إجمالي النسبة المئوية:
+                              {% else %}
+                                Total Percentage:
+                              {% endif %}
+                              <strong id="totalPercentage" class="ms-1">
+                                {% set total_percentage = namespace(value=0) %}
+                                {% for row in data_mkt_segments %}
+                                  {% set total_percentage.value = total_percentage.value + row.segment_percentage %}
+                                {% endfor %}
+                                {{ "%.1f"|format(total_percentage.value) }}%
+                              </strong>
+                            </span>
+                          </div>
+
+                          <div class="d-flex align-items-center">
+                            <span id="percentageStatus" class="badge bg-success me-2">
+                              <i class="fas fa-check-circle me-1"></i>
+                              {% set total_percentage = namespace(value=0) %}
+                              {% for row in data_mkt_segments %}
+                                {% set total_percentage.value = total_percentage.value + row.segment_percentage %}
+                              {% endfor %}
+                              {% if total_percentage.value > 100 %}
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  غير صالح
+                                {% else %}
+                                  Invalid
+                                {% endif %}
+                              {% else %}
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  صالح
+                                {% else %}
+                                  Valid
+                                {% endif %}
+                              {% endif %}
+                            </span>
+                            <small class="text-muted" id="remainingPercentage">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                متبقي: {{ "%.1f"|format(100 - total_percentage.value) }}%
+                              {% else %}
+                                Remaining: {{ "%.1f"|format(100 - total_percentage.value) }}%
+                              {% endif %}
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <div class="row">
+                <div class="col">
+                  <!-- 1st row -->
+                  <div class="row">
+                    <div class="col">
+                        <div class="input-group input-group-static mb-4">
+                            <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    اسم القطاع
+                                {% else %}
+                                    Segment Name
+                                {% endif %}
+                            </label>
+                        </div>
+                        <div class="input-group input-group-static mb-0">
+                            <input class="form-control"
+                                   type="text"
+                                   name="segment_name"
+                                   value="{% if data_mkt_analysis[0].segment_name == '<name>' %}{% else %}{{ data_mkt_analysis[0].segment_name }}{% endif %}"
+                                   placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل اسم القطاع{% else %}Enter segment name{% endif %}"
+                                   required
+                                   autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            نموذج العمل
+                          {% else %}
+                            Business Model
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="multisteps-form__input form-control" name="choice_business_model" id="choice_business_model" onchange="check()">
+                          <option value="B2C" {% if data_mkt_analysis[0].business_model == "B2C" %} selected {% endif %}>
+                            {% if session.get('lang', 'en') == 'ar' %}عمل لعميل{% else %}Business to Client{% endif %}
+                          </option>
+                          <option value="B2B" {% if data_mkt_analysis[0].business_model == "B2B" %} selected {% endif %}>
+                            {% if session.get('lang', 'en') == 'ar' %}عمل لعمل{% else %}Business to Business{% endif %}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="input-group input-group-static mb-4">
+                            <label class="form-label text-dark">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    النسبة المئوية
+                                {% else %}
+                                    Percentage
+                                {% endif %}
+                            </label>
+                        </div>
+                        <div class="input-group input-group-static mb-0 position-relative">
+                            <input class="multisteps-form__input form-control"
+                                   type="number"
+                                   min="0"
+                                   max="100"
+                                   step="0.01"
+                                   name="segment_percentage"
+                                   id="segment_percentage"
+                                   value="{{ data_mkt_analysis[0].segment_percentage }}"
+                                   autocomplete="off"
+                                   oninput="validatePercentage(this)"/>
+                            <div class="invalid-feedback d-block" id="percentageError" style="display: none !important;">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    النسبة تتجاوز 100%! يرجى تعديل القيمة.
+                                {% else %}
+                                    Percentage exceeds 100%! Please adjust the value.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+           <script>
+            // Store current segment percentages
+            let segmentPercentages = {
+                {% for row in data_mkt_segments %}
+                    "{{ row.segment_id }}": {{ row.segment_percentage }},
+                {% endfor %}
+            };
+
+            let currentSegmentId = "{{ segment_id }}";
+
+            // Calculate initial total from backend data
+            function calculateInitialTotal() {
+                let total = 0;
+                Object.keys(segmentPercentages).forEach(segmentId => {
+                    total += segmentPercentages[segmentId];
+                });
+                return total;
+            }
+
+            // Initialize display with correct values immediately
+            function initializeDisplay() {
+                const initialTotal = calculateInitialTotal();
+                const progressBar = document.getElementById('totalProgressBar');
+                const totalPercentageElement = document.getElementById('totalPercentage');
+                const percentageStatus = document.getElementById('percentageStatus');
+                const remainingPercentage = document.getElementById('remainingPercentage');
+                const alertElement = document.getElementById('totalPercentageAlert');
+
+                if (progressBar) {
+                    progressBar.style.width = initialTotal + '%';
+                    progressBar.setAttribute('aria-valuenow', initialTotal);
+                }
+
+                if (totalPercentageElement) {
+                    totalPercentageElement.textContent = initialTotal.toFixed(1) + '%';
+                }
+
+                if (remainingPercentage) {
+                    const remaining = Math.max(0, 100 - initialTotal);
+                    const remainingText = "{{ 'متبقي:' if session.get('lang', 'en') == 'ar' else 'Remaining:' }}";
+                    remainingPercentage.textContent = `${remainingText} ${remaining.toFixed(1)}%`;
+                }
+
+                // Set initial styling based on calculated total
+                updateStyling(initialTotal);
+            }
+
+            function updateStyling(total) {
+                const percentageStatus = document.getElementById('percentageStatus');
+                const progressBar = document.getElementById('totalProgressBar');
+                const alertElement = document.getElementById('totalPercentageAlert');
+
+                if (total > 100) {
+                    percentageStatus.className = 'badge bg-danger me-2';
+                    percentageStatus.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>{{ "غير صالح" if session.get("lang", "en") == "ar" else "Invalid" }}';
+                    if (progressBar) progressBar.className = 'progress-bar bg-danger';
+                    alertElement.className = 'card border-0 shadow-sm border-danger';
+                } else if (total === 100) {
+                    percentageStatus.className = 'badge bg-success me-2';
+                    percentageStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i>{{ "مكتمل" if session.get("lang", "en") == "ar" else "Complete" }}';
+                    if (progressBar) progressBar.className = 'progress-bar bg-success';
+                    alertElement.className = 'card border-0 shadow-sm border-success';
+                } else if (total >= 80) {
+                    percentageStatus.className = 'badge bg-warning me-2';
+                    percentageStatus.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>{{ "شبه مكتمل" if session.get("lang", "en") == "ar" else "Almost Full" }}';
+                    if (progressBar) progressBar.className = 'progress-bar bg-warning';
+                    alertElement.className = 'card border-0 shadow-sm border-warning';
+                } else {
+                    percentageStatus.className = 'badge bg-info me-2';
+                    percentageStatus.innerHTML = '<i class="fas fa-check-circle me-1"></i>{{ "صالح" if session.get("lang", "en") == "ar" else "Valid" }}';
+                    if (progressBar) progressBar.className = 'progress-bar bg-info';
+                    alertElement.className = 'card border-0 shadow-sm';
+                }
+            }
+
+            function validatePercentage(input) {
+                const value = parseFloat(input.value) || 0;
+                const totalPercentageElement = document.getElementById('totalPercentage');
+                const percentageStatus = document.getElementById('percentageStatus');
+                const alertElement = document.getElementById('totalPercentageAlert');
+                const percentageError = document.getElementById('percentageError');
+                const remainingPercentage = document.getElementById('remainingPercentage');
+                const progressBar = document.getElementById('totalProgressBar');
+
+                // Calculate total percentage including all other segments
+                let total = value;
+                Object.keys(segmentPercentages).forEach(segmentId => {
+                    if (segmentId !== currentSegmentId) {
+                        total += segmentPercentages[segmentId];
+                    }
+                });
+
+                const remaining = Math.max(0, 100 - total);
+
+                // Update total display
+                totalPercentageElement.textContent = total.toFixed(1) + '%';
+
+                // Update progress bar
+                if (progressBar) {
+                    progressBar.style.width = total + '%';
+                    progressBar.setAttribute('aria-valuenow', total);
+                }
+
+                // Update remaining percentage
+                if (remainingPercentage) {
+                    const remainingText = "{{ 'متبقي:' if session.get('lang', 'en') == 'ar' else 'Remaining:' }}";
+                    remainingPercentage.textContent = `${remainingText} ${remaining.toFixed(1)}%`;
+                }
+
+                // Validate and show appropriate feedback
+                if (total > 100) {
+                    input.classList.add('is-invalid');
+                    if (percentageError) percentageError.style.display = 'block';
+                    updateStyling(total);
+                    disableSaveButtons(true);
+                } else {
+                    input.classList.remove('is-invalid');
+                    if (percentageError) percentageError.style.display = 'none';
+                    updateStyling(total);
+                    disableSaveButtons(false);
+                    segmentPercentages[currentSegmentId] = value;
+                }
+            }
+
+            function disableSaveButtons(disabled) {
+                const saveButtons = document.querySelectorAll('button[name="action"][value="Save_segment"], button[name="action"][value="new_segment"]');
+                saveButtons.forEach(button => {
+                    if (disabled) {
+                        button.disabled = true;
+                        button.classList.add('disabled');
+                    } else {
+                        button.disabled = false;
+                        button.classList.remove('disabled');
+                    }
+                });
+            }
+
+            // Initialize immediately when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                initializeDisplay();
+
+                // Validate current input
+                const percentageInput = document.getElementById('segment_percentage');
+                if (percentageInput) {
+                    validatePercentage(percentageInput);
+                }
+            });
+
+            // Function to update percentages when segments are loaded
+            function updateSegmentPercentages(percentages) {
+                segmentPercentages = percentages;
+                initializeDisplay();
+                const percentageInput = document.getElementById('segment_percentage');
+                if (percentageInput) {
+                    validatePercentage(percentageInput);
+                }
+            }
+            </script>
+            <style>
+            .is-invalid {
+                border-color: #dc3545 !important;
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+            }
+
+            .invalid-feedback {
+                display: none !important; /* Hidden by default */
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.5rem;
+            }
+
+            .invalid-feedback.show {
+                display: block !important;
+            }
+
+            /* Style for disabled buttons */
+            .btn.disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            /* Progress bar style for total percentage */
+            #totalPercentageAlert {
+                transition: all 0.3s ease;
+            }
+            </style>
+
+
+
+            <style>
+            /* Ensure consistent progress bar colors */
+            .progress-bar.bg-info { background-color: #1A73E8 !important; }
+            .progress-bar.bg-success { background-color: #34A853 !important; }
+            .progress-bar.bg-warning { background-color: #FBBC05 !important; }
+            .progress-bar.bg-danger { background-color: #EA4335 !important; }
+
+            /* Consistent badge colors */
+            .badge.bg-info { background-color: #1A73E8 !important; }
+            .badge.bg-success { background-color: #34A853 !important; }
+            .badge.bg-warning { background-color: #FBBC05 !important; color: #000; }
+            .badge.bg-danger { background-color: #EA4335 !important; }
+
+            /* Border colors for cards */
+            .border-danger { border: 1px solid #EA4335 !important; }
+            .border-success { border: 1px solid #34A853 !important; }
+            .border-warning { border: 1px solid #FBBC05 !important; }
+
+            /* Smooth transitions */
+            #totalPercentageAlert,
+            #totalProgressBar,
+            #percentageStatus {
+                transition: all 0.3s ease;
+            }
+            </style>
+            <!--interactive percentages-->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const segmentNameInput = document.querySelector('input[name="segment_name"]');
+                    const segmentPercentageInput = document.getElementById('segment_percentage');
+                    const currentSegmentId = "{{ segment_id }}";
+
+                    // Function to update the segment card
+                    function updateSegmentCard(segmentId, newName, newPercentage) {
+                        // Find the card for this segment
+                        const segmentCards = document.querySelectorAll('.segment-donut');
+
+                        segmentCards.forEach(card => {
+                            const button = card.querySelector('button[name="select_segment"]');
+                            if (button && button.value === segmentId) {
+                                // Update the segment name
+                                const nameElement = card.querySelector('.text-truncate');
+                                if (nameElement && newName !== null) {  // ← CHANGED: Check for !== null
+                                    nameElement.textContent = newName;
+                                }
+
+                                // Update the percentage display
+                                const percentageElement = card.querySelector('strong.h6');
+                                if (percentageElement && newPercentage !== null && newPercentage !== undefined) {  // ← CHANGED: Check for !== null
+                                    percentageElement.textContent = parseFloat(newPercentage).toFixed(1) + '%';
+                                }
+
+                                // Update the SVG donut chart
+                                const donutSegment = card.querySelector('.donut-segment');
+                                if (donutSegment && newPercentage !== null && newPercentage !== undefined) {  // ← CHANGED: Check for !== null
+                                    const percentage = parseFloat(newPercentage) || 0;
+                                    const remaining = 100 - percentage;
+                                    donutSegment.setAttribute('stroke-dasharray', `${percentage} ${remaining}`);
+                                }
+                            }
+                        });
+                    }
+                    // Listen for segment name changes
+                    if (segmentNameInput) {
+                        segmentNameInput.addEventListener('input', function() {
+                            const newName = this.value.trim();
+                            if (newName && currentSegmentId) {
+                                updateSegmentCard(currentSegmentId, newName, null);
+                            }
+                        });
+                    }
+
+                    // Listen for percentage changes (reuse existing function)
+                    if (segmentPercentageInput) {
+                        segmentPercentageInput.addEventListener('input', function() {
+                            const newPercentage = this.value;
+                            if (currentSegmentId) {
+                                updateSegmentCard(currentSegmentId, null, newPercentage);
+                            }
+
+                            // Also call the existing validatePercentage function
+                            validatePercentage(this);
+                        });
+                    }
+                });
+                </script>
+
+        </div>
+
+        <!-- Segment Details card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">
+              {% if session.get('lang', 'en') == 'ar' %}
+                تفاصيل القطاع
+              {% else %}
+                Segment Details
+              {% endif %}
+            </h5>
+              <!-- ADD card body -->
+              <div class="row">
+                <div class="col">
+
+
+
+                    <style>
+                      /* Scoped styles for B2C card */
+                      #b2c_segment_details_card {
+                        background: white !important;
+                        border-radius: 16px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        position: relative;
+                      }
+
+                      #b2c_segment_details_card .form-section-b2c {
+                        margin-bottom: 28px;
+                        padding-bottom: 28px;
+                        border-bottom: 1px solid #e5e7eb;
+                        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                      }
+
+                      #b2c_segment_details_card .form-section-b2c:last-child {
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                        border-bottom: none;
+                      }
+
+                      #b2c_segment_details_card .section-header-b2c {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        margin-bottom: 16px;
+                      }
+
+                      #b2c_segment_details_card .section-icon-b2c {
+                        width: 40px;
+                        height: 40px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-size: 18px;
+                        flex-shrink: 0;
+                      }
+
+                      #b2c_segment_details_card .section-title-b2c {
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #1f2937;
+                        flex-grow: 1;
+                      }
+
+                      #b2c_segment_details_card .section-content-wrapper-b2c {
+                        display: grid;
+                        grid-template-rows: 0fr;
+                        transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                      }
+
+                      #b2c_segment_details_card .section-content-wrapper-b2c > div {
+                        overflow: hidden;
+                      }
+
+                      #b2c_segment_details_card .section-content-wrapper-b2c.active-b2c {
+                        grid-template-rows: 1fr;
+                      }
+
+                      #b2c_segment_details_card .section-inner-b2c {
+                        padding-top: 16px;
+                      }
+
+                      /* Pill-style selection buttons */
+                      #b2c_segment_details_card .pill-container-b2c {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 10px;
+                        margin-top: 12px;
+                      }
+
+                      #b2c_segment_details_card .pill-option-b2c {
+                        padding: 10px 20px;
+                        border: 2px solid #e5e7eb;
+                        border-radius: 25px;
+                        background: white;
+                        cursor: pointer;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        font-size: 14px;
+                        color: #6b7280;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        user-select: none;
+                      }
+
+                      #b2c_segment_details_card .pill-option-b2c:hover {
+                        border-color: #667eea;
+                        background: #f3f4f6;
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+                      }
+
+                      #b2c_segment_details_card .pill-option-b2c.selected-b2c {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-color: transparent;
+                        color: white;
+                        font-weight: 500;
+                      }
+
+                      #b2c_segment_details_card .pill-option-b2c input[type="checkbox"] {
+                        display: none;
+                      }
+
+                      /* Help text for selections */
+                      #b2c_segment_details_card .selection-help-b2c {
+                        font-size: 13px;
+                        color: #6b7280;
+                        margin-bottom: 12px;
+                        font-style: italic;
+                      }
+
+                      #b2c_segment_details_card .range-inputs-b2c {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 16px;
+                      }
+
+                      #b2c_segment_details_card .range-input-b2c label {
+                        display: block;
+                        font-size: 12px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        color: #6b7280;
+                        margin-bottom: 8px;
+                        font-weight: 600;
+                      }
+
+                      #b2c_segment_details_card input[type="number"] {
+                        width: 100%;
+                        padding: 10px 14px;
+                        border: 2px solid #e5e7eb;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        transition: all 0.3s;
+                      }
+
+                      #b2c_segment_details_card input[type="number"]:focus {
+                        outline: none;
+                        border-color: #667eea;
+                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                      }
+
+                      #b2c_segment_details_card input[type="text"] {
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 2px solid #e5e7eb;
+                        border-radius: 10px;
+                        font-size: 14px;
+                        transition: all 0.3s;
+                      }
+
+                      #b2c_segment_details_card input[type="text"]:focus {
+                        outline: none;
+                        border-color: #667eea;
+                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                      }
+
+                      #b2c_segment_details_card .form-label {
+                        display: block;
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #374151;
+                        margin-bottom: 10px;
+                      }
+
+                      #b2c_segment_details_card .help-text-b2c {
+                        font-size: 12px;
+                        color: #6b7280;
+                        margin-top: 6px;
+                        font-style: italic;
+                      }
+
+                      @media (max-width: 768px) {
+                        #b2c_segment_details_card .range-inputs-b2c {
+                          grid-template-columns: 1fr;
+                        }
+
+                        #b2c_segment_details_card .section-icon-b2c {
+                          width: 36px;
+                          height: 36px;
+                          font-size: 16px;
+                        }
+                      }
+                    </style>
+
+                    <div class="card card-body bg-gray-100 px-4 py-3" id="b2c_segment_details_card" style="display: none;">
+
+                      <!-- 1st row - Market Channels -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">📢</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              قنوات التسويق
+                            {% else %}
+                              Market Channel
+                            {% endif %}
+                          </div>
+                        </div>
+
+                        <div class="selection-help-b2c">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            اختر القنوات التسويقية المناسبة
+                          {% else %}
+                            Select your marketing channels
+                          {% endif %}
+                        </div>
+
+                        <div class="pill-container-b2c">
+                          <label class="pill-option-b2c" data-value="1">
+                            <input type="checkbox" name="choice_marketing_channel" value="1" {% if 1 in market_channel_list %} checked {% endif %}>
+                            📰 <span>{% if session.get('lang', 'en') == 'ar' %}إعلانات مطبوعة{% else %}Printed Ads{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="2">
+                            <input type="checkbox" name="choice_marketing_channel" value="2" {% if 2 in market_channel_list %} checked {% endif %}>
+                            🎬 <span>{% if session.get('lang', 'en') == 'ar' %}أفلام{% else %}Motion Pictures{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="3">
+                            <input type="checkbox" name="choice_marketing_channel" value="3" {% if 3 in market_channel_list %} checked {% endif %}>
+                            📄 <span>{% if session.get('lang', 'en') == 'ar' %}كتيبات{% else %}Brochures{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="4">
+                            <input type="checkbox" name="choice_marketing_channel" value="4" {% if 4 in market_channel_list %} checked {% endif %}>
+                            🖼️ <span>{% if session.get('lang', 'en') == 'ar' %}ملصقات{% else %}Posters{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="5">
+                            <input type="checkbox" name="choice_marketing_channel" value="5" {% if 5 in market_channel_list %} checked {% endif %}>
+                            🪧 <span>{% if session.get('lang', 'en') == 'ar' %}لوحات إعلانية{% else %}Billboards{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="6">
+                            <input type="checkbox" name="choice_marketing_channel" value="6" {% if 6 in market_channel_list %} checked {% endif %}>
+                            🏪 <span>{% if session.get('lang', 'en') == 'ar' %}لافتات عرض{% else %}Display Sign{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="7">
+                            <input type="checkbox" name="choice_marketing_channel" value="7" {% if 7 in market_channel_list %} checked {% endif %}>
+                            📦 <span>{% if session.get('lang', 'en') == 'ar' %}إدراجات تغليف{% else %}Packaging Inserts{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="8">
+                            <input type="checkbox" name="choice_marketing_channel" value="8" {% if 8 in market_channel_list %} checked {% endif %}>
+                            🎁 <span>{% if session.get('lang', 'en') == 'ar' %}مسابقات{% else %}Contests{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="9">
+                            <input type="checkbox" name="choice_marketing_channel" value="9" {% if 9 in market_channel_list %} checked {% endif %}>
+                            🎉 <span>{% if session.get('lang', 'en') == 'ar' %}هدايا مميزة{% else %}Premium Gifts{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="10">
+                            <input type="checkbox" name="choice_marketing_channel" value="10" {% if 10 in market_channel_list %} checked {% endif %}>
+                            🧪 <span>{% if session.get('lang', 'en') == 'ar' %}عيّنات{% else %}Sampling{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="11">
+                            <input type="checkbox" name="choice_marketing_channel" value="11" {% if 11 in market_channel_list %} checked {% endif %}>
+                            🎪 <span>{% if session.get('lang', 'en') == 'ar' %}معارض{% else %}Fairs{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="12">
+                            <input type="checkbox" name="choice_marketing_channel" value="12" {% if 12 in market_channel_list %} checked {% endif %}>
+                            🎫 <span>{% if session.get('lang', 'en') == 'ar' %}كوبونات{% else %}Coupons{% endif %}</span>
+                          </label>
+                          <label class="pill-option-b2c" data-value="13">
+                            <input type="checkbox" name="choice_marketing_channel" value="13" {% if 13 in market_channel_list %} checked {% endif %}>
+                            💳 <span>{% if session.get('lang', 'en') == 'ar' %}برامج ولاء{% else %}Loyalty Programs{% endif %}</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <!-- 2nd row - Age Range -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">👥</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              نطاق العمر
+                            {% else %}
+                              Age Range
+                            {% endif %}
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_age_range" name="show_age_range"
+                                   onchange="toggleSectionB2C('age_range_section_b2c', this)"
+                                   {% if data_mkt_analysis[0].show_age_range == 'on' %} checked {% endif %}>
+                          </div>
+                        </div>
+                        <div class="section-content-wrapper-b2c {% if data_mkt_analysis[0].show_age_range == 'on' %}active-b2c{% endif %}" id="age_range_section_b2c">
+                          <div class="section-inner-b2c">
+                            <div class="range-inputs-b2c">
+                              <div class="range-input-b2c">
+                                <label>
+                                  {% if session.get('lang', 'en') == 'ar' %}الحد الأدنى{% else %}Min Age{% endif %}
+                                </label>
+                                <input type="number" id="sliderAge_min" name="sliderAge_min" value="{{ data_mkt_analysis[0].age_min }}" autocomplete="off" min="0" max="100">
+                              </div>
+                              <div class="range-input-b2c">
+                                <label>
+                                  {% if session.get('lang', 'en') == 'ar' %}الحد الأقصى{% else %}Max Age{% endif %}
+                                </label>
+                                <input type="number" id="sliderAge_max" name="sliderAge_max" value="{{ data_mkt_analysis[0].age_max }}" autocomplete="off" min="0" max="100">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 3rd row - Income Range -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">💰</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              نطاق الدخل
+                            {% else %}
+                              Income Range
+                            {% endif %}
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_income_range" name="show_income_range"
+                                   onchange="toggleSectionB2C('income_range_section_b2c', this)"
+                                   {% if data_mkt_analysis[0].show_income_range == 'on' %} checked {% endif %}>
+                          </div>
+                        </div>
+                        <div class="section-content-wrapper-b2c {% if data_mkt_analysis[0].show_income_range == 'on' %}active-b2c{% endif %}" id="income_range_section_b2c">
+                          <div class="section-inner-b2c">
+                            <div class="range-inputs-b2c">
+                              <div class="range-input-b2c">
+                                <label>
+                                  {% if session.get('lang', 'en') == 'ar' %}الحد الأدنى ($){% else %}Min Income ($){% endif %}
+                                </label>
+                                <input type="number" id="sliderIncome_min" name="sliderIncome_min" value="{{ data_mkt_analysis[0].income_min }}" autocomplete="off" step="1" min="0">
+                              </div>
+                              <div class="range-input-b2c">
+                                <label>
+                                  {% if session.get('lang', 'en') == 'ar' %}الحد الأقصى ($){% else %}Max Income ($){% endif %}
+                                </label>
+                                <input type="number" id="sliderIncome_max" name="sliderIncome_max" value="{{ data_mkt_analysis[0].income_max }}" autocomplete="off" step="1" min="0">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 4th row - Gender Percentage -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">⚧️</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              نسبة الجنس
+                            {% else %}
+                              Gender Percentage
+                            {% endif %}
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_gender_percentage" name="show_gender_percentage"
+                                   onchange="toggleSectionB2C('gender_section_b2c', this)"
+                                   {% if data_mkt_analysis[0].show_gender_percentage == 'on' %} checked {% endif %}>
+                          </div>
+                        </div>
+                        <div class="section-content-wrapper-b2c {% if data_mkt_analysis[0].show_gender_percentage == 'on' %}active-b2c{% endif %}" id="gender_section_b2c">
+                          <div class="section-inner-b2c">
+                            <div class="range-inputs-b2c">
+                              <div class="range-input-b2c">
+                                <label>
+                                  {% if session.get('lang', 'en') == 'ar' %}ذكر (%){% else %}Male (%){% endif %}
+                                </label>
+                                <input type="number" id="sliderGender_male" name="sliderGender_male" value="{{ data_mkt_analysis[0].male_rate }}" autocomplete="off" min="0" max="100">
+                              </div>
+                              <div class="range-input-b2c">
+                                <label>
+                                  {% if session.get('lang', 'en') == 'ar' %}أنثى (%){% else %}Female (%){% endif %}
+                                </label>
+                                <input type="number" id="sliderGender_female" name="sliderGender_female" value="{{ data_mkt_analysis[0].female_rate }}" autocomplete="off" min="0" max="100">
+                              </div>
+                            </div>
+                            <div class="help-text-b2c">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                يجب أن يكون المجموع 100%
+                              {% else %}
+                                Percentages should total 100%
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 5th row - Education -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">🎓</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              التعليم
+                            {% else %}
+                              Education
+                            {% endif %}
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_education" name="show_education"
+                                   onchange="toggleSectionB2C('education_section_b2c', this)"
+                                   {% if data_mkt_analysis[0].show_education == 'on' %} checked {% endif %}>
+                          </div>
+                        </div>
+                        <div class="section-content-wrapper-b2c {% if data_mkt_analysis[0].show_education == 'on' %}active-b2c{% endif %}" id="education_section_b2c">
+                          <div class="section-inner-b2c">
+                            <div class="selection-help-b2c">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                اختر المستويات التعليمية
+                              {% else %}
+                                Select education levels
+                              {% endif %}
+                            </div>
+                            <div class="pill-container-b2c">
+                              <label class="pill-option-b2c" data-value="1">
+                                <input type="checkbox" name="choice_education" value="1" {% if 1 in education_list %} checked {% endif %}>
+                                🎓 <span>{% if session.get('lang', 'en') == 'ar' %}مستوى جامعي{% else %}University Level{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="2">
+                                <input type="checkbox" name="choice_education" value="2" {% if 2 in education_list %} checked {% endif %}>
+                                📚 <span>{% if session.get('lang', 'en') == 'ar' %}مستوى ثانوي{% else %}Secondary Level{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="3">
+                                <input type="checkbox" name="choice_education" value="3" {% if 3 in education_list %} checked {% endif %}>
+                                🔧 <span>{% if session.get('lang', 'en') == 'ar' %}معهد تقني{% else %}Technical Institute{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="4">
+                                <input type="checkbox" name="choice_education" value="4" {% if 4 in education_list %} checked {% endif %}>
+                                📖 <span>{% if session.get('lang', 'en') == 'ar' %}مستوى ابتدائي{% else %}Elementary Level{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="5">
+                                <input type="checkbox" name="choice_education" value="5" {% if 5 in education_list %} checked {% endif %}>
+                                ✍️ <span>{% if session.get('lang', 'en') == 'ar' %}أمي{% else %}Illiterate{% endif %}</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 6th row - Occupation -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">💼</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              المهنة
+                            {% else %}
+                              Occupation
+                            {% endif %}
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_occupation" name="show_occupation"
+                                   onchange="toggleSectionB2C('occupation_section_b2c', this)"
+                                   {% if data_mkt_analysis[0].show_occupation == 'on' %} checked {% endif %}>
+                          </div>
+                        </div>
+                        <div class="section-content-wrapper-b2c {% if data_mkt_analysis[0].show_occupation == 'on' %}active-b2c{% endif %}" id="occupation_section_b2c">
+                          <div class="section-inner-b2c">
+                            <div class="selection-help-b2c">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                اختر المهن المستهدفة
+                              {% else %}
+                                Select target occupations
+                              {% endif %}
+                            </div>
+                            <div class="pill-container-b2c">
+                              <label class="pill-option-b2c" data-value="1">
+                                <input type="checkbox" name="choice_occupation" value="1" {% if 1 in occupation_list %} checked {% endif %}>
+                                📝 <span>{% if session.get('lang', 'en') == 'ar' %}طلاب{% else %}Students{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="2">
+                                <input type="checkbox" name="choice_occupation" value="2" {% if 2 in occupation_list %} checked {% endif %}>
+                                👔 <span>{% if session.get('lang', 'en') == 'ar' %}موظفون{% else %}Employees{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="3">
+                                <input type="checkbox" name="choice_occupation" value="3" {% if 3 in occupation_list %} checked {% endif %}>
+                                🏢 <span>{% if session.get('lang', 'en') == 'ar' %}أصحاب أعمال{% else %}Business Owners{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="4">
+                                <input type="checkbox" name="choice_occupation" value="4" {% if 4 in occupation_list %} checked {% endif %}>
+                                🔍 <span>{% if session.get('lang', 'en') == 'ar' %}عاطلون عن العمل{% else %}Unemployed{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="5">
+                                <input type="checkbox" name="choice_occupation" value="5" {% if 5 in occupation_list %} checked {% endif %}>
+                                🏖️ <span>{% if session.get('lang', 'en') == 'ar' %}متقاعدون{% else %}Retired{% endif %}</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 7th row - Life Stage -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">🌱</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              مرحلة الحياة
+                            {% else %}
+                              Life Stage
+                            {% endif %}
+                          </div>
+                          <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_life_stage" name="show_life_stage"
+                                   onchange="toggleSectionB2C('life_stage_section_b2c', this)"
+                                   {% if data_mkt_analysis[0].show_life_stage == 'on' %} checked {% endif %}>
+                          </div>
+                        </div>
+                        <div class="section-content-wrapper-b2c {% if data_mkt_analysis[0].show_life_stage == 'on' %}active-b2c{% endif %}" id="life_stage_section_b2c">
+                          <div class="section-inner-b2c">
+                            <div class="selection-help-b2c">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                اختر مراحل الحياة المستهدفة
+                              {% else %}
+                                Select target life stages
+                              {% endif %}
+                            </div>
+                            <div class="pill-container-b2c">
+                              <label class="pill-option-b2c" data-value="1">
+                                <input type="checkbox" name="choice_life_stage" value="1" {% if 1 in life_stage_list %} checked {% endif %}>
+                                🎯 <span>{% if session.get('lang', 'en') == 'ar' %}عازب شاب{% else %}Young Single{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="2">
+                                <input type="checkbox" name="choice_life_stage" value="2" {% if 2 in life_stage_list %} checked {% endif %}>
+                                💑 <span>{% if session.get('lang', 'en') == 'ar' %}متزوج حديثاً بدون أطفال{% else %}Newly Married No Children{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="3">
+                                <input type="checkbox" name="choice_life_stage" value="3" {% if 3 in life_stage_list %} checked {% endif %}>
+                                👨‍👩‍👧 <span>{% if session.get('lang', 'en') == 'ar' %}1 إلى 2 طفل{% else %}1 to 2 Children{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="4">
+                                <input type="checkbox" name="choice_life_stage" value="4" {% if 4 in life_stage_list %} checked {% endif %}>
+                                👨‍👩‍👧‍👦 <span>{% if session.get('lang', 'en') == 'ar' %}3 إلى 4 أطفال{% else %}3 to 4 Children{% endif %}</span>
+                              </label>
+                              <label class="pill-option-b2c" data-value="5">
+                                <input type="checkbox" name="choice_life_stage" value="5" {% if 5 in life_stage_list %} checked {% endif %}>
+                                👨‍👩‍👧‍👦👶 <span>{% if session.get('lang', 'en') == 'ar' %}أكثر من 5 أطفال{% else %}more than 5 Children{% endif %}</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 8th row - Location -->
+                      <div class="form-section-b2c">
+                        <div class="section-header-b2c">
+                          <div class="section-icon-b2c">📍</div>
+                          <div class="section-title-b2c">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              الموقع
+                            {% else %}
+                              Location
+                            {% endif %}
+                          </div>
+                        </div>
+                        <label class="form-label">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            الموقع المستهدف
+                          {% else %}
+                            Target Location
+                          {% endif %}
+                        </label>
+                        <input class="form-control" type="text" name="b2c_location" value="{{ data_mkt_analysis[0].location }}"
+                               placeholder="{% if session.get('lang', 'en') == 'ar' %}مدينة، عبر الإنترنت، ..{% else %}city, online, ..{% endif %}"
+                               autocomplete="off">
+                      </div>
+
+                    </div>
+
+                    <script>
+                    // Toggle function for B2C sections
+                    function toggleSectionB2C(sectionId, checkbox) {
+                      const section = document.getElementById(sectionId);
+                      if (checkbox.checked) {
+                        section.classList.add('active-b2c');
+                      } else {
+                        section.classList.remove('active-b2c');
+                      }
+                    }
+
+                    // Initialize pill selections
+                    document.addEventListener('DOMContentLoaded', function() {
+
+                      // Initialize pill behavior for each section (simplified - no selected pills bar)
+                      function initializePillSection(sectionSelector) {
+                        const section = document.querySelector(sectionSelector);
+
+                        if (!section) return;
+
+                        const pillOptions = section.querySelectorAll('.pill-option-b2c');
+
+                        pillOptions.forEach(option => {
+                          const checkbox = option.querySelector('input[type="checkbox"]');
+
+                          // Set initial state
+                          if (checkbox.checked) {
+                            option.classList.add('selected-b2c');
+                          }
+
+                          // Click handler
+                          option.addEventListener('click', function(e) {
+                            checkbox.checked = !checkbox.checked;
+                            option.classList.toggle('selected-b2c', checkbox.checked);
+                          });
+                        });
+                      }
+
+                      // Initialize all sections
+                      initializePillSection('#b2c_segment_details_card');
+                      initializePillSection('#education_section_b2c');
+                      initializePillSection('#occupation_section_b2c');
+                      initializePillSection('#life_stage_section_b2c');
+
+                      // Auto-adjust gender percentages
+                      const maleInput = document.getElementById('sliderGender_male');
+                      const femaleInput = document.getElementById('sliderGender_female');
+
+                      if (maleInput && femaleInput) {
+                        maleInput.addEventListener('input', function() {
+                          const maleValue = parseInt(this.value) || 0;
+                          femaleInput.value = 100 - maleValue;
+                        });
+
+                        femaleInput.addEventListener('input', function() {
+                          const femaleValue = parseInt(this.value) || 0;
+                          maleInput.value = 100 - femaleValue;
+                        });
+                      }
+
+                      // Age range validation
+                      const ageMin = document.getElementById('sliderAge_min');
+                      const ageMax = document.getElementById('sliderAge_max');
+
+                      if (ageMin && ageMax) {
+                        ageMin.addEventListener('change', function() {
+                          if (parseInt(this.value) > parseInt(ageMax.value)) {
+                            ageMax.value = this.value;
+                          }
+                        });
+
+                        ageMax.addEventListener('change', function() {
+                          if (parseInt(this.value) < parseInt(ageMin.value)) {
+                            ageMin.value = this.value;
+                          }
+                        });
+                      }
+                    });
+                    </script>
+
+                  <div class="card card-body bg-gray-100 px-4 py-3" id="b2b_segment_details_card" style="display: block;">
+
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="mb-0 fw-bold" style="color: #1A73E8;">
+                            <i class="fas fa-building me-2"></i>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                أفضل 3 عملاء B2B
+                            {% else %}
+                                Top 3 B2B Clients
+                            {% endif %}
+                        </h6>
+                        <span class="badge bg-info" id="client-count-badge">
+                            <span id="client-count">{{ data_b2b_clients|length }}</span>/3
+                        </span>
+                    </div>
+
+                    <!-- Add Client Form -->
+                    <div class="card border-0 shadow-sm mb-4" id="add-client-form-container">
+                        <div class="card-body p-4" style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark mb-2">
+                                        <i class="fas fa-user me-1"></i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            اسم العميل
+                                        {% else %}
+                                            Client Name
+                                        {% endif %}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="client_name_input"
+                                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: شركة ABC{% else %}e.g., ABC Company{% endif %}"
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold text-dark mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            الموقع
+                                        {% else %}
+                                            Location
+                                        {% endif %}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="client_location_input"
+                                           placeholder="{% if session.get('lang', 'en') == 'ar' %}مثل: دبي{% else %}e.g., Dubai{% endif %}"
+                                           maxlength="100">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark mb-2">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {% if session.get('lang', 'en') == 'ar' %}
+                                            الوصف
+                                        {% else %}
+                                            Description
+                                        {% endif %}
+                                        <span class="text-muted">({% if session.get('lang', 'en') == 'ar' %}اختياري{% else %}Optional{% endif %})</span>
+                                    </label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="client_description_input"
+                                           placeholder="{% if session.get('lang', 'en') == 'ar' %}وصف قصير...{% else %}Brief description...{% endif %}"
+                                           maxlength="200">
+                                </div>
+
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button"
+                                            class="btn btn-primary w-100"
+                                            id="add-client-btn"
+                                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Helper Text -->
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-lightbulb me-1"></i>
+                                    {% if session.get('lang', 'en') == 'ar' %}
+                                        أضف حتى 3 عملاء رئيسيين من قطاع الأعمال
+                                    {% else %}
+                                        Add up to 3 key B2B clients for this segment
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clients List -->
+                    <div id="clients-list-container">
+                        {% if data_b2b_clients %}
+                        <div class="row g-3" id="clients-grid">
+                            {% for client in data_b2b_clients %}
+                            <div class="col-md-4" data-client-id="{{ client.client_id }}">
+                                <div class="card client-card border-0 shadow-sm h-100"
+                                     style="transition: all 0.3s ease; border-left: 4px solid #667eea !important;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.95rem;">
+                                                    <i class="fas fa-building text-primary me-2"></i>
+                                                    {{ client.client_name }}
+                                                </h6>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    {{ client.client_location }}
+                                                </p>
+                                                {% if client.client_description %}
+                                                <p class="mb-0 text-muted" style="font-size: 0.8rem; font-style: italic;">
+                                                    "{{ client.client_description }}"
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger delete-client-btn ms-2"
+                                                    data-client-id="{{ client.client_id }}"
+                                                    style="padding: 0.25rem 0.5rem;">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5" id="empty-state">
+                            <i class="fas fa-users text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                            <p class="text-muted mt-3">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    لم يتم إضافة عملاء بعد
+                                {% else %}
+                                    No clients added yet
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                    <style>
+                    /* B2B Clients Styling */
+                    #add-client-form-container input:focus {
+                        border-color: #667eea;
+                        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+                    }
+
+                    .client-card {
+                        transition: all 0.3s ease;
+                    }
+
+                    .client-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+                    }
+
+                    .delete-client-btn {
+                        transition: all 0.3s ease;
+                        opacity: 0.7;
+                    }
+
+                    .delete-client-btn:hover {
+                        opacity: 1;
+                        transform: scale(1.1);
+                    }
+
+                    #add-client-btn:hover {
+                        transform: scale(1.05);
+                        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                    }
+
+                    #add-client-btn:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+
+                    /* Animation for new cards */
+                    @keyframes slideIn {
+                        from {
+                            opacity: 0;
+                            transform: translateY(20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    .client-card-new {
+                        animation: slideIn 0.4s ease;
+                    }
+
+                    /* Badge animation */
+                    #client-count-badge {
+                        transition: all 0.3s ease;
+                    }
+
+                    #client-count-badge.badge-warning {
+                        background-color: #ffc107 !important;
+                        animation: pulse 0.5s ease;
+                    }
+
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.1); }
+                    }
+                    </style>
+
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const addClientBtn = document.getElementById('add-client-btn');
+                        const clientNameInput = document.getElementById('client_name_input');
+                        const clientLocationInput = document.getElementById('client_location_input');
+                        const clientDescriptionInput = document.getElementById('client_description_input');
+                        const clientsGrid = document.getElementById('clients-grid');
+                        const clientCountBadge = document.getElementById('client-count-badge');
+                        const clientCount = document.getElementById('client-count');
+                        const emptyState = document.getElementById('empty-state');
+                        const addFormContainer = document.getElementById('add-client-form-container');
+
+                        const bplanId = "{{ bplan_id }}";
+                        const segmentId = "{{ segment_id }}";
+                        const maxClients = 3;
+
+                        // Update UI based on client count
+                        function updateClientCount() {
+                            const grid = document.getElementById('clients-grid');
+                            const currentCount = grid ? grid.querySelectorAll('.col-md-4[data-client-id]').length : 0;
+
+                            const clientCountElement = document.getElementById('client-count');
+                            if (clientCountElement) {
+                                clientCountElement.textContent = currentCount;
+                            }
+
+                            // Update badge color
+                            const clientCountBadge = document.getElementById('client-count-badge');
+                            if (currentCount >= maxClients) {
+                                clientCountBadge.classList.remove('bg-info');
+                                clientCountBadge.classList.add('bg-warning');
+                                addClientBtn.disabled = true;
+                                addFormContainer.style.opacity = '0.6';
+                                addFormContainer.style.pointerEvents = 'none';
+                            } else {
+                                clientCountBadge.classList.remove('bg-warning');
+                                clientCountBadge.classList.add('bg-info');
+                                addClientBtn.disabled = false;
+                                addFormContainer.style.opacity = '1';
+                                addFormContainer.style.pointerEvents = 'auto';
+                            }
+
+                            return currentCount;
+                        }
+
+                        // Add Client
+                        addClientBtn.addEventListener('click', function() {
+                            const clientName = clientNameInput.value.trim();
+                            const clientLocation = clientLocationInput.value.trim();
+                            const clientDescription = clientDescriptionInput.value.trim();
+
+                            // Validation
+                            if (!clientName || !clientLocation) {
+                                alert("{% if session.get('lang', 'en') == 'ar' %}يرجى إدخال اسم العميل والموقع{% else %}Please enter client name and location{% endif %}");
+                                return;
+                            }
+
+                            const currentCount = updateClientCount();
+                            if (currentCount >= maxClients) {
+                                alert("{% if session.get('lang', 'en') == 'ar' %}لا يمكنك إضافة أكثر من 3 عملاء{% else %}You cannot add more than 3 clients{% endif %}");
+                                return;
+                            }
+
+                            // Disable button and show loading
+                            addClientBtn.disabled = true;
+                            addClientBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                            // AJAX request
+                            fetch(`/add_b2b_client/${bplanId}/${segmentId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    client_name: clientName,
+                                    client_location: clientLocation,
+                                    client_description: clientDescription
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Create and add new client card
+                                    addClientCard(data.client);
+
+                                    // Clear inputs
+                                    clientNameInput.value = '';
+                                    clientLocationInput.value = '';
+                                    clientDescriptionInput.value = '';
+
+                                    // Remove empty state if exists
+                                    if (emptyState) {
+                                        emptyState.remove();
+                                    }
+
+                                    // Update count
+                                    updateClientCount();
+                                } else {
+                                    alert('Error: ' + (data.error || 'Failed to add client'));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while adding the client');
+                            })
+                            .finally(() => {
+                                // Re-enable button
+                                addClientBtn.disabled = false;
+                                addClientBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                                updateClientCount();
+                            });
+                        });
+
+                        // Add client card to DOM
+                        // ✅ FIXED: Add client card to DOM
+                        function addClientCard(client) {
+                            let grid = document.getElementById('clients-grid');
+                            const container = document.getElementById('clients-list-container');
+
+                            // Remove empty state if it exists
+                            const emptyState = document.getElementById('empty-state');
+                            if (emptyState) {
+                                emptyState.remove();
+                            }
+
+                            // If grid doesn't exist, create it
+                            if (!grid) {
+                                const newGrid = document.createElement('div');
+                                newGrid.className = 'row g-3';
+                                newGrid.id = 'clients-grid';
+                                container.appendChild(newGrid);
+                                grid = newGrid;
+                            }
+
+                            // Create the new card
+                            const col = document.createElement('div');
+                            col.className = 'col-md-4';
+                            col.setAttribute('data-client-id', client.client_id);
+
+                            const descriptionHtml = client.client_description ?
+                                `<p class="mb-0 text-muted" style="font-size: 0.8rem; font-style: italic;">"${client.client_description}"</p>` : '';
+
+                            col.innerHTML = `
+                                <div class="card client-card client-card-new border-0 shadow-sm h-100"
+                                     style="transition: all 0.3s ease; border-left: 4px solid #667eea !important;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.95rem;">
+                                                    <i class="fas fa-building text-primary me-2"></i>
+                                                    ${client.client_name}
+                                                </h6>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    ${client.client_location}
+                                                </p>
+                                                ${descriptionHtml}
+                                            </div>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger delete-client-btn ms-2"
+                                                    data-client-id="${client.client_id}"
+                                                    style="padding: 0.25rem 0.5rem;">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            grid.appendChild(col);
+                            attachDeleteHandler(col.querySelector('.delete-client-btn'));
+                        }
+
+                        // Delete Client
+                        function attachDeleteHandler(button) {
+                            button.addEventListener('click', function() {
+                                const clientId = this.getAttribute('data-client-id');
+                                const confirmDelete = confirm("{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف هذا العميل؟{% else %}Are you sure you want to delete this client?{% endif %}");
+
+                                if (!confirmDelete) return;
+
+                                const deleteBtn = this;
+                                const cardToRemove = deleteBtn.closest('.col-md-4[data-client-id]');
+
+                                // Disable button
+                                deleteBtn.disabled = true;
+                                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                                fetch(`/delete_b2b_client/${clientId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        // Animate removal
+                                        cardToRemove.style.transition = 'all 0.3s ease';
+                                        cardToRemove.style.opacity = '0';
+                                        cardToRemove.style.transform = 'scale(0.8)';
+
+                                        setTimeout(() => {
+                                            // Remove the card
+                                            cardToRemove.remove();
+
+                                            // Update count
+                                            updateClientCount();
+
+                                            // Check if grid is now empty
+                                            const grid = document.getElementById('clients-grid');
+                                            if (!grid || grid.children.length === 0) {
+                                                const container = document.getElementById('clients-list-container');
+                                                container.innerHTML = `
+                                                    <div class="text-center py-5" id="empty-state">
+                                                        <i class="fas fa-users text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                                                        <p class="text-muted mt-3">
+                                                            {% if session.get('lang', 'en') == 'ar' %}
+                                                                لم يتم إضافة عملاء بعد
+                                                            {% else %}
+                                                                No clients added yet
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                `;
+                                            }
+                                        }, 300);
+                                    } else {
+                                        alert('Error: Failed to delete client');
+                                        deleteBtn.disabled = false;
+                                        deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('An error occurred while deleting the client');
+                                    deleteBtn.disabled = false;
+                                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                                });
+                            });
+                        }
+
+                        // Attach delete handlers to existing buttons
+                        document.querySelectorAll('.delete-client-btn').forEach(btn => {
+                            attachDeleteHandler(btn);
+                        });
+
+                        // Initial count update
+                        updateClientCount();
+                    });
+                    </script>
+
+                  <!-- preferences -->
+                  <div class="row">
+                    <div class="col mb-1 pt-4">
+                      <h6 class="font-weight-bolder">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                          التفضيلات
+                        {% else %}
+                          Preferences
+                        {% endif %}
+                      </h6>
+
+                      <div class="input-group input-group-static mb-5">
+                        <label class="form-label text-dark">
+                          {% if session.get('lang', 'en') == 'ar' %}
+                            ما الذي يستمتع العملاء بفعله؟
+                          {% else %}
+                            What customers enjoy to do?
+                          {% endif %}
+                        </label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="text" name="preferences" value="{{ data_mkt_analysis[0].preferences }}" placeholder="" autocomplete="off">
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+          </div>
+
+                        <!-- Action Buttons -->
+            <div class="card-footer d-flex justify-content-between align-items-center">
+
+              <!-- Left side (Delete) -->
+              <div>
+                <button class="btn btn-outline-danger"
+                        type="submit"
+                        name="segment_delete"
+                        value="{{ segment_id }}"
+                        data-bs-toggle="tooltip"
+                        title="{% if session.get('lang', 'en') == 'ar' %}حذف هذا القطاع{% else %}Delete this segment{% endif %}">
+                  <i class="fas fa-trash me-2"></i>
+                  {% if session.get('lang', 'en') == 'ar' %}
+                    حذف القطاع
+                  {% else %}
+                    Delete Segment
+                  {% endif %}
+                </button>
+              </div>
+              <div>
+
+                <button class="btn btn-outline-primary me-2" type="submit" name="action" value="Save_segment" data-bs-toggle="tooltip" title="{% if session.get('lang', 'en') == 'ar' %}حفظ القطاع{% else %}Save segment{% endif %}" style="border-color: #1A73E8; color: #1A73E8;">
+                  <i class="fas fa-save me-2"></i>
+                  {% if session.get('lang', 'en') == 'ar' %}
+                    حفظ القطاع
+                  {% else %}
+                    Save Segment
+                  {% endif %}
+                </button>
+              </div>
+              <div>
+
+                <button class="btn btn-outline-primary me-2" type="submit" name="action" value="new_segment" data-bs-toggle="tooltip" title="{% if session.get('lang', 'en') == 'ar' %}حفظ وإنشاء قطاع آخر{% else %}Save and create another segment{% endif %}" style="border-color: #1A73E8; color: #1A73E8;">
+                  <i class="fas fa-save me-2"></i>
+                  {% if session.get('lang', 'en') == 'ar' %}
+                    إضافة قطاع جديد
+                  {% else %}
+                    ADD New Segment
+                  {% endif %}
+                </button>
+              </div>
+            </div>
+        </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteButton = document.querySelector('button[name="segment_delete"]');
+                const segmentNameInput = document.querySelector('input[name="segment_name"]');
+
+                if (deleteButton && segmentNameInput) {
+                    deleteButton.addEventListener('click', function(e) {
+                        // Remove required attribute to allow deletion with empty name
+                        segmentNameInput.removeAttribute('required');
+
+                        // Optional: Add confirmation dialog
+                        const confirmDelete = confirm(
+                            "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف هذا القطاع؟{% else %}Are you sure you want to delete this segment?{% endif %}"
+                        );
+
+                        if (!confirmDelete) {
+                            e.preventDefault();
+                            // Restore required attribute if user cancels
+                            segmentNameInput.setAttribute('required', '');
+                        }
+                    });
+                }
+            });
+            </script>
+
+        <!-- Customer Preferences card -->
+        <div class="card my-3 shadow-lg border-0">
+          <div class="card-body px-4 pt-4 pb-3">
+            <h5 class="fw-bold mb-4" style="color: #1A73E8;">
+              <i class="fas fa-chart-pie me-2" style="color: #1A73E8;"></i>
+              {% if session.get('lang', 'en') == 'ar' %}
+                تحليل تفضيلات العملاء
+              {% else %}
+                Customer Preferences Analysis
+              {% endif %}
+            </h5>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" id="preferencesTab" role="tablist">
+              {% for tab in ['price', 'service', 'quality', 'location'] %}
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link {% if loop.first %}active{% endif %}"
+                  id="{{ tab }}-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#{{ tab }}"
+                  type="button"
+                  role="tab"
+                  aria-controls="{{ tab }}"
+                  aria-selected="{{ 'true' if loop.first else 'false' }}"
+                  style="{% if loop.first %}color: #1A73E8; border-color: #1A73E8 #1A73E8 #fff !important;{% endif %}"
+                >
+                  <i class="fas fa-{{ 'tag' if tab == 'price' else 'concierge-bell' if tab == 'service' else 'award' if tab == 'quality' else 'map-marker-alt' }} me-2"></i>
+                  {% if tab == 'price' %}
+                    {% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price{% endif %}
+                  {% elif tab == 'service' %}
+                    {% if session.get('lang', 'en') == 'ar' %}الخدمة{% else %}Service{% endif %}
+                  {% elif tab == 'quality' %}
+                    {% if session.get('lang', 'en') == 'ar' %}الجودة{% else %}Quality{% endif %}
+                  {% elif tab == 'location' %}
+                    {% if session.get('lang', 'en') == 'ar' %}الموقع{% else %}Location{% endif %}
+                  {% endif %}
+                </button>
+              </li>
+              {% endfor %}
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="preferencesTabContent">
+              {% for tab, data, col in [
+                ('price', data_price, 12),
+                ('service', data_service, 6),
+                ('quality', data_quality, 4),
+                ('location', data_location, 4)
+              ] %}
+              <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ tab }}" role="tabpanel" aria-labelledby="{{ tab }}-tab">
+                <div class="card shadow-sm border">
+                  <div class="card-header py-3 border-bottom" style="background-color: rgba(26, 115, 232, 0.1);">
+                    <h6 class="mb-0" style="color: #1A73E8;">
+                      <i class="fas fa-{{ 'tag' if tab == 'price' else 'concierge-bell' if tab == 'service' else 'award' if tab == 'quality' else 'map-marker-alt' }} me-2"></i>
+                      {% if tab == 'price' %}
+                        {% if session.get('lang', 'en') == 'ar' %}تفضيلات السعر{% else %}Price Preferences{% endif %}
+                      {% elif tab == 'service' %}
+                        {% if session.get('lang', 'en') == 'ar' %}تفضيلات الخدمة{% else %}Service Preferences{% endif %}
+                      {% elif tab == 'quality' %}
+                        {% if session.get('lang', 'en') == 'ar' %}تفضيلات الجودة{% else %}Quality Preferences{% endif %}
+                      {% elif tab == 'location' %}
+                        {% if session.get('lang', 'en') == 'ar' %}تفضيلات الموقع{% else %}Location Preferences{% endif %}
+                      {% endif %}
+                    </h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      {% for row in data %}
+                      <div class="col-md-{{ col }} mb-3">
+                        <div class="mb-1">
+                          <span class="text-sm fw-bold" style="color: #1A73E8;">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              {{ row.preference_ar }}
+                            {% else %}
+                              {{ row.preference }}
+                            {% endif %}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          class="form-range"
+                          min="0"
+                          max="5"
+                          step="1"
+                          name="{{ row.preference }}"
+                          value="{{ row.preference_value }}"
+                          style="--bs-range-thumb-bg: #1A73E8; --bs-range-track-bg: rgba(26, 115, 232, 0.1);"
+                        >
+                        {% if tab == 'price' %}
+                        <div class="d-flex justify-content-between text-xs" style="color: #1A73E8; opacity: 0.7;">
+                          <span>{% if session.get('lang', 'en') == 'ar' %}غير مهم{% else %}Not important{% endif %}</span>
+                          <span>{% if session.get('lang', 'en') == 'ar' %}مهم جداً{% else %}Very important{% endif %}</span>
+                        </div>
+                        {% endif %}
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card-footer d-flex justify-content-between align-items-center">
+
+              <div>
+                <button class="btn" type="submit" name="action" value="save" data-bs-toggle="tooltip" title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save and continue{% endif %}" style="background-color: #1A73E8; color: white;">
+                  <i class="fas fa-arrow-right me-2"></i>
+                  {% if session.get('lang', 'en') == 'ar' %}
+                    حفظ ومتابعة
+                  {% else %}
+                    Save & Continue
+                  {% endif %}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<!-- Custom Styles -->
+<style>
+  .nav-tabs .nav-link.active {
+    color: #1A73E8 !important;
+    border-color: #1A73E8 #1A73E8 #fff !important;
+    font-weight: 600;
+  }
+
+  .nav-tabs .nav-link {
+    color: #6c757d;
+  }
+
+  .nav-tabs .nav-link:hover {
+    color: #1A73E8 !important;
+    border-color: #e9ecef #e9ecef #1A73E8 !important;
+  }
+
+  .form-range::-webkit-slider-thumb {
+    background: #1A73E8 !important;
+  }
+
+  .form-range::-moz-range-thumb {
+    background: #1A73E8 !important;
+  }
+
+  .form-range::-ms-thumb {
+    background: #1A73E8 !important;
+  }
+
+  /* Active tab styling */
+  .nav-tabs .nav-link.active i {
+    color: #1A73E8 !important;
+  }
+</style>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!--
+    AI SEGMENT HELPER COMPONENT - V5
+    This version matches your existing working code pattern exactly
+    Just replace your current AI Helper section with this
+-->
+
+<!-- Floating AI Helper Button -->
+<button type="button"
+        class="btn ai-helper-btn"
+        id="aiHelperBtn"
+        data-bs-toggle="modal"
+        data-bs-target="#aiSegmentModal"
+        title="{% if session.get('lang', 'en') == 'ar' %}مساعد الذكاء الاصطناعي{% else %}AI Helper{% endif %}">
+    <i class="fas fa-magic"></i>
+    <span class="btn-text">
+        {% if session.get('lang', 'en') == 'ar' %}
+            اقتراح قطاعات
+        {% else %}
+            Suggest Segments
+        {% endif %}
+    </span>
+</button>
+
+<!-- AI Segment Suggestion Modal -->
+<div class="modal fade" id="aiSegmentModal" tabindex="-1" aria-labelledby="aiSegmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
+
+            <!-- Modal Header -->
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <h5 class="modal-title text-white" id="aiSegmentModalLabel">
+                    <i class="fas fa-robot me-2"></i>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مساعد قطاعات السوق
+                    {% else %}
+                        Market Segment Helper
+                    {% endif %}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4">
+
+                <!-- Input Section -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            صف عملك بإيجاز
+                        {% else %}
+                            Briefly describe your business
+                        {% endif %}
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="businessDescriptionInput"
+                        rows="3"
+                        placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: أبيع مجوهرات يدوية عبر الإنترنت للنساء الشابات...{% else %}Example: I sell handmade jewelry online to young women...{% endif %}"
+                        style="border-radius: 10px; border: 2px solid #e5e7eb; resize: none;"></textarea>
+                    <small class="text-muted">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            كلما كان الوصف أكثر تفصيلاً، كانت الاقتراحات أفضل
+                        {% else %}
+                            The more detailed your description, the better the suggestions
+                        {% endif %}
+                    </small>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="text-center mb-4">
+                    <button type="button"
+                            class="btn btn-lg px-5"
+                            id="generateSuggestionsBtn"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 25px;">
+                        <i class="fas fa-wand-magic-sparkles me-2"></i>
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            اقترح قطاعات
+                        {% else %}
+                            Generate Suggestions
+                        {% endif %}
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="text-center py-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            جاري تحليل عملك...
+                        {% else %}
+                            Analyzing your business...
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Suggestions Container -->
+                <div id="suggestionsContainer" style="display: none;">
+                    <hr class="my-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-chart-pie text-info me-2"></i>
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            القطاعات المقترحة
+                        {% else %}
+                            Suggested Segments
+                        {% endif %}
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                            انقر على أي قطاع لإضافته إلى خطة عملك
+                        {% else %}
+                            Click any segment to add it to your business plan
+                        {% endif %}
+                    </p>
+                    <div id="suggestionsList" class="row g-3">
+                        <!-- Suggestions will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="errorState" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorMessage"></span>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        إغلاق
+                    {% else %}
+                        Close
+                    {% endif %}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Styles for AI Helper -->
+<style>
+/* Floating Button */
+.ai-helper-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1050;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 15px 25px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-helper-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+    color: white;
+}
+
+.ai-helper-btn i {
+    font-size: 1.2rem;
+}
+
+.ai-helper-btn .btn-text {
+    font-weight: 600;
+}
+
+/* RTL Support */
+html[dir="rtl"] .ai-helper-btn,
+html[lang="ar"] .ai-helper-btn {
+    right: auto;
+    left: 30px;
+}
+
+/* Suggestion Card */
+.segment-suggestion-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.segment-suggestion-card:hover {
+    border-color: #667eea;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.segment-suggestion-card.selected {
+    border-color: #34A853;
+    background: #f0fdf4;
+    pointer-events: none;
+}
+
+.segment-suggestion-card.adding {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.segment-suggestion-card .segment-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.segment-suggestion-card .segment-model {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.segment-suggestion-card .segment-model.b2b {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.segment-suggestion-card .segment-model.b2c {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.segment-suggestion-card .segment-description {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.segment-suggestion-card .segment-percentage {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.segment-suggestion-card .card-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+}
+
+.segment-suggestion-card .add-icon {
+    color: #667eea;
+    opacity: 0;
+}
+
+.segment-suggestion-card:hover .add-icon {
+    opacity: 1;
+}
+
+.segment-suggestion-card .check-icon {
+    color: #34A853;
+    display: none;
+}
+
+.segment-suggestion-card.selected .check-icon {
+    display: block;
+}
+
+.segment-suggestion-card.selected .add-icon {
+    display: none;
+}
+
+.segment-suggestion-card .spinner-icon {
+    display: none;
+}
+
+.segment-suggestion-card.adding .spinner-icon {
+    display: block;
+}
+
+.segment-suggestion-card.adding .add-icon {
+    display: none;
+}
+
+/* Success Toast */
+.segment-added-toast {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background: #34A853;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 2000;
+    animation: segmentToastSlideIn 0.3s ease;
+}
+
+.segment-added-toast.error {
+    background: #EA4335;
+}
+
+@keyframes segmentToastSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ai-helper-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+    }
+
+    .ai-helper-btn .btn-text {
+        display: none;
+    }
+
+    .segment-added-toast {
+        right: 20px;
+        left: 20px;
+        text-align: center;
+    }
+}
+</style>
+
+<!-- JavaScript for AI Helper -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generateSuggestionsBtn');
+    const descriptionInput = document.getElementById('businessDescriptionInput');
+    const loadingState = document.getElementById('loadingState');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
+    const suggestionsList = document.getElementById('suggestionsList');
+    const errorState = document.getElementById('errorState');
+    const errorMessage = document.getElementById('errorMessage');
+
+    const bplanId = "{{ bplan_id }}";
+    const isArabic = "{{ session.get('lang', 'en') }}" === 'ar';
+
+    // Generate suggestions
+    generateBtn.addEventListener('click', async function() {
+        const description = descriptionInput.value.trim();
+
+        if (!description) {
+            showError(isArabic ? 'الرجاء إدخال وصف لعملك' : 'Please enter a description of your business');
+            return;
+        }
+
+        if (description.length < 10) {
+            showError(isArabic ? 'الرجاء إدخال وصف أكثر تفصيلاً' : 'Please enter a more detailed description');
+            return;
+        }
+
+        // Show loading
+        generateBtn.disabled = true;
+        loadingState.style.display = 'block';
+        suggestionsContainer.style.display = 'none';
+        errorState.style.display = 'none';
+
+        try {
+            const response = await fetch("/api/suggest_segments_smart/" + bplanId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ description: description })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.segments && data.segments.length > 0) {
+                displaySuggestions(data.segments);
+            } else {
+                showError(data.error || (isArabic ? 'لم نتمكن من توليد اقتراحات' : 'Could not generate suggestions'));
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            showError(isArabic ? 'حدث خطأ. الرجاء المحاولة مرة أخرى' : 'An error occurred. Please try again.');
+        } finally {
+            generateBtn.disabled = false;
+            loadingState.style.display = 'none';
+        }
+    });
+
+    // Display suggestions
+    function displaySuggestions(segments) {
+        suggestionsList.innerHTML = '';
+
+        segments.forEach((segment, index) => {
+            const card = document.createElement('div');
+            card.className = 'col-md-6';
+
+            const cardHtml = '<div class="segment-suggestion-card position-relative" data-index="' + index + '">' +
+                '<i class="fas fa-plus-circle card-icon add-icon"></i>' +
+                '<i class="fas fa-check-circle card-icon check-icon"></i>' +
+                '<i class="fas fa-spinner fa-spin card-icon spinner-icon"></i>' +
+                '<div class="segment-name">' + escapeHtml(segment.name) + '</div>' +
+                '<span class="segment-model ' + segment.business_model.toLowerCase() + '">' + segment.business_model + '</span>' +
+                '<div class="segment-description">' + escapeHtml(segment.description) + '</div>' +
+                '<div class="segment-percentage">' +
+                    '<i class="fas fa-chart-pie me-1"></i>' +
+                    (isArabic ? 'النسبة المقترحة:' : 'Suggested:') + ' ' + segment.suggested_percentage + '%' +
+                '</div>' +
+            '</div>';
+
+            card.innerHTML = cardHtml;
+
+            // Click handler to add segment to database
+            const cardElement = card.querySelector('.segment-suggestion-card');
+            cardElement.addEventListener('click', function() {
+                if (!this.classList.contains('selected') && !this.classList.contains('adding')) {
+                    addSegmentToDatabase(segment, this);
+                }
+            });
+
+            suggestionsList.appendChild(card);
+        });
+
+        suggestionsContainer.style.display = 'block';
+    }
+
+    // Add segment to database
+    async function addSegmentToDatabase(segment, cardElement) {
+        // Show loading state on card
+        cardElement.classList.add('adding');
+
+        try {
+            const response = await fetch("/api/add_segment/" + bplanId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    name: segment.name,
+                    business_model: segment.business_model,
+                    suggested_percentage: segment.suggested_percentage
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Mark card as selected
+                cardElement.classList.remove('adding');
+                cardElement.classList.add('selected');
+
+                // Show success toast
+                showToast(
+                    isArabic ? 'تمت إضافة "' + segment.name + '" بنجاح!' : '"' + segment.name + '" added successfully!',
+                    'success'
+                );
+
+                // Reload the page after a short delay to show the new segment
+                setTimeout(function() {
+                    window.location.href = '/market_analysis/' + bplanId;
+                }, 1500);
+
+            } else {
+                cardElement.classList.remove('adding');
+                showToast(
+                    data.error || (isArabic ? 'فشل في إضافة القطاع' : 'Failed to add segment'),
+                    'error'
+                );
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            cardElement.classList.remove('adding');
+            showToast(
+                isArabic ? 'حدث خطأ. الرجاء المحاولة مرة أخرى' : 'An error occurred. Please try again.',
+                'error'
+            );
+        }
+    }
+
+    // Show error
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorState.style.display = 'block';
+        suggestionsContainer.style.display = 'none';
+    }
+
+    // Show toast notification
+    function showToast(message, type) {
+        type = type || 'success';
+        const toast = document.createElement('div');
+        toast.className = 'segment-added-toast' + (type === 'error' ? ' error' : '');
+        toast.innerHTML = '<i class="fas fa-' + (type === 'error' ? 'exclamation-circle' : 'check-circle') + ' me-2"></i>' + escapeHtml(message);
+        document.body.appendChild(toast);
+
+        setTimeout(function() {
+            toast.style.animation = 'segmentToastSlideIn 0.3s ease reverse';
+            setTimeout(function() {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Allow Enter key to submit
+    descriptionInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            generateBtn.click();
+        }
+    });
+});
+</script>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+
+<script src="../../static/assets/js/plugins/nouislider.min.js"></script>
+
+<script>
+
+var sliderAge = document.querySelector("#slider_Age");
+var valueMinAge = document.querySelector("#slider_Age_min");
+var valueMaxAge = document.querySelector("#slider_Age_max");
+
+noUiSlider.create(sliderAge, {
+    start: [20, 80],
+    connect: true,
+    range: {
+        "min": 0,
+        "max": 100
+    },
+    step: 1,
+        format:{
+            to: (v) => v | 0,
+            from: (v) => v | 0
+        }
+});
+
+sliderAge.noUiSlider.on("update", function (values, handle1) {
+    if (handle1) {
+        valueMaxAge.innerHTML = values[handle1];
+    } else {
+        valueMinAge.innerHTML = values[handle1];
+    }
+});
+</script>
+
+<script>
+
+  var sliderIncome = document.querySelector("#slider_Income");
+  var valueMinIncome = document.querySelector("#slider_Income_min");
+  var valueMaxIncome= document.querySelector("#slider_Income_max");
+
+  noUiSlider.create(sliderIncome, {
+      start: [500, 8000],
+      connect: true,
+      range: {
+          "min": 0,
+          "max": 10000
+      },
+      step: 50,
+          format:{
+              to: (v) => v | 0,
+              from: (v) => v | 0
+          }
+  });
+
+  sliderIncome.noUiSlider.on("update", function (values, handle2) {
+      if (handle2) {
+        valueMinIncome.innerHTML = values[handle2];
+      } else {
+        valueMaxIncome.innerHTML = values[handle2];
+      }
+  });
+</script>
+
+<script>
+  // Inject DB value from Flask
+  var db_business_model = "{{ data_mkt_analysis[0].business_model or '' }}";
+
+  // Function to toggle B2C/B2B cards
+function check() {
+    const select = document.getElementById('choice_business_model');
+    const value = select ? select.value : '';
+
+    console.log("Selected value:", value); // debug
+
+    if (value == "B2C") {
+        document.getElementById('b2c_segment_details_card').style.display = 'block';
+        document.getElementById('b2b_segment_details_card').style.display = 'none';
+    } else if (value == "B2B") {
+        document.getElementById('b2c_segment_details_card').style.display = 'none';
+        document.getElementById('b2b_segment_details_card').style.display = 'block';
+    }
+}
+
+  // Initialize Choices.js and attach change listener
+  if (document.getElementById('choice_business_model')) {
+    var element = document.getElementById('choice_business_model');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+    element.addEventListener('change', check); // 🔹 call check on dropdown change
+  }
+
+  if (document.getElementById("choices_industry")) {
+    var element = document.getElementById("choices_industry");
+    const example = new Choices(element, {searchEnabled: false});
+  }
+
+  if (document.getElementById('choice_marketing_channel')) {
+    var tags = document.getElementById('choice_marketing_channel');
+    const examples = new Choices(tags, {
+      searchEnabled: false,
+      removeItemButton: true
+    });
+  }
+
+  if (document.getElementById('choice_education')) {
+    var tags = document.getElementById('choice_education');
+    const examples = new Choices(tags, {
+        searchEnabled: false,
+        removeItemButton: true
+    });
+  }
+
+  if (document.getElementById('choice_occupation')) {
+    var tags = document.getElementById('choice_occupation');
+    const examples = new Choices(tags, {
+        searchEnabled: false,
+        removeItemButton: true
+    });
+  }
+
+  if (document.getElementById('choice_life_stage')) {
+    var tags = document.getElementById('choice_life_stage');
+    const examples = new Choices(tags, {
+        searchEnabled: false,
+        removeItemButton: true
+    });
+  }
+
+  if (document.getElementById('choice_location')) {
+    var tags = document.getElementById('choice_location');
+    const examples = new Choices(tags, {
+        searchEnabled: false,
+        removeItemButton: true
+    });
+  }
+
+  function toggleSection(sectionId, checkbox) {
+  const section = document.getElementById(sectionId);
+  if (checkbox.checked) {
+    section.style.display = 'flex'; // show the section (row layout)
+  } else {
+    section.style.display = 'none'; // hide the section
+  }
+}
+
+  // Run check() once on page load to reflect DB value
+  window.onload = check;
+
+</script>
+
+
+<style>
+ /* Target Arabic language specifically */
+html[lang="ar"] .choices[data-type*="select-one"]:after {
+    display: none !important;
+}
+
+html[lang="ar"] select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+</style>
+
+
+{% endblock javascripts %}

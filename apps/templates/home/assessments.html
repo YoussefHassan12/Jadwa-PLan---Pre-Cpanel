@@ -1,0 +1,567 @@
+{% if session.get('lang', 'en') == 'ar' %}
+     {% extends "layouts/base-m-rtl.html" %}
+   {% else %}
+     {% extends "layouts/base-m.html" %}
+   {% endif %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    التقييمات
+  {% else %}
+    Assessments
+  {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page-header {
+        margin-bottom: 24px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #344767;
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 14px;
+        color: #7b809a;
+        margin: 4px 0 0 0;
+    }
+
+    .stat-card {
+        border-radius: 12px;
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+        border: 1px solid #f0f2f5;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-icon.green {
+        background: rgba(76, 175, 80, 0.15);
+        color: #4CAF50;
+    }
+
+    .stat-icon.orange {
+        background: rgba(255, 152, 0, 0.15);
+        color: #FF9800;
+    }
+
+    .stat-icon.blue {
+        background: rgba(79, 125, 243, 0.15);
+        color: #4F7DF3;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #344767;
+        margin: 12px 0 4px 0;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #7b809a;
+        margin: 0;
+    }
+
+    .content-card {
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        padding: 24px;
+    }
+
+    .filter-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .filter-icon {
+        color: #7b809a;
+    }
+
+    .filter-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 8px 32px 8px 12px;
+        font-size: 14px;
+        color: #344767;
+        background: #fff;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237b809a' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    [dir="rtl"] .filter-select {
+        padding: 8px 12px 8px 32px;
+        background-position: left 12px center;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #4F7DF3;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .assessments-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .assessments-table th {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #7b809a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    [dir="rtl"] .assessments-table th {
+        text-align: right;
+    }
+
+    .assessments-table td {
+        padding: 16px;
+        font-size: 14px;
+        color: #344767;
+        border-bottom: 1px solid #f0f2f5;
+        vertical-align: middle;
+    }
+
+    .assessments-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .assessments-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .sme-name {
+        font-weight: 600;
+        color: #344767;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge.completed {
+        background: rgba(76, 175, 80, 0.15);
+        color: #2E7D32;
+    }
+
+    .status-badge.in-progress {
+        background: rgba(255, 193, 7, 0.15);
+        color: #F9A825;
+    }
+
+    .status-badge.scheduled {
+        background: rgba(158, 158, 158, 0.15);
+        color: #616161;
+    }
+
+    .score {
+        font-weight: 600;
+        color: #4F7DF3;
+    }
+
+    .score.na {
+        color: #7b809a;
+        font-weight: 400;
+    }
+
+    .action-link {
+        font-size: 14px;
+        font-weight: 600;
+        color: #4F7DF3;
+        text-decoration: none;
+    }
+
+    .action-link:hover {
+        text-decoration: underline;
+        color: #1A73E8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            {% if session.get('lang', 'en') == 'ar' %}
+                التقييمات
+            {% else %}
+                Assessments
+            {% endif %}
+        </h1>
+        <p class="page-subtitle">
+            {% if session.get('lang', 'en') == 'ar' %}
+                تتبع وإدارة تقييمات جاهزية المشاريع الصغيرة والمتوسطة
+            {% else %}
+                Track and manage SME readiness assessments
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-lg-0 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="material-icons">check_circle</i>
+                </div>
+                <p class="stat-value">3</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مكتمل
+                    {% else %}
+                        Completed
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-lg-0 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="material-icons">schedule</i>
+                </div>
+                <p class="stat-value">1</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        قيد التنفيذ
+                    {% else %}
+                        In Progress
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-lg-0 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="material-icons">event</i>
+                </div>
+                <p class="stat-value">1</p>
+                <p class="stat-label">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مجدول
+                    {% else %}
+                        Scheduled
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessments Table -->
+    <div class="content-card">
+        <div class="filter-section">
+            <i class="material-icons filter-icon">filter_list</i>
+            <select class="filter-select">
+                <option>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        جميع التقييمات
+                    {% else %}
+                        All Assessments
+                    {% endif %}
+                </option>
+                <option>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مكتمل
+                    {% else %}
+                        Completed
+                    {% endif %}
+                </option>
+                <option>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        قيد التنفيذ
+                    {% else %}
+                        In Progress
+                    {% endif %}
+                </option>
+                <option>
+                    {% if session.get('lang', 'en') == 'ar' %}
+                        مجدول
+                    {% else %}
+                        Scheduled
+                    {% endif %}
+                </option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="assessments-table">
+                <thead>
+                    <tr>
+                        <th>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                اسم المشروع
+                            {% else %}
+                                SME Name
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                تاريخ التقييم
+                            {% else %}
+                                Assessment Date
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                المسؤول
+                            {% else %}
+                                Officer
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                الحالة
+                            {% else %}
+                                Status
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                الدرجة
+                            {% else %}
+                                Score
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                الإجراءات
+                            {% else %}
+                                Actions
+                            {% endif %}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="sme-name">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    سوق الأغذية الطازجة
+                                {% else %}
+                                    Fresh Foods Market
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>11/20/2024</td>
+                        <td>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                أحمد خوري
+                            {% else %}
+                                Ahmad Khoury
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge completed">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مكتمل
+                                {% else %}
+                                    Completed
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td><span class="score">72/100</span></td>
+                        <td>
+                            <a href="#" class="action-link">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    عرض التقرير
+                                {% else %}
+                                    View Report
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="sme-name">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مركز الحلول التقنية
+                                {% else %}
+                                    Tech Solutions Hub
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>10/18/2024</td>
+                        <td>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                سارة منصور
+                            {% else %}
+                                Sara Mansour
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge completed">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مكتمل
+                                {% else %}
+                                    Completed
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td><span class="score">85/100</span></td>
+                        <td>
+                            <a href="#" class="action-link">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    عرض التقرير
+                                {% else %}
+                                    View Report
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="sme-name">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    تعاونية منتجي زيت الزيتون
+                                {% else %}
+                                    Olive Oil Producers Co-op
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>12/7/2024</td>
+                        <td>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                أحمد خوري
+                            {% else %}
+                                Ahmad Khoury
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge in-progress">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    قيد التنفيذ
+                                {% else %}
+                                    In Progress
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td><span class="score">58/100</span></td>
+                        <td>
+                            <a href="#" class="action-link">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    متابعة
+                                {% else %}
+                                    Continue
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="sme-name">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    بوتيك الأزياء
+                                {% else %}
+                                    Fashion Boutique
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>12/10/2024</td>
+                        <td>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                سارة منصور
+                            {% else %}
+                                Sara Mansour
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge scheduled">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مجدول
+                                {% else %}
+                                    Scheduled
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td><span class="score na">—</span></td>
+                        <td>
+                            <a href="#" class="action-link">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    متابعة
+                                {% else %}
+                                    Continue
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="sme-name">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    شركة مستلزمات البناء
+                                {% else %}
+                                    Construction Supplies Ltd
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>11/15/2024</td>
+                        <td>
+                            {% if session.get('lang', 'en') == 'ar' %}
+                                أحمد خوري
+                            {% else %}
+                                Ahmad Khoury
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge completed">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    مكتمل
+                                {% else %}
+                                    Completed
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td><span class="score">78/100</span></td>
+                        <td>
+                            <a href="#" class="action-link">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                    عرض التقرير
+                                {% else %}
+                                    View Report
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

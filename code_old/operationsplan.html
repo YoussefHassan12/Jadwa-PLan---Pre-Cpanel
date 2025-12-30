@@ -1,0 +1,968 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Operations Plan {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+<div class="container-fluid pl-5 pt-3">
+  <div class="row">
+    <div class="col-10">
+
+      <form role="form" method="POST" action="/operations_plan/{{ bplan_id }}">
+
+        <div class="row px-8 pt-0 pb-3">
+          <span class="me-2 text-xxs font-weight-bold">{{ data_comp[0].completion }}% Completed</span>
+          <div class="progress">
+            {% if data_comp[0].completion == 100: %}
+            <div class="progress-bar bg-gradient-success" role="progressbar"
+              aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100"
+              style="width: {{ data_comp[0].completion }}%;"></div>
+            {% elif data_comp[0].completion >= 50: %}
+            <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}"
+              aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% else %}
+            <div class="progress-bar bg-gradient-danger" role="progressbar"
+              aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100"
+              style="width: {{ data_comp[0].completion }}%;"></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Title + Operation Plan card -->
+<div class="card my-3">
+  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+    <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+      <h5 class="text-white text-capitalize ps-3 mx-3">Operation Plan - Suppliers</h5>
+    </div>
+  </div>
+
+  <div class="card-body px-6 pt-2">
+    <!-- Supplier Creation Section (Always Visible) -->
+    <div class="mb-5">
+      <h5 class="font-weight-bolder text-info">Add New Supplier</h5>
+      <form method="POST" class="mt-3">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="input-group input-group-static mb-4">
+              <label class="form-label text-dark">Supplier Name</label>
+            </div>
+            <div class="input-group input-group-static mb-0">
+              <input class="form-control form-control-sm" type="text" name="supplier_name" required>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="input-group input-group-static mb-4">
+              <label class="form-label text-dark">Years of Collaboration</label>
+            </div>
+            <div class="input-group input-group-static mb-0">
+              <select class="form-control form-control-sm" name="choice_collaboration" required>
+                <option value="0-1" selected>0-1</option>
+                <option value="1-3">1-3</option>
+                <option value="3-5">3-5</option>
+                <option value="5-7">5-7</option>
+                <option value="7-10">7-10</option>
+                <option value="10+">10+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="input-group input-group-static mb-4">
+              <label class="form-label text-dark">Performance Rating</label>
+            </div>
+            <div class="input-group input-group-static mb-0">
+              <input class="form-control form-control-sm" type="text" name="choice_performance_type" required>
+            </div>
+          </div>
+
+          <div class="col-md-2 align-self-end">
+            <button class="btn bg-gradient-info btn-sm" type="submit" name="supplier_add" value="{{ bplan_id }}">
+              Add Supplier
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Supplier List with Expandable Product Sections -->
+    <div class="mt-5">
+      <h5 class="font-weight-bolder text-info">Your Suppliers</h5>
+
+      {% for supplier in data_bs %}
+      <div class="card card-body mb-3 supplier-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="mb-0">{{ supplier.supplier_name }}</h6>
+            <p class="text-sm text-muted mb-0">
+              Collaboration: {{ supplier.years_of_collaboration }} |
+              Performance: {{ supplier.performance_type }}
+            </p>
+          </div>
+
+          <div>
+            <!-- Toggle Product Section Button -->
+            <button class="btn btn-sm btn-outline-info toggle-products"
+                    data-supplier-id="{{ supplier.supplier_id }}">
+              {% if supplier.products %}Manage Products ({{ supplier.products|length }}){% else %}Add Products{% endif %}
+              <i class="material-icons ms-1">expand_more</i>
+            </button>
+
+            <!-- Delete Supplier Button -->
+            <form method="POST" style="display: inline;" class="ms-2">
+              <button type="submit" class="btn btn-sm btn-outline-danger"
+                      name="supplier_delete" value="{{ supplier.supplier_id }}"
+                      onclick="return confirm('Delete this supplier and ALL their products?')">
+                <i class="material-icons">delete</i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Product Section (Collapsed by Default) -->
+        <div class="product-section mt-3" id="products-{{ supplier.supplier_id }}" style="display: none;">
+          <!-- Product List -->
+          {% if supplier.products %}
+          <div class="mb-3">
+            <h6 class="text-sm font-weight-bold">Current Products</h6>
+            <div class="table-responsive">
+              <table class="table table-sm align-items-center">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-xs">Product/Service</th>
+                    <th class="text-uppercase text-xs">Price</th>
+                    <th class="text-uppercase text-xs">Quantity</th>
+                    <th class="text-uppercase text-xs">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for product in supplier.products %}
+                  <tr>
+                    <td class="text-xs">{{ product.product_service }}</td>
+                    <td class="text-xs">{{ product.prices }}</td>
+                    <td class="text-xs">{{ product.quantity }}</td>
+                    <td class="text-xs">
+                      <form method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-link text-danger p-0"
+                                name="supplier_product_delete"
+                                value="{{ supplier.supplier_id }}_{{ product.product_id }}"
+                                onclick="return confirm('Delete this product?')">
+                          <i class="material-icons text-xs">delete</i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Add Product Form -->
+          <div class="bg-gray-100 p-3 rounded">
+            <h6 class="text-sm font-weight-bold mb-3">{% if supplier.products %}Add Another Product{% else %}Add First Product{% endif %}</h6>
+            <form method="POST">
+              <input type="hidden" name="supplier_id" value="{{ supplier.supplier_id }}">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="input-group input-group-static mb-4">
+                    <label class="form-label text-dark">Product/Service</label>
+                  </div>
+                  <div class="input-group input-group-static mb-0">
+                    <input class="form-control form-control-sm" type="text" name="product_service" required>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="input-group input-group-static mb-4">
+                    <label class="form-label text-dark">Price Level</label>
+                  </div>
+                  <div class="input-group input-group-static mb-0">
+                    <select class="form-control form-control-sm" name="product_prices" required>
+                      <option value="Very expensive">Very expensive</option>
+                      <option value="Expensive">Expensive</option>
+                      <option value="Moderate" selected>Moderate</option>
+                      <option value="Affordable">Affordable</option>
+                      <option value="Very low">Very low</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="input-group input-group-static mb-4">
+                    <label class="form-label text-dark">Quantity</label>
+                  </div>
+                  <div class="input-group input-group-static mb-0">
+                    <select class="form-control form-control-sm" name="product_quantity" required>
+                      <option value="Consistent" selected>Consistent</option>
+                      <option value="Inconsistent">Inconsistent</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-md-2 align-self-end">
+                  <button class="btn bg-gradient-info btn-sm" type="submit" name="add_product">
+                    Add Product
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+// Toggle product sections
+document.querySelectorAll('.toggle-products').forEach(button => {
+  button.addEventListener('click', function() {
+    const supplierId = this.getAttribute('data-supplier-id');
+    const productSection = document.getElementById(`products-${supplierId}`);
+    const icon = this.querySelector('i');
+
+    if (productSection.style.display === 'none') {
+      productSection.style.display = 'block';
+      icon.textContent = 'expand_less';
+    } else {
+      productSection.style.display = 'none';
+      icon.textContent = 'expand_more';
+    }
+  });
+});
+</script>
+
+<style>
+.supplier-card {
+  transition: all 0.3s ease;
+  border-left: 4px solid #17c1e8;
+}
+.supplier-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.product-section {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+</style>
+
+
+        <!-- Production card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">Production</h5>
+
+            <!-- ADD card body -->
+            <div class="row">
+              <div class="col">
+                <div class="card card-body bg-gray-100 px-4 py-2">
+
+                  <!-- 1st row -->
+                  <div class="row">
+
+                    <!-- <div class="col">
+                        <div class="input-group input-group-static mb-4">
+                          <label class="form-label text-dark">Allocated Resources</label>
+                        </div>
+                        <div class="input-group input-group-static mb-0">
+                          <select class="multisteps-form__input form-control" name="choice_allocated_resources" id="choice_allocated_resources">
+                            {% for row in data_res %}
+                            <option value="{{ row.resource_subtype }}" selected>{{ row.resource_subtype }} (Qty: {{ row.quantity }})</option>
+                            {% endfor %}
+                          </select>
+                        </div>  
+                      </div> -->
+
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">Production Unit</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="multisteps-form__input form-control form-control-sm"
+                          name="choice_production_unit" id="choice_production_unit">
+                          <option value="Bag" selected>Bag</option>
+                          <option value="Bottle">Bottle</option>
+                          <option value="Box">Box</option>
+                          <option value="Grams">Grams</option>
+                          <option value="Head">Head</option>
+                          <option value="Hectar">Hectar</option>
+                          <option value="Kg">Kg</option>
+                          <option value="License">License</option>
+                          <option value="Liter">Liter</option>
+                          <option value="Meters">M</option>
+                          <option value="Meters^2">M^2</option>
+                          <option value="Meters^3">M^3</option>
+                          <option value="Piece">Piece</option>
+                          <option value="Service">Service</option>
+                          <option value="Solution">Solution</option>
+                          <option value="Sqm">Sqm</option>
+                          <option value="Ton">Ton</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">Timeframe</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="multisteps-form__input form-control form-control-sm" name="choice_time_frame"
+                          id="choice_time_frame">
+                          <option value="Hour" selected>Hour</option>
+                          <option value="Day">Day</option>
+                          <option value="Month">Month</option>
+                          <option value="Year">Year</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">Current Capacity</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="text" name="current_capacity" placeholder="">
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">Max. Expected Capacity</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="text" name="max_expected_capacity" placeholder="">
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                </div>
+              </div>
+
+              <div class="col-1 align-self-end">
+                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="production_add"
+                  value="{{ bplan_id }}">add</button>
+              </div>
+            </div>
+
+            <!-- Table row -->
+            <div class="row mt-3">
+              <div class="table-responsive">
+                <table class="table align-items-center display compact border">
+                  <thead class="badge-info">
+                    <tr>
+                      <!-- <th class="text-uppercase text-dark text-xs font-weight-bolder">Resources</th> -->
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder">Unit</th>
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Timeframe</th>
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Capacity</th>
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Expected Capacity</th>
+                      <th class="text-uppercase text-info text-xs font-weight-bolder ps-2">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in data_bp %}
+                    <tr>
+                      <!-- <td>
+                        <p class="text-xs font-weight-bold">{{ row.allocated_resources }}</p>
+                      </td> -->
+                      <td>
+                        <p class="text-xs font-weight-bold">{{ row.production_unit }}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold">{{ row.time_frame }}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold">{{ row.current_capacity }}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold">{{ row.max_expected_capacity }}</p>
+                      </td>
+                      <td class="px-0 py-0">
+                        <button type="submit" class="btn btn-sm" data-bs-toggle="tooltip"
+                          data-bs-original-title="Delete" name="production_delete" value="{{ row.production_id }}"><i
+                            class="material-icons text-info position-relative text-lg">delete</i></button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="col-4 mb-1 pt-2">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">How to enhance Production?</label>
+                </div>
+              </div>
+              <div class="col mb-1 pt-2">
+                <div class="input-group input-group-static mb-0">
+                  <select class="multisteps-form__input form-control" name="choice_enhance" id="choice_enhance"
+                    multiple>
+                    <option value="1" {% if "1" in data_op[0].enhance_production %} selected {% endif %}>Recruiting
+                    </option>
+                    <option value="2" {% if "2" in data_op[0].enhance_production %} selected {% endif %}>Staff Training
+                    </option>
+                    <option value="3" {% if "3" in data_op[0].enhance_production %} selected {% endif %}>Improved
+                      Equipment</option>
+                    <option value="4" {% if "4" in data_op[0].enhance_production %} selected {% endif %}>Inventory
+                      Management</option>
+                    <option value="5" {% if "5" in data_op[0].enhance_production %} selected {% endif %}>Quality Control
+                    </option>
+                    <option value="6" {% if "6" in data_op[0].enhance_production %} selected {% endif %}>Regular
+                      Mantainance</option>
+                    <option value="7" {% if "7" in data_op[0].enhance_production %} selected {% endif %}>Advanced Tools
+                      & Technology</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Distribution card -->
+        <div class="card my-3">
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-3">Distribution</h5>
+
+            <!-- ADD card body -->
+            <div class="row">
+              <div class="col">
+                <div class="card card-body bg-gray-100 px-4 py-2">
+
+                  <!-- 1st row -->
+                  <div class="row">
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label text-dark">Type</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <select class="multisteps-form__input form-control" name="choice_type" id="choice_type">
+                          <option value="Wholesaler" selected>Wholesaler</option>
+                          <option value="Distributer">Distributer</option>
+                          <option value="Retailer">Retailer</option>
+                          <option value="Direct Sales">Direct Sales</option>
+                          <option value="Online">Online</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label">Distributor Name</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="text" name="distributor_name" placeholder="">
+                      </div>
+                    </div>
+
+                    <div class="col">
+                      <div class="input-group input-group-static mb-4">
+                        <label class="form-label">Years of collaboration</label>
+                      </div>
+                      <div class="input-group input-group-static mb-0">
+                        <input class="form-control" type="number" name="dis_collaboration_years" placeholder="">
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-1 align-self-end">
+                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit"
+                  name="distribution_add" value="{{ bplan_id }}">add</button>
+              </div>
+            </div>
+
+            <!-- Table row -->
+            <div class="row mt-3">
+              <div class="table-responsive">
+                <table class="table align-items-center display compact border">
+                  <thead class="badge-info">
+                    <tr>
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder">Type</th>
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Distributor Name</th>
+                      <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Collaboration years</th>
+                      <th class="text-uppercase text-info text-xs font-weight-bolder ps-2">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in data_bd %}
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-xs">{{ row.type }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold">{{ row.distribution_name }}</p>
+                      </td>
+                      <td>
+                        <p class="text-xs font-weight-bold">{{ row.collaboration_years }}</p>
+                      </td>
+
+                      <td class="px-0 py-0">
+                        <button type="submit" class="btn btn-sm" data-bs-toggle="tooltip"
+                          data-bs-original-title="Delete" name="distribution_delete"
+                          value="{{ row.distribution_id }}"><i
+                            class="material-icons text-info position-relative text-lg">delete</i></button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-4 mb-1 pt-2">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">Customer Support</label>
+                </div>
+              </div>
+              <div class="col mb-1 pt-2">
+                <div class="input-group input-group-static mb-0">
+                  <select class="multisteps-form__input form-control" name="choice_customer_support"
+                    id="choice_customer_support" multiple>
+                    <option value="1" {% if "1" in data_op[0].customer_support %} selected {% endif %}>Return Policy
+                    </option>
+                    <option value="2" {% if "2" in data_op[0].customer_support %} selected {% endif %}>Maintenance
+                    </option>
+                    <option value="3" {% if "3" in data_op[0].customer_support %} selected {% endif %}>Warranty</option>
+                    <option value="4" {% if "4" in data_op[0].customer_support %} selected {% endif %}>Customer Feedback
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-row d-flex mt-4">
+              <!-- <button class="btn bg-gradient-light mb-0 js-btn-prev" data-bs-toggle="tooltip" data-bs-placement="top" title="Previous" type="submit" name="action" value="prev">Prev</button> -->
+              <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top"
+                title="Save & Continue" type="submit" name="action" value="save">Save</button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="container-fluid pl-5 pt-3">
+  <div class="row">
+    <div class="col-10">
+      <div class="card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+            
+            <div class="multisteps-form__progress">
+              <button class="multisteps-form__progress-btn js-active" type="button" title="suppliers">Suppliers</button>
+              <button class="multisteps-form__progress-btn" type="button" title="production">Production</button>
+              <button class="multisteps-form__progress-btn" type="button" title="distribution">Distribution</button>
+              <button class="multisteps-form__progress-btn" type="button" title="customer-support">Customer Support</button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card-body px-6 pt-2 shadow-dark">
+          <form role="form" method="post" action="/requested_fund" class="multisteps-form__form">
+
+
+            <div class="multisteps-form__panel pt-3 border-radius-xl bg-white js-active" data-animation="FadeIn">
+              <h5 class="font-weight-bolder">Suppliers</h5>
+              <div class="multisteps-form__content">
+                
+                <div class="row">
+                  <div class="col">
+                    <div class="card card-body bg-gray-100 px-4 py-2">
+
+                      <div class="row">
+                        <div class="col">
+                          <div class="input-group input-group-static mb-4">
+                            <label class="form-label">Supplier Name</label>
+                          </div>
+                          <div class="input-group input-group-static mb-0">
+                            <input class="form-control" type="text" name="supplier-name" placeholder="">
+                          </div>
+                        </div>
+
+                        <div class="col">
+                          <div class="input-group input-group-static mb-4">
+                            <label class="form-label">Collaboration years</label>
+                          </div>
+                          <div class="input-group input-group-static mb-0">
+                            <input class="form-control" type="number" name="sup-collaboration-years" placeholder="">
+                          </div>
+                        </div>
+                        <div class="col">
+
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="col-1 align-self-end">
+                    <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="option" value="add">add</button>
+                  </div>
+                </div>
+
+
+                <div class="row mt-3">
+                  <div class="table-responsive">
+                    <table class="table align-items-center display compact border">
+                      <thead class="badge-info">
+                        <tr>
+                          <th class="text-uppercase text-dark text-xs font-weight-bolder">Supplier Name</th>
+                          <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Collaboration years</th>
+                          <th class="text-uppercase text-info text-xs font-weight-bolder ps-2">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-xs">GG Co</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold mb-0">3</p>
+                          </td>
+
+                          <td class="text-sm">
+                            <a href="javascript:;" class="mx-0" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                              <i class="material-icons text-info position-relative text-lg">drive_file_rename_outline</i>
+                            </a>
+                            <a href="javascript:;" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                              <i class="material-icons text-info position-relative text-lg">delete</i>
+                            </a>
+                          </td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+                <div class="button-row d-flex mt-4">
+                  <button class="btn bg-gradient-light mb-0 js-btn-prev" type="submit" name="option" value="previous" title="Prev">Prev</button>
+                  <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button" title="Next">Next</button>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="multisteps-form__panel pt-3 border-radius-xl bg-white" data-animation="FadeIn">
+              <h5 class="font-weight-bolder">Production</h5>
+              <div class="multisteps-form__content">
+
+                <div class="row">
+
+                  <div class="col">
+                    <div class="input-group input-group-static mb-5">
+                      <label class="form-label text-dark">Production Enhancement</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck1" checked="">
+                      <label class="mb-0" for="customCheck1">Recruiting</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck2" checked="">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Staff Training</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck3" checked="">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Improved Equipment</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck4">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Inventory Management</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck5">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Quality Control</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck5">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Reqular Maintenance</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck5">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Advanced Tools & Technology</label>
+                    </div>
+                  </div>
+   
+                </div>
+
+                <div class="button-row d-flex mt-4">
+                  <button class="btn bg-gradient-light mb-0 js-btn-prev" type="button" title="Prev">Prev</button>
+                  <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button" title="Next">Next</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="multisteps-form__panel pt-3 border-radius-xl bg-white" data-animation="FadeIn">
+              <h5 class="font-weight-bolder">Distribution</h5>
+              <div class="multisteps-form__content">
+
+                <div class="row">
+                  <div class="col">
+                    <div class="card card-body bg-gray-100 px-4 py-2">
+                    
+                      <div class="row">
+                        <div class="col">
+                          <div class="input-group input-group-static mb-4">
+                            <label class="form-label">Distributor Name</label>
+                          </div>
+                          <div class="input-group input-group-static mb-0">
+                            <input class="form-control" type="text" name="distributor-name" placeholder="">
+                          </div>
+                        </div>
+
+                        <div class="col">
+                          <div class="input-group input-group-static mb-4">
+                            <label class="form-label text-dark">Type</label>
+                          </div>
+                          <div class="input-group input-group-static mb-0">
+                            <select class="multisteps-form__input form-control" name="choice-type" id="choice-type">
+                              <option value="wholesaler" selected>Wholesaler</option>
+                              <option value="distributer">Distributer</option>
+                              <option value="retailer">Retailer</option>
+                              <option value="direct-sales">Direct Sales</option>
+                              <option value="online">Online</option>
+                            </select>
+                          </div>  
+                        </div>
+
+                        <div class="col">
+                          <div class="input-group input-group-static mb-4">
+                            <label class="form-label">Collaboration years</label>
+                          </div>
+                          <div class="input-group input-group-static mb-0">
+                            <input class="form-control" type="number" name="dis-collaboration-years" placeholder="">
+                          </div>
+                        </div>
+                      </div>
+                    
+                    </div>
+                  </div>
+
+                  <div class="col-1 align-self-end">
+                    <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="option" value="add">add</button>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <div class="table-responsive">
+                    <table class="table align-items-center display compact border">
+                      <thead class="badge-info">
+                        <tr>
+                          <th class="text-uppercase text-dark text-xs font-weight-bolder">Distributor Name</th>
+                          <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Type</th>
+                          <th class="text-uppercase text-dark text-xs font-weight-bolder ps-2">Collaboration years</th>
+                          <th class="text-uppercase text-info text-xs font-weight-bolder ps-2">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-xs">GG Co</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold">Wholesaler</p>
+                          </td>
+                          <td>
+                            <p class="text-xs font-weight-bold">3</p>
+                          </td>
+
+                          <td class="text-sm">
+                            <a href="javascript:;" class="mx-0" data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                              <i class="material-icons text-info position-relative text-lg">drive_file_rename_outline</i>
+                            </a>
+                            <a href="javascript:;" data-bs-toggle="tooltip" data-bs-original-title="Delete">
+                              <i class="material-icons text-info position-relative text-lg">delete</i>
+                            </a>
+                          </td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="button-row d-flex mt-4 col-12">
+                    <button class="btn bg-gradient-light mb-0 js-btn-prev" type="button" title="Prev">Prev</button>
+                    <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button" title="Next">Next</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="multisteps-form__panel pt-3 border-radius-xl bg-white" data-animation="FadeIn">
+              <h5 class="font-weight-bolder">Customer Support</h5>
+              <div class="multisteps-form__content">
+
+                <div class="row">
+
+                  <div class="col">
+                    <div class="input-group input-group-static mb-5">
+                      <label class="form-label text-dark">Support Type</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck1" checked="">
+                      <label class="mb-0" for="customCheck1">Return Policy</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck2" checked="">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Maintenance</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck3" checked="">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Warranty</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="" type="checkbox" value="" id="fcustomCheck4">
+                      <label class="mb-0" for="flexSwitchCheckDefault">Customer Feedback</label>
+                    </div>
+                    
+                  </div>
+   
+                </div>
+
+                <div class="button-row d-flex mt-0 mt-md-4">
+                  <button class="btn bg-gradient-light mb-0 js-btn-prev" type="button" title="Prev">Prev</button>
+                  <button class="btn bg-gradient-primary ms-auto mb-0" type="submit" name="option" value="save">Save</button>
+                </div>
+
+              </div>
+            </div>
+
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div> -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+
+{% block javascripts %}
+
+<script>
+
+  if (document.getElementById('choice_collaboration')) {
+    var element = document.getElementById('choice_collaboration');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_performance_type')) {
+    var element = document.getElementById('choice_performance_type');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_prices')) {
+    var element = document.getElementById('choice_prices');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_quantity')) {
+    var element = document.getElementById('choice_quantity');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_quality')) {
+    var element = document.getElementById('choice_quality');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_customer_service')) {
+    var element = document.getElementById('choice_customer_service');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_type')) {
+    var element = document.getElementById('choice_type');
+    const example = new Choices(element, {
+      searchEnabled: false
+    });
+  };
+
+  // if (document.getElementById('choice_allocated_resources')) {
+  //   var element = document.getElementById('choice_allocated_resources');
+  //   const example = new Choices(element, {
+  //     searchEnabled: false
+  //   });
+  // };
+
+  if (document.getElementById('choice_enhance')) {
+    var tags = document.getElementById('choice_enhance');
+    const examples = new Choices(tags, {
+      searchEnabled: false,
+      removeItemButton: true
+    });
+  };
+
+  if (document.getElementById('choice_customer_support')) {
+    var tags = document.getElementById('choice_customer_support');
+    const examples = new Choices(tags, {
+      searchEnabled: false,
+      removeItemButton: true
+    });
+  };
+
+  if (document.getElementById('choice_production_unit')) {
+    var tags = document.getElementById('choice_production_unit');
+    const examples = new Choices(tags, {
+      searchEnabled: false
+    });
+  };
+
+  if (document.getElementById('choice_time_frame')) {
+    var tags = document.getElementById('choice_time_frame');
+    const examples = new Choices(tags, {
+      searchEnabled: false
+    });
+  };
+
+
+</script>
+{% endblock javascripts %}

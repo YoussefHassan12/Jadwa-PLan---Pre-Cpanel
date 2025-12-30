@@ -1,0 +1,559 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {% if session.get('lang', 'en') == 'ar' %}
+    المنافسون
+  {% else %}
+    Competitors
+  {% endif %}
+{% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container-fluid pl-5 pt-3">
+  <div class="row">
+    <div class="col-10">
+
+      <form role="form" method="POST" action="/competitors/{{ bplan_id }}" id="competitors-form">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-danger">
+              {% for message in messages %}
+                {{ message }}
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="row px-8 pt-0 pb-3">
+          <span class="me-2 text-xxs font-weight-bold">
+            {% if session.get('lang', 'en') == 'ar' %}
+              تم الإكمال بنسبة
+            {% endif %}
+            {{ data_comp[0].completion }}%
+            {% if session.get('lang', 'en') == 'ar' %}
+              من الملف
+            {% else %}
+              Completed
+            {% endif %}
+          </span>
+          <div class="progress">
+            {% if data_comp[0].completion == 100: %}
+            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% elif data_comp[0].completion >= 50: %}
+              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% else %}
+              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Title + Competitors card -->
+        <div class="card my-3">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+              <h5 class="text-white text-capitalize ps-3 mx-3">
+                {% if session.get('lang', 'en') == 'ar' %}
+                  المنافسون
+                {% else %}
+                  Competitors
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+
+          <div class="card-body px-6 pt-2">
+            <h5 class="font-weight-bolder text-info mt-4">
+              {% if session.get('lang', 'en') == 'ar' %}
+                المنافسون
+              {% else %}
+                Competitors
+              {% endif %}
+            </h5>
+
+            <!-- 1st row -->
+            <div class="row">
+              <div class="col">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      (الأول) اسم المنافس
+                    {% else %}
+                      (1st) Competitor Name
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <input class="form-control" type="text" name="first_competitor_name" value="{{ data_compname[0].competitor_name_1st }}" placeholder="" autocomplete="off" required/>
+                </div>
+              </div>
+
+              <div class="col">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      (الثاني) اسم المنافس
+                    {% else %}
+                      (2nd) Competitor Name
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <input class="form-control" type="text" name="second_competitor_name" value="{{ data_compname[0].competitor_name_2nd }}" placeholder="" autocomplete="off" required/>
+                </div>
+              </div>
+
+              <div class="col">
+                <div class="input-group input-group-static mb-4">
+                  <label class="form-label text-dark">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      (الثالث) اسم المنافس
+                    {% else %}
+                      (3rd) Competitor Name
+                    {% endif %}
+                  </label>
+                </div>
+                <div class="input-group input-group-static mb-0">
+                  <input class="form-control" type="text" name="third_competitor_name" value="{{ data_compname[0].competitor_name_3rd }}" placeholder="" autocomplete="off" required/>
+                </div>
+              </div>
+            </div>
+
+            <br>
+
+            <!-- Enhanced Preferences Selection -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="card border-0 shadow-sm bg-white border-radius-lg p-4 position-relative overflow-hidden">
+                  <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #21a0ff, #00d4ff); border-top-left-radius: 12px; border-top-right-radius: 12px;"></div>
+
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center">
+                      <i class="material-icons text-info me-2 fs-4">tune</i>
+                      <h5 class="text-dark mb-0 fw-bold">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                          اختر 3 تفضيلات رئيسية للمقارنة
+                        {% else %}
+                          Select 3 Key Preferences for Comparison
+                        {% endif %}
+                      </h5>
+                    </div>
+                    <span class="badge bg-info px-3 py-2 rounded-pill shadow-sm">
+                      3 {% if session.get('lang', 'en') == 'ar' %}حد أقصى{% else %}max{% endif %}
+                    </span>
+                  </div>
+
+                  <p class="text-muted small mb-4">
+                    {% if session.get('lang', 'en') == 'ar' %}
+                      اختر أهم 3 معايير للمقارنة بين منافسيك. سيتم عرضها فقط في الجدول أدناه لتركيز المقارنة.
+                    {% else %}
+                      Choose the top 3 criteria to compare your competitors. Only these will be displayed in the table below for focused comparison.
+                    {% endif %}
+                  </p>
+
+                  <!-- Preference Selection Wrapper (No Form) -->
+                  <div id="preferences-wrapper">
+                    <div class="row g-3">
+                      {% for i in range(1, 4) %}
+                      <div class="col-md-4">
+                        <div class="form-group border rounded-3 px-3 py-2 bg-white shadow-sm hover-shadow-sm transition">
+                          <label class="form-label text-dark fw-bold small mb-1">
+                            {% if session.get('lang', 'en') == 'ar' %}
+                              التفضيل {{ i }}
+                            {% else %}
+                              {{ i }}{% if i == 1 %}st{% elif i == 2 %}nd{% else %}rd{% endif %} Preference
+                            {% endif %}
+                          </label>
+                          <select class="form-select preference-select border-0 bg-light" name="preference_{{ i }}" required>
+                            <option value="">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                ← اختر التفضيل
+                              {% else %}
+                                Select preference →
+                              {% endif %}
+                            </option>
+                            {% for row in data_competitors %}
+                            <option value="{{ row.preference }}"
+                              {% if selected_preferences and selected_preferences[i-1] == row.preference %}selected{% endif %}>
+                              {{ row.preference }}
+                            </option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between align-items-center">
+                      <div>
+                        <small class="fw-semibold text-info">
+<!--                          <span id="selected-count">{{ selected_preferences|length if selected_preferences else 0 }}</span>/3-->
+<!--                          {% if session.get('lang', 'en') == 'ar' %}-->
+<!--                            تفضيلات مختارة-->
+<!--                          {% else %}-->
+<!--                            preferences selected-->
+<!--                          {% endif %}-->
+                        </small>
+                      </div>
+                      <button type="button" id="update-table-btn" class="btn btn-outline-info btn-sm">
+                        <i class="material-icons me-1" style="font-size: 16px;">refresh</i>
+                        {% if session.get('lang', 'en') == 'ar' %}
+                          تحديث الجدول
+                        {% else %}
+                          Update Table
+                        {% endif %}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Comparison Table -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="card border-radius-lg shadow-sm overflow-hidden">
+                  <div class="card-header bg-gradient-dark py-3">
+                    <h6 class="text-white mb-0">
+                      <i class="material-icons text-white me-2">compare</i>
+                      {% if session.get('lang', 'en') == 'ar' %}
+                        جدول المقارنة
+                      {% else %}
+                        Comparison Table
+                      {% endif %}
+                    </h6>
+                  </div>
+
+                  <div class="card-body p-0">
+                    <div class="table-responsive">
+                      <table class="table table-hover align-items-center mb-0" id="preferences-table">
+                        <thead class="bg-gray-100">
+                          <tr>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-4">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                معايير المقارنة
+                              {% else %}
+                                Comparison Criteria
+                              {% endif %}
+                            </th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                سعر السوق
+                              {% else %}
+                                Market Rate
+                              {% endif %}
+                            </th>
+                            <th id="comp1-header" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                {{ data_compname[0].competitor_name_1st or "المنافس الأول" }}
+                              {% else %}
+                                {{ data_compname[0].competitor_name_1st or "1st Comp." }}
+                              {% endif %}
+                            </th>
+                            <th id="comp2-header" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                {{ data_compname[0].competitor_name_2nd or "المنافس الثاني" }}
+                              {% else %}
+                                {{ data_compname[0].competitor_name_2nd or "2nd Comp." }}
+                              {% endif %}
+                            </th>
+                            <th id="comp3-header" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
+                              {% if session.get('lang', 'en') == 'ar' %}
+                                {{ data_compname[0].competitor_name_3rd or "المنافس الثالث" }}
+                              {% else %}
+                                {{ data_compname[0].competitor_name_3rd or "3rd Comp." }}
+                              {% endif %}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for row in data_competitors %}
+                          <tr class="preference-row" data-preference="{{ row.preference }}" data-selected="{{ row.is_selected|lower }}">
+                            <td class="ps-4">
+                              <div class="d-flex align-items-center">
+                                <span class="text-xs font-weight-bold">{{ row.preference }}</span>
+                              </div>
+                            </td>
+                            <td class="text-center">
+                              <span class="text-xs font-weight-bold text-dark bg-gray-200 px-2 py-1 rounded">{{ row.preference_value }}</span>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-control form-control-sm text-xs text-center border-radius-lg competitor-input"
+                                   type="number"
+                                   name="{{ row.preference }}_1"
+                                   value="{{ row.competitor1_value }}"
+                                   placeholder="-"
+                                   autocomplete="off"
+                                   min="0" max="5"
+                                   oninput="validateRange(this)"
+                                   style="max-width: 100px; margin: 0 auto;"/>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-control form-control-sm text-xs text-center border-radius-lg competitor-input"
+                                   type="number"
+                                   name="{{ row.preference }}_2"
+                                   value="{{ row.competitor2_value }}"
+                                   placeholder="-"
+                                   autocomplete="off"
+                                   min="0" max="5"
+                                   oninput="validateRange(this)"
+                                   style="max-width: 100px; margin: 0 auto;"/>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-control form-control-sm text-xs text-center border-radius-lg competitor-input"
+                                   type="number"
+                                   name="{{ row.preference }}_3"
+                                   value="{{ row.competitor3_value }}"
+                                   placeholder="-"
+                                   autocomplete="off"
+                                   min="0" max="5"
+                                   oninput="validateRange(this)"
+                                   style="max-width: 100px; margin: 0 auto;"/>
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="empty-state" class="text-center py-5" style="display: none;">
+                      <i class="material-icons text-gray-300 mb-3" style="font-size: 48px;">filter_list</i>
+                      <h6 class="text-gray-500 mb-2">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                          لم يتم اختيار أي تفضيلات
+                        {% else %}
+                          No preferences selected
+                        {% endif %}
+                      </h6>
+                      <p class="text-sm text-gray-400">
+                        {% if session.get('lang', 'en') == 'ar' %}
+                          اختر حتى 3 تفضيلات من الأعلى لعرضها في جدول المقارنة
+                        {% else %}
+                          Select up to 3 preferences from above to display in the comparison table
+                        {% endif %}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="button-row d-flex mt-4">
+              <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}" type="submit" name="action" value="save" id="save-btn">
+                {% if session.get('lang', 'en') == 'ar' %}
+                  حفظ
+                {% else %}
+                  Save
+                {% endif %}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+// Simple function to show only selected preferences
+function filterTableBySelectedPreferences() {
+    // Show rows where data-selected="true", hide others
+    const allRows = document.querySelectorAll('.preference-row');
+    let visibleCount = 0;
+
+    allRows.forEach(row => {
+        if (row.getAttribute('data-selected') === 'true') {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Show/hide empty state
+    const emptyState = document.getElementById('empty-state');
+    const tableBody = document.querySelector('tbody');
+
+    if (visibleCount === 0) {
+        emptyState.style.display = 'block';
+        tableBody.style.display = 'none';
+    } else {
+        emptyState.style.display = 'none';
+        tableBody.style.display = '';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    filterTableBySelectedPreferences();
+
+    // Handle update table button click
+    document.getElementById('update-table-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        updatePreferences();
+    });
+
+    // Update selection counter when selects change
+    document.querySelectorAll('.preference-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const selectedCount = document.querySelectorAll('.preference-select option:checked[value!=""]').length;
+            document.getElementById('selected-count').textContent = selectedCount;
+        });
+    });
+
+    // Update competitor headers when names change
+    const competitors = [
+        { input: 'input[name="first_competitor_name"]', header: '#comp1-header', defaultEn: '1st Comp.', defaultAr: 'المنافس الأول' },
+        { input: 'input[name="second_competitor_name"]', header: '#comp2-header', defaultEn: '2nd Comp.', defaultAr: 'المنافس الثاني' },
+        { input: 'input[name="third_competitor_name"]', header: '#comp3-header', defaultEn: '3rd Comp.', defaultAr: 'المنافس الثالث' },
+    ];
+
+    competitors.forEach(c => {
+        const inputEl = document.querySelector(c.input);
+        const headerEl = document.querySelector(c.header);
+        if (!inputEl || !headerEl) return;
+
+        inputEl.addEventListener('input', function() {
+            const newName = inputEl.value.trim();
+            {% if session.get('lang', 'en') == 'ar' %}
+            headerEl.textContent = newName || c.defaultAr;
+            {% else %}
+            headerEl.textContent = newName || c.defaultEn;
+            {% endif %}
+        });
+    });
+});
+
+// Update preferences via AJAX
+function updatePreferences() {
+    // Gather values from select elements
+    const preference1 = document.querySelector('select[name="preference_1"]').value;
+    const preference2 = document.querySelector('select[name="preference_2"]').value;
+    const preference3 = document.querySelector('select[name="preference_3"]').value;
+
+    // Validate selections
+    const selectedPreferences = [preference1, preference2, preference3].filter(p => p !== '');
+    const uniquePreferences = [...new Set(selectedPreferences)];
+
+    if (uniquePreferences.length !== 3) {
+        showAlert('{% if session.get("lang", "en") == "ar" %}الرجاء اختيار 3 تفضيلات فريدة{% else %}Please select exactly 3 unique preferences{% endif %}', 'error');
+        return;
+    }
+
+    const submitBtn = document.getElementById('update-table-btn');
+    const originalText = submitBtn.innerHTML;
+
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '{% if session.get("lang", "en") == "ar" %}جاري التحديث...{% else %}Updating...{% endif %}';
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('action', 'update_preferences');
+    formData.append('preference_1', preference1);
+    formData.append('preference_2', preference2);
+    formData.append('preference_3', preference3);
+
+    // Send AJAX request
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update the data-selected attributes and refresh table
+            document.querySelectorAll('.preference-row').forEach(row => {
+                const preference = row.getAttribute('data-preference');
+                if (data.selected_preferences.includes(preference)) {
+                    row.setAttribute('data-selected', 'true');
+                } else {
+                    row.setAttribute('data-selected', 'false');
+                }
+            });
+
+            // Refresh table view
+            filterTableBySelectedPreferences();
+
+            // Show success message
+            showAlert('{% if session.get("lang", "en") == "ar" %}تم تحديث الجدول بنجاح{% else %}Table updated successfully{% endif %}', 'success');
+        } else {
+            showAlert(data.message || '{% if session.get("lang", "en") == "ar" %}فشل التحديث{% else %}Update failed{% endif %}', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('{% if session.get("lang", "en") == "ar" %}حدث خطأ أثناء التحديث{% else %}An error occurred during update{% endif %}', 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+}
+
+// Simple range validation
+function validateRange(input) {
+    if (input.value === "") return;
+    let val = parseFloat(input.value);
+    if (val < 0) input.value = 0;
+    if (val > 5) input.value = 5;
+}
+
+// Helper function to show alerts
+function showAlert(message, type) {
+    // Remove existing alerts
+    const existingAlert = document.querySelector('.ajax-alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
+    // Create new alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} ajax-alert position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="material-icons me-2">${type === 'success' ? 'check_circle' : 'error'}</i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (alertDiv.parentElement) {
+            alertDiv.remove();
+        }
+    }, 3000);
+}
+</script>
+
+<style>
+.hover-shadow-sm:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+.transition {
+    transition: all 0.2s ease-in-out;
+}
+</style>
+{% endblock javascripts %}
