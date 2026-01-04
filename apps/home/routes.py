@@ -1284,6 +1284,142 @@ def update_side_business (business_name,business_industry,business_location,busi
             conn.close()
     return
 
+#inline updates client's profile
+def experience_update(experience_id, field, value):
+    """Update a single field in experiences table"""
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        # Map allowed fields
+        allowed_fields = {
+            'field': 'field',
+            'years_of_experience': 'years_of_experience',
+            'workplace': 'workplace'
+        }
+
+        if field not in allowed_fields:
+            return ("*", "Invalid field")
+
+        db_field = allowed_fields[field]
+
+        if field == 'years_of_experience':
+            if value in ('', None):
+                value = 0
+            value = int(value)
+
+        sql = "UPDATE public.experiences SET {} = %s WHERE experience_id = %s;".format(db_field)
+        cur.execute(sql, (value, experience_id))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return ("", "")
+
+
+def partner_update(partner_id, field, value):
+    """Update a single field in partners table"""
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        # Map allowed fields
+        allowed_fields = {
+            'partner_name': 'partner_name',
+            'partner_relation': 'partner_relation',
+            'partner_experience': 'partner_experience',
+            'partner_years_of_experience': 'partner_years_of_experience',
+            'partner_role': 'partner_role',
+            'partner_shares': 'partner_shares'
+        }
+
+        if field not in allowed_fields:
+            return ("*", "Invalid field")
+
+        db_field = allowed_fields[field]
+
+        if field == 'partner_years_of_experience':
+            if value in ('', None):
+                value = 0
+            value = int(value)
+        elif field == 'partner_shares':
+            if value in ('', None):
+                value = 0
+            value = float(value)
+
+        sql = "UPDATE public.partners SET {} = %s WHERE partner_id = %s;".format(db_field)
+        cur.execute(sql, (value, partner_id))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return ("", "")
+
+
+def expense_update(expense_id, field, value):
+    """Update a single field in expenses table and recalculate total"""
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        # Map allowed fields
+        allowed_fields = {
+            'living_expenses': 'living_expenses',
+            'value': 'value',
+            'unit': 'unit'
+        }
+
+        if field not in allowed_fields:
+            return ("*", "Invalid field")
+
+        db_field = allowed_fields[field]
+
+        if field == 'value':
+            if value in ('', None):
+                value = 0
+            value = int(value)
+        elif field == 'unit':
+            if value in ('', None):
+                value = 1
+            value = int(value)
+
+        # Update the field
+        sql = "UPDATE public.expenses SET {} = %s WHERE expense_id = %s;".format(db_field)
+        cur.execute(sql, (value, expense_id))
+
+        # Recalculate total_value if value or unit changed
+        if field in ('value', 'unit'):
+            sql = """
+                UPDATE public.expenses 
+                SET total_value = CASE WHEN unit = 2 THEN value * 12 ELSE value END 
+                WHERE expense_id = %s;
+            """
+            cur.execute(sql, (expense_id,))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return ("", "")
+
+
 # Business Profile
 def get_buz_info(bplan_id):
     conn = None
@@ -1429,21 +1565,39 @@ def delete_product_service(service_id):
 ########################################################################################
 
 
-def staff_add(bplan_id, staff_position, choice_work_time, staff_salary):
+def staff_add(bplan_id, staff_position, number_of_staff, choice_work_time, staff_salary):
+    """
+    UPDATED: Now includes number_of_staff field.
+    The staff_salary is the TOTAL for all staff in this position.
+    """
     conn = None
-    try:       
+    try:
         db_params = config()
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
-         
-        if staff_salary in ('',None): staff_salary = 0
-        
-        sql = "INSERT INTO public.buz_staff( bplan_id, staff_position, work_time, staff_salary, total_salary) VALUES ({}, '{}', '{}', {}, {});".format(bplan_id, staff_position, choice_work_time, staff_salary, int(staff_salary)*12)
-        cur.execute(sql)
 
-        cur.close()       
+        if staff_salary in ('', None):
+            staff_salary = 0
+        if number_of_staff in ('', None):
+            number_of_staff = 1
+
+        sql = """
+            INSERT INTO public.buz_staff(
+                bplan_id, staff_position, number_of_staff, work_time, staff_salary, total_salary
+            ) VALUES (%s, %s, %s, %s, %s, %s);
+        """
+        cur.execute(sql, (
+            bplan_id,
+            staff_position,
+            int(number_of_staff),
+            choice_work_time,
+            int(staff_salary),
+            int(staff_salary) * 12  # Yearly total
+        ))
+
+        cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        return ("*", error )
+        return ("*", error)
     finally:
         if conn is not None:
             conn.commit()
@@ -1470,33 +1624,36 @@ def staff_delete(staff_id):
     return
 
 def get_buz_staff(bplan_id):
+    """
+    UPDATED: Now includes number_of_staff in results.
+    """
     conn = None
     try:
         db_params = config()
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
 
-        sql = "select * from public.buz_staff where bplan_id ={};".format(bplan_id)
-        cur.execute(sql)
+        sql = "SELECT * FROM public.buz_staff WHERE bplan_id = %s;"
+        cur.execute(sql, (bplan_id,))
 
         columns = [column[0] for column in cur.description]
         results = []
-        total = 0
 
         for row in cur.fetchall():
             result = dict(zip(columns, row))
-            # total += result['staff_salary']
-            results.append (result)
+            # Ensure number_of_staff has a default value
+            if 'number_of_staff' not in result or result['number_of_staff'] is None:
+                result['number_of_staff'] = 1
+            results.append(result)
 
-        sql = "SELECT sum(total_salary) as total_salary FROM public.buz_staff WHERE bplan_id ={};".format(bplan_id)
-        cur.execute(sql)
-        total_result = cur.fetchall()
-        if total_result[0][0] == None: total_salary = 0
-        else: total_salary = total_result[0][0]
+        sql = "SELECT SUM(total_salary) as total_salary FROM public.buz_staff WHERE bplan_id = %s;"
+        cur.execute(sql, (bplan_id,))
+        total_result = cur.fetchone()
+        total_salary = total_result[0] if total_result[0] else 0
 
-        cur.close()       
+        cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        return (False, error , None)
+        return (False, error, None)
     finally:
         if conn is not None:
             conn.close()
@@ -1592,22 +1749,31 @@ def resource_delete(resource_id):
             conn.close()
     return
 
-def financial_add(bplan_id, financial_year, financial_sales, financial_profit ):
+def financial_add(bplan_id, financial_year, financial_sales, financial_profit):
+    """
+    Add financial record with growth_reason support.
+    """
     conn = None
-    try:      
+    try:
         db_params = config()
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
-         
-        if financial_sales in ('',None): financial_sales = 0
-        if financial_profit in ('',None): financial_profit = 0
-        
-        sql = "INSERT INTO public.buz_financial_history(bplan_id, financial_year, financial_sales, financial_profit) VALUES ({}, '{}', {}, {});".format(bplan_id, financial_year, financial_sales, financial_profit)
-        cur.execute(sql)
 
-        cur.close()       
+        if financial_sales in ('', None):
+            financial_sales = 0
+        if financial_profit in ('', None):
+            financial_profit = 0
+
+        sql = """
+            INSERT INTO public.buz_financial_history(
+                bplan_id, financial_year, financial_sales, financial_profit, growth_reason
+            ) VALUES (%s, %s, %s, %s, NULL);
+        """
+        cur.execute(sql, (bplan_id, financial_year, int(financial_sales), int(financial_profit)))
+
+        cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        return ("*", error )
+        return ("*", error)
     finally:
         if conn is not None:
             conn.commit()
@@ -1636,31 +1802,108 @@ def financial_delete(financial_id):
             conn.close()
     return
 
-
-def get_buz_financial(bplan_id):
+def financial_update(financial_id, financial_sales, financial_profit, growth_reason):
+    """
+    NEW: Update financial record (for inline editing).
+    """
     conn = None
-    try:   
-        db_params = config()    
+    try:
+        db_params = config()
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
 
-        sql = "select * from public.buz_financial_history where bplan_id ={};".format(bplan_id)
-        cur.execute(sql)
+        if financial_sales in ('', None):
+            financial_sales = 0
+        if financial_profit in ('', None):
+            financial_profit = 0
+
+        sql = """
+            UPDATE public.buz_financial_history 
+            SET financial_sales = %s, financial_profit = %s, growth_reason = %s
+            WHERE financial_id = %s;
+        """
+        cur.execute(sql, (int(financial_sales), int(financial_profit), growth_reason, financial_id))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(f"Error updating financial record: {error}")
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return
+
+def generate_financial_years(bplan_id, start_year, end_year):
+    """
+    NEW: Auto-generate financial years based on establishment date.
+    Only creates years that don't already exist.
+    """
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        # Get existing years
+        sql = "SELECT financial_year FROM public.buz_financial_history WHERE bplan_id = %s;"
+        cur.execute(sql, (bplan_id,))
+        existing_years = [row[0] for row in cur.fetchall()]
+
+        # Insert missing years
+        for year in range(start_year, end_year + 1):
+            year_str = str(year)
+            if year_str not in existing_years:
+                sql = """
+                    INSERT INTO public.buz_financial_history(
+                        bplan_id, financial_year, financial_sales, financial_profit, growth_reason
+                    ) VALUES (%s, %s, 0, 0, NULL);
+                """
+                cur.execute(sql, (bplan_id, year_str))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(f"Error generating financial years: {error}")
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return
+
+
+def get_buz_financial(bplan_id):
+    """
+    UPDATED: Now includes growth_reason and orders by year.
+    """
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        sql = """
+            SELECT * FROM public.buz_financial_history 
+            WHERE bplan_id = %s 
+            ORDER BY financial_year ASC;
+        """
+        cur.execute(sql, (bplan_id,))
 
         columns = [column[0] for column in cur.description]
         results = []
 
         for row in cur.fetchall():
             result = dict(zip(columns, row))
-            results.append (result)
+            results.append(result)
 
-        cur.close()       
+        cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        return ("*", error )
+        return ("*", error)
     finally:
         if conn is not None:
             conn.close()
     return (results, "")
+
 
 def get_buz_other_resource(bplan_id):
     conn = None
@@ -5561,6 +5804,9 @@ def index():
 
 
 
+
+
+
 @blueprint.route('/set-language/<lang>')
 @login_required  # Add this if you want it protected
 def set_language(lang):
@@ -5637,6 +5883,22 @@ def clientprofile(bplan_id):
             if is_ajax:
                 return _render_clientprofile_page(bplan_id)
 
+        # --- INLINE UPDATE (for editable table cells) ---
+        if request.form.get('inline_update'):
+            table = request.form.get('table')
+            item_id = request.form.get('id')
+            field = request.form.get('field')
+            value = request.form.get('value')
+
+            if table == 'experience':
+                experience_update(item_id, field, value)
+            elif table == 'partner':
+                partner_update(item_id, field, value)
+            elif table == 'expense':
+                expense_update(item_id, field, value)
+
+            if is_ajax:
+                return jsonify({'success': True})
         # ============================================================
         # TABLE OPERATIONS (AJAX) - Handle these and return page
         # ============================================================
@@ -5683,6 +5945,7 @@ def clientprofile(bplan_id):
             client_profile_expense_delete(request.form.get('expense_delete'))
             if is_ajax:
                 return _render_clientprofile_page(bplan_id)
+
 
         # --- Expenses ADD ---
         if request.form.get('expenses_add'):
@@ -5811,73 +6074,127 @@ def _render_clientprofile_page(bplan_id):
 
 @blueprint.route('/business_profile/<bplan_id>', methods=['GET', 'POST'])
 @login_required
-def bussiness_profile(bplan_id):
+def business_profile(bplan_id):
 
     if request.method == 'POST':
         update_bool = False
 
+        # Silent save for AJAX operations (save business info without redirect)
+        if request.form.get('silent_save') == 'true':
+            update_buz_info(
+                request.form.get('buz_address'),
+                request.form.get('buz_est_date'),
+                request.form.get('choice_legal_status'),
+                str(request.form.getlist('choice_business_model')).replace("'", ""),
+                request.form.get('product_services'),
+                bplan_id
+            )
+            # Return success for AJAX
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return '', 200
+
+        # Product/Service operations
         if request.form.get('product_service_add') is not None:
             update_bool = True
             product_service_add(
                 bplan_id,
                 request.form.get('product_service_name'),
-                request.form.get('product_service_description'),
-                request.form.get('product_service_image')  # or file/image handler if applicable
+                request.form.get('product_service_description'),  # This now stores differentiator
+                None  # image placeholder
             )
 
         if request.form.get('product_service_delete') is not None:
             update_bool = True
             delete_product_service(request.form.get('product_service_delete'))
 
-
-        if request.form.get('staff_add') != None:
+        # Staff operations (UPDATED with number_of_staff)
+        if request.form.get('staff_add') is not None:
             update_bool = True
-            staff_add(  request.form.get('staff_add'),
-                        request.form.get('staff_position'),
-                        request.form.get('choice_work_time'),
-                        request.form.get('staff_salary') )
-        if request.form.get('staff_delete') != None:
+            staff_add(
+                request.form.get('staff_add'),
+                request.form.get('staff_position'),
+                request.form.get('number_of_staff'),  # NEW FIELD
+                request.form.get('choice_work_time'),
+                request.form.get('staff_salary')
+            )
+
+        if request.form.get('staff_delete') is not None:
             update_bool = True
             staff_delete(request.form.get('staff_delete'))
-        if request.form.get('resource_add') != None:
+
+        # Resource operations
+        if request.form.get('resource_add') is not None:
             update_bool = True
-            resource_add(   request.form.get('resource_add') ,
-                            request.form.get('choice_type'),
-                            request.form.get('choice_subtype'),
-                            request.form.get('resource_value'))
-        if request.form.get('resource_delete') != None:
+            resource_add(
+                request.form.get('resource_add'),
+                request.form.get('choice_type'),
+                request.form.get('choice_subtype'),
+                request.form.get('resource_value')
+            )
+
+        if request.form.get('resource_delete') is not None:
             update_bool = True
             resource_delete(request.form.get('resource_delete'))
-        if request.form.get('financial_add') != None:
+
+        # Financial History operations
+        if request.form.get('financial_add') is not None:
             update_bool = True
-            financial_add(request.form.get('financial_add'),
-                          request.form.get('financial_year'),
-                          request.form.get('financial_sales'),
-                          request.form.get('financial_profit'))
-        if request.form.get('financial_delete') != None:
+            financial_add(
+                request.form.get('financial_add'),
+                request.form.get('financial_year'),
+                request.form.get('financial_sales'),
+                request.form.get('financial_profit')
+            )
+
+        if request.form.get('financial_delete') is not None:
             update_bool = True
             financial_delete(request.form.get('financial_delete'))
-        if request.form.get('fund_add') != None:
+
+        # NEW: Financial record update (inline editing)
+        if request.form.get('financial_update') is not None:
             update_bool = True
-            other_resource_add(request.form.get('fund_add'),
-                               request.form.get('choice_fund') ,
-                               request.form.get('fund_contribution') )
-        if request.form.get('fund_delete') != None:
+            financial_update(
+                request.form.get('financial_update'),
+                request.form.get('financial_sales'),
+                request.form.get('financial_profit'),
+                request.form.get('growth_reason')  # NEW FIELD
+            )
+
+        # NEW: Generate financial years from establishment date
+        if request.form.get('generate_financial_years') is not None:
+            generate_financial_years(
+                request.form.get('generate_financial_years'),
+                int(request.form.get('start_year')),
+                int(request.form.get('end_year'))
+            )
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return '', 200
+
+        # Funding source operations
+        if request.form.get('fund_add') is not None:
             update_bool = True
-            other_resource_delete(request.form.get('fund_delete') )
+            other_resource_add(
+                request.form.get('fund_add'),
+                request.form.get('choice_fund'),
+                request.form.get('fund_contribution')
+            )
+
+        if request.form.get('fund_delete') is not None:
+            update_bool = True
+            other_resource_delete(request.form.get('fund_delete'))
 
         if update_bool:
-            update_buz_info(    request.form.get('buz_address'),
-                                request.form.get('buz_est_date'),
-                                request.form.get('choice_legal_status'),
-                                str(request.form.getlist('choice_business_model')).replace("'", ""),
-                                request.form.get('product_services'),
-                                bplan_id)
+            update_buz_info(
+                request.form.get('buz_address'),
+                request.form.get('buz_est_date'),
+                request.form.get('choice_legal_status'),
+                str(request.form.getlist('choice_business_model')).replace("'", ""),
+                request.form.get('product_services'),
+                bplan_id
+            )
 
-
-        # ✅ ADD THIS AJAX DETECTION RIGHT BEFORE THE REDIRECT:
+        # AJAX response - return full page for table refresh
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            # Return full page for AJAX requests
             data_completion, status_completion = get_completion(bplan_id)
             data_buz_info, status_buz_info = get_buz_info(bplan_id)
             status_buz_staff, data_buz_staff, data_buz_total_salaries = get_buz_staff(bplan_id)
@@ -5887,29 +6204,34 @@ def bussiness_profile(bplan_id):
             status_buz_product_services, data_buz_product_services = get_product_services(bplan_id)
 
             return render_template('home/businessprofile.html', segment='businessprofile',
-                                   data_comp = data_completion,
-                                   data_bi = data_buz_info,
-                                   data_bs = data_buz_staff,
-                                   data_bs_total = data_buz_total_salaries,
-                                   data_br = data_buz_resource,
-                                   data_br_total = data_buz_total_resources,
-                                   data_fin = data_buz_financial,
-                                   data_bor = data_buz_other_resource,
-                                   data_bps = data_buz_product_services,
-                                   bplan_id = bplan_id)
+                                   data_comp=data_completion,
+                                   data_bi=data_buz_info,
+                                   data_bs=data_buz_staff,
+                                   data_bs_total=data_buz_total_salaries,
+                                   data_br=data_buz_resource,
+                                   data_br_total=data_buz_total_resources,
+                                   data_fin=data_buz_financial,
+                                   data_bor=data_buz_other_resource,
+                                   data_bps=data_buz_product_services,
+                                   bplan_id=bplan_id)
 
+        # Save and continue
         if request.form.get('action') == 'save':
-            update_bplan_completion ('complete_business_profile',bplan_id)
-            update_buz_info(    request.form.get('buz_address'),
-                                request.form.get('buz_est_date'),
-                                request.form.get('choice_legal_status'),
-                                str(request.form.getlist('choice_business_model')).replace("'", ""),
-                                request.form.get('product_services'),
-                                bplan_id)
+            update_bplan_completion('complete_business_profile', bplan_id)
+            update_buz_info(
+                request.form.get('buz_address'),
+                request.form.get('buz_est_date'),
+                request.form.get('choice_legal_status'),
+                str(request.form.getlist('choice_business_model')).replace("'", ""),
+                request.form.get('product_services'),
+                bplan_id
+            )
             return redirect(url_for('home_blueprint.business_premises', bplan_id=bplan_id))
-        # ✅ Redirect after any POST to prevent duplicate insertions on refresh
-        return redirect(url_for('home_blueprint.bussiness_profile', bplan_id=bplan_id))
 
+        # Redirect after POST to prevent duplicate insertions
+        return redirect(url_for('home_blueprint.business_profile', bplan_id=bplan_id))
+
+    # GET request - render page
     data_completion, status_completion = get_completion(bplan_id)
     data_buz_info, status_buz_info = get_buz_info(bplan_id)
     status_buz_staff, data_buz_staff, data_buz_total_salaries = get_buz_staff(bplan_id)
@@ -5919,16 +6241,17 @@ def bussiness_profile(bplan_id):
     status_buz_product_services, data_buz_product_services = get_product_services(bplan_id)
 
     return render_template('home/businessprofile.html', segment='businessprofile',
-                           data_comp = data_completion,
-                           data_bi = data_buz_info,
-                           data_bs = data_buz_staff,
-                           data_bs_total = data_buz_total_salaries,
-                           data_br = data_buz_resource,
-                           data_br_total = data_buz_total_resources,
-                           data_fin = data_buz_financial,
-                           data_bor = data_buz_other_resource,
-                           data_bps=data_buz_product_services,  # <- NEW Youssef
-                           bplan_id = bplan_id)
+                           data_comp=data_completion,
+                           data_bi=data_buz_info,
+                           data_bs=data_buz_staff,
+                           data_bs_total=data_buz_total_salaries,
+                           data_br=data_buz_resource,
+                           data_br_total=data_buz_total_resources,
+                           data_fin=data_buz_financial,
+                           data_bor=data_buz_other_resource,
+                           data_bps=data_buz_product_services,
+                           bplan_id=bplan_id)
+
 
 
 def allowed_doc(filename):

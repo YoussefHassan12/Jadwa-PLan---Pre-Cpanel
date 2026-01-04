@@ -1,1719 +1,1932 @@
 {% extends "layouts/base.html" %}
 
 {% block title %}
-  {% if session.get('lang', 'en') == 'ar' %}
-    الملف التعريفي للأعمال
-  {% else %}
-    Business Profile
-  {% endif %}
+  {% if session.get('lang', 'en') == 'ar' %}الملف التعريفي للأعمال{% else %}Business Profile{% endif %}
 {% endblock %}
 
-<!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #4F7DF3 0%, #1A73E8 100%);
+  --primary-color: #4F7DF3;
+  --primary-dark: #1A73E8;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --info-color: #17c1e8;
+  --surface-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+.profile-page-container { padding: 1.5rem; background: linear-gradient(180deg, #F0F4FF 0%, #FFFFFF 100%); min-height: 100vh; }
+.progress-section { background: white; border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); }
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.progress-label { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.progress-percentage { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); }
+.progress-bar-container { height: 10px; background: #E2E8F0; border-radius: 5px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
+.progress-bar-fill.success { background: var(--success-color); }
+.progress-bar-fill.info { background: var(--info-color); }
+.progress-bar-fill.danger { background: var(--danger-color); }
+.profile-card { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); margin-bottom: 1.5rem; overflow: hidden; }
+.profile-card:hover { box-shadow: var(--shadow-lg); }
+.profile-card-header { background: var(--primary-gradient); padding: 1.25rem 1.5rem; position: relative; }
+.profile-card-header::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; }
+.profile-card-header h5 { color: white; font-size: 1.25rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 0.75rem; }
+.profile-card-body { padding: 1.5rem; }
+.section-title { font-size: 1rem; font-weight: 600; color: var(--primary-color); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid rgba(79, 125, 243, 0.1); display: flex; align-items: center; gap: 0.5rem; }
+.form-group-modern { margin-bottom: 1.25rem; }
+.form-label-modern { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.025em; }
+.form-control-modern { width: 100%; padding: 0.75rem 1rem; font-size: 0.9375rem; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); background: white; color: var(--text-primary); transition: all 0.2s ease; box-sizing: border-box; }
+.form-control-modern:hover { border-color: #CBD5E1; }
+.form-control-modern:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15); }
+select.form-control-modern { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; cursor: pointer; }
+html[dir="rtl"] select.form-control-modern { background-position: left 1rem center; padding-right: 1rem; padding-left: 2.5rem; }
+.add-item-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+.add-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.add-item-title { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
+.add-item-title i { color: var(--primary-color); }
+.btn-add-item { padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; background: var(--primary-gradient); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; gap: 0.375rem; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(79, 125, 243, 0.3); }
+.btn-add-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 125, 243, 0.4); }
+.add-item-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+.data-table-container { background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; }
+.data-table-header { background: var(--surface-color); padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.data-table-title { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
+.data-table-title i { color: var(--primary-color); }
+.data-table-count { background: var(--primary-color); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.625rem; border-radius: 20px; }
+.data-table { width: 100%; margin: 0; border-collapse: collapse; }
+.data-table thead { background: #F1F5F9; }
+.data-table th { padding: 0.875rem 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border: none; text-align: left; }
+.data-table td { padding: 1rem; font-size: 0.875rem; color: var(--text-primary); border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+.data-table tbody tr { transition: all 0.2s ease; }
+.data-table tbody tr:hover { background: rgba(79, 125, 243, 0.04); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+html[dir="rtl"] .data-table th, html[dir="rtl"] .data-table td { text-align: right; }
+.btn-delete-row { width: 32px; height: 32px; border-radius: var(--radius-sm); border: 1px solid #FECACA; background: #FEF2F2; color: var(--danger-color); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.btn-delete-row:hover { background: var(--danger-color); border-color: var(--danger-color); color: white; transform: scale(1.1); }
+.empty-table-state { padding: 3rem 1.5rem; text-align: center; }
+.empty-table-icon { font-size: 48px; color: #CBD5E1; margin-bottom: 1rem; }
+.empty-table-text { font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+.empty-table-hint { font-size: 0.8125rem; color: #94A3B8; }
+.toggle-section { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: var(--surface-color); border-radius: var(--radius-lg); margin-bottom: 1rem; }
+.toggle-switch-wrapper { flex-shrink: 0; padding-top: 0.25rem; }
+.toggle-content { flex: 1; }
+.toggle-label { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem; }
+.toggle-hint { font-size: 0.8125rem; color: var(--text-secondary); }
+.toggle-fields { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); display: none; }
+.toggle-fields.show { display: block; }
+.custom-toggle { position: relative; width: 52px; height: 28px; }
+.custom-toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: 0.3s; border-radius: 28px; }
+.toggle-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+.custom-toggle input:checked + .toggle-slider { background: var(--primary-gradient); }
+.custom-toggle input:checked + .toggle-slider:before { transform: translateX(24px); }
+.badge-modern { padding: 0.375rem 0.75rem; font-size: 0.75rem; font-weight: 600; border-radius: 20px; display: inline-block; }
+.badge-success { background: #D1FAE5; color: #065F46; }
+.badge-info { background: #DBEAFE; color: #1E40AF; }
+.badge-warning { background: #FEF3C7; color: #92400E; }
+.badge-primary { background: rgba(79, 125, 243, 0.15); color: var(--primary-color); }
+.form-actions { display: flex; justify-content: flex-end; gap: 1rem; padding: 1.5rem; background: var(--surface-color); border-top: 1px solid var(--border-color); border-radius: 0 0 var(--radius-xl) var(--radius-xl); align-items: center; }
+.btn-modern { padding: 0.875rem 1.75rem; font-size: 0.9375rem; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease; border: none; }
+.btn-primary-modern { background: var(--primary-gradient); color: white; box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35); }
+.btn-primary-modern:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45); }
+.auto-save-status { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--text-secondary); margin-right: auto; }
+.auto-save-status.saving { color: var(--warning-color); }
+.auto-save-status.saved { color: var(--success-color); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+@media (max-width: 992px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .profile-page-container { padding: 1rem; } }
+.toast-notification { position: fixed; bottom: 20px; right: 20px; z-index: 1060; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; }
+.toast-notification.show { transform: translateY(0); opacity: 1; }
+.toast-notification.success { border-left: 4px solid var(--success-color); }
+.toast-notification.error { border-left: 4px solid var(--danger-color); }
+.toast-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.toast-icon.success { background: #D1FAE5; color: var(--success-color); }
+.toast-icon.error { background: #FEE2E2; color: var(--danger-color); }
+html[dir="rtl"] .toast-notification { right: auto; left: 20px; }
+html[dir="rtl"] .toast-notification.success { border-left: none; border-right: 4px solid var(--success-color); }
+html[dir="rtl"] .toast-notification.error { border-left: none; border-right: 4px solid var(--danger-color); }
+.leave-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
+.leave-modal-overlay.show { display: flex; }
+.leave-modal { background: white; border-radius: var(--radius-xl); padding: 2rem; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+.leave-modal-icon { width: 64px; height: 64px; background: #FEF3C7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
+.leave-modal-icon i { font-size: 32px; color: var(--warning-color); }
+.leave-modal-title { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.75rem; }
+.leave-modal-message { font-size: 0.9375rem; color: var(--text-secondary); margin: 0 0 1.5rem; }
+.leave-modal-actions { display: flex; gap: 0.75rem; justify-content: center; }
+.btn-stay { padding: 0.75rem 1.5rem; background: var(--primary-gradient); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; font-weight: 600; }
+.btn-leave { padding: 0.75rem 1.5rem; background: white; color: var(--text-secondary); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); cursor: pointer; font-weight: 600; }
+.btn-leave:hover { border-color: var(--danger-color); color: var(--danger-color); }
+.address-input-wrapper { position: relative; }
+.address-input-wrapper .form-control-modern { padding-left: 2.5rem; }
+html[dir="rtl"] .address-input-wrapper .form-control-modern { padding-left: 1rem; padding-right: 2.5rem; }
+.address-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 20px; }
+html[dir="rtl"] .address-icon { left: auto; right: 0.75rem; }
+.other-input-container { display: none; margin-top: 0.5rem; }
+.other-input-container.show { display: block; }
+.multi-select-container { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.multi-select-pill { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.25rem; background: var(--surface-color); border: 1.5px solid var(--border-color); border-radius: 25px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease; }
+.multi-select-pill:hover { border-color: var(--primary-color); }
+.multi-select-pill.active { background: var(--primary-gradient); border-color: transparent; color: white; }
+.chart-container { background: var(--surface-color); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1.5rem; }
+.chart-title { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.chart-title i { color: var(--primary-color); }
+#financialChart { max-height: 300px; }
+.editable-input { width: 100%; padding: 0.5rem; border: 1.5px solid transparent; border-radius: var(--radius-sm); background: transparent; font-size: 0.875rem; text-align: center; transition: all 0.2s ease; box-sizing: border-box; }
+.editable-input:hover { background: var(--surface-color); border-color: var(--border-color); }
+.editable-input:focus { outline: none; background: white; border-color: var(--primary-color); }
+.editable-select { width: 100%; padding: 0.5rem; border: 1.5px solid transparent; border-radius: var(--radius-sm); background: transparent; font-size: 0.75rem; cursor: pointer; }
+.editable-select:hover { background: var(--surface-color); border-color: var(--border-color); }
+.contribution-progress { margin-top: 1rem; padding: 1rem; background: var(--surface-color); border-radius: var(--radius-md); }
+.contribution-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.contribution-label { font-size: 0.8125rem; font-weight: 600; color: var(--text-primary); }
+.contribution-value { font-size: 1rem; font-weight: 700; }
+.contribution-value.valid { color: var(--success-color); }
+.contribution-value.invalid { color: var(--danger-color); }
+.contribution-bar { height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden; }
+.contribution-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+.contribution-bar-fill.valid { background: var(--success-color); }
+.contribution-bar-fill.invalid { background: var(--danger-color); }
+.contribution-bar-fill.warning { background: var(--warning-color); }
+.year-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: var(--primary-gradient); color: white; border-radius: 20px; font-size: 0.8125rem; font-weight: 600; }
+.growth-indicator { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); }
+.growth-indicator.positive { background: #D1FAE5; color: #065F46; }
+.growth-indicator.negative { background: #FEE2E2; color: #991B1B; }
+.growth-indicator.neutral { background: #F1F5F9; color: #64748B; }
+.table-footer-totals { padding: 1rem 1.25rem; background: #F0FDF4; border-top: 1px solid var(--border-color); }
+.total-row { display: flex; justify-content: space-between; align-items: center; }
+.total-label { font-weight: 600; color: var(--text-primary); }
+.total-value { font-size: 1.125rem; font-weight: 700; color: var(--success-color); }
+.staff-count-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; background: rgba(79, 125, 243, 0.15); color: var(--primary-color); border-radius: 12px; font-size: 0.75rem; font-weight: 600; padding: 0 0.5rem; }
+html[dir="rtl"] .section-title, html[dir="rtl"] .add-item-title, html[dir="rtl"] .data-table-title, html[dir="rtl"] .toggle-section, html[dir="rtl"] .btn-modern, html[dir="rtl"] .chart-title { flex-direction: row-reverse; }
+html[dir="rtl"] .form-actions { flex-direction: row-reverse; }
+html[dir="rtl"] .auto-save-status { margin-right: 0; margin-left: auto; }
+
+
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  align-items: center;
+}
+
+.btn-modern {
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary-modern {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.btn-primary-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45);
+}
+
+.btn-primary-modern:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auto-save-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-right: auto;
+}
+
+.auto-save-status i {
+  font-size: 18px;
+}
+
+.auto-save-status.saving {
+  color: var(--warning-color);
+}
+
+.auto-save-status.saving i {
+  animation: spin 1s linear infinite;
+}
+
+.auto-save-status.saved {
+  color: var(--success-color);
+}
+
+.auto-save-status.error {
+  color: var(--danger-color);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* RTL Support */
+html[dir="rtl"] .form-actions {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .auto-save-status {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+html[dir="rtl"] .btn-modern {
+  flex-direction: row-reverse;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock stylesheets %}
 
 {% block content %}
+<div class="profile-page-container">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
 
-<div class="container-fluid pl-5 pt-3">
-  <div class="row">
-    <div class="col-10">
-      <form role="form" method="POST" action="/business_profile/{{ bplan_id }}">
+        <!-- Toast Notification -->
+        <div class="toast-notification" id="toast-notification">
+          <div class="toast-icon" id="toast-icon"><i class="material-icons" id="toast-icon-symbol">check</i></div>
+          <span class="toast-message" id="toast-message"></span>
+        </div>
 
-        <!-- Progress Bar -->
-        <div class="row px-8 pt-0 pb-3">
-          <span class="me-2 text-xxs font-weight-bold">
-            {% if session.get('lang', 'en') == 'ar' %}
-              تم الإكمال بنسبة
-            {% endif %}
-            {{ data_comp[0].completion }}%
-            {% if session.get('lang', 'en') == 'ar' %}
-              من الملف
-            {% else %}
-              Completed
-            {% endif %}
-          </span>
-          <div class="progress">
-            {% if data_comp[0].completion == 100: %}
-            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
-            {% elif data_comp[0].completion >= 50: %}
-              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
-            {% else %}
-              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
-            {% endif %}
+        <!-- Leave Warning Modal -->
+        <div class="leave-modal-overlay" id="leave-modal-overlay">
+          <div class="leave-modal">
+            <div class="leave-modal-icon"><i class="material-icons">warning</i></div>
+            <h4 class="leave-modal-title">{% if session.get('lang', 'en') == 'ar' %}مغادرة الملف التعريفي؟{% else %}Leaving Business Profile?{% endif %}</h4>
+            <p class="leave-modal-message">{% if session.get('lang', 'en') == 'ar' %}التغييرات قد لا يتم حفظها.{% else %}Changes may not be saved.{% endif %}</p>
+            <div class="leave-modal-actions">
+              <button type="button" class="btn-stay" id="btn-stay">{% if session.get('lang', 'en') == 'ar' %}البقاء{% else %}Stay{% endif %}</button>
+              <button type="button" class="btn-leave" id="btn-leave">{% if session.get('lang', 'en') == 'ar' %}مغادرة{% else %}Leave{% endif %}</button>
+            </div>
           </div>
         </div>
 
-        <!-- Business Information Card -->
-        <div class="card my-3">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
-              <h5 class="text-white text-capitalize ps-3 mx-3">
-                {% if session.get('lang', 'en') == 'ar' %}
-                  الملف التعريفي للأعمال
-                {% else %}
-                  Business Profile
-                {% endif %}
-              </h5>
-            </div>
+        <!-- Progress Section -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">{% if session.get('lang', 'en') == 'ar' %}تقدم الملف{% else %}Profile Completion{% endif %}</span>
+            <span class="progress-percentage">{{ data_comp[0].completion }}%</span>
           </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill {% if data_comp[0].completion == 100 %}success{% elif data_comp[0].completion >= 50 %}info{% else %}danger{% endif %}" style="width: {{ data_comp[0].completion }}%;"></div>
+          </div>
+        </div>
 
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-4">
-              {% if session.get('lang', 'en') == 'ar' %}
-                معلومات العمل
-              {% else %}
-                Business Information
-              {% endif %}
-            </h5>
+        <!-- Main Form -->
+        <form id="business-profile-form" method="POST" action="/business_profile/{{ bplan_id }}">
+          <input type="hidden" name="action" value="">
 
-            <!-- 1st Row -->
-            <div class="row">
-              <div class="col">
-                <div class="input-group input-group-static mb-4">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      العنوان
-                    {% else %}
-                      Address
-                    {% endif %}
-                  </label>
+          <!-- BUSINESS INFORMATION CARD -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <h5><i class="material-icons">business</i>{% if session.get('lang', 'en') == 'ar' %}الملف التعريفي للأعمال{% else %}Business Profile{% endif %}</h5>
+            </div>
+            <div class="profile-card-body">
+              <h6 class="section-title"><i class="material-icons">info</i>{% if session.get('lang', 'en') == 'ar' %}معلومات العمل{% else %}Business Information{% endif %}</h6>
+              <div class="grid-3">
+                <div class="form-group-modern">
+                  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}العنوان{% else %}Address{% endif %}</label>
+                  <div class="address-input-wrapper">
+                    <i class="material-icons address-icon">location_on</i>
+                    <input class="form-control-modern" type="text" name="buz_address" id="buz_address" value="{{ data_bi[0].buz_address if data_bi[0].buz_address else '' }}" placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل العنوان{% else %}Enter address{% endif %}" onchange="markUnsaved()" autocomplete="off"/>
+                  </div>
                 </div>
-                <div class="input-group input-group-static mb-0">
-                  <input class="form-control" type="text" name="buz_address" value="{{ data_bi[0].buz_address }}" autocomplete="off">
+                <div class="form-group-modern">
+                  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}تاريخ التأسيس{% else %}Establishment Date{% endif %}</label>
+                  <input class="form-control-modern" type="date" name="buz_est_date" id="buz_est_date" value="{{ data_bi[0].buz_est_date.strftime('%Y-%m-%d') if data_bi[0].buz_est_date else '' }}" onchange="markUnsaved(); generateFinancialYears();"/>
                 </div>
-              </div>
-
-              <div class="col">
-                <div class="input-group input-group-static mb-3">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      تاريخ التأسيس
-                    {% else %}
-                      Establishment Date
-                    {% endif %}
-                  </label>
-                </div>
-                <div class="input-group input-group-static mb-0">
-                  <input class="multisteps-form__input form-control" type="date" name="buz_est_date" value="{{ data_bi[0].buz_est_date.strftime('%Y-%m-%d') }}"/>
-                </div>
-              </div>
-
-              <div class="col">
-                <div class="input-group input-group-static mb-4">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      الوضع القانوني
-                    {% else %}
-                      Legal Status
-                    {% endif %}
-                  </label>
-                </div>
-                <div class="input-group input-group-static mb-0">
-                  <select class="multisteps-form__input form-control" name="choice_legal_status" id="choice_legal_status">
-                    <option value="1" {% if data_bi[0].buz_legal_status == 1 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}ملكية فردية{% else %}Sole proprietorship{% endif %}
-                    </option>
-                    <option value="2" {% if data_bi[0].buz_legal_status == 2 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}شركة ذات مسؤولية محدودة{% else %}Limited Liability Company{% endif %}
-                    </option>
-                    <option value="3" {% if data_bi[0].buz_legal_status == 3 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}شركة مساهمة{% else %}Joint Stock Company{% endif %}
-                    </option>
-                    <option value="4" {% if data_bi[0].buz_legal_status == 4 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}شركة خارجية{% else %}OffShore{% endif %}
-                    </option>
-                    <option value="5" {% if data_bi[0].buz_legal_status == 5 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}مؤسسة اجتماعية{% else %}Social Enterprise{% endif %}
-                    </option>
-                    <option value="6" {% if data_bi[0].buz_legal_status == 6 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}غير ربحي{% else %}Non Profit{% endif %}
-                    </option>
-                    <option value="7" {% if data_bi[0].buz_legal_status == 7 %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}غير مسجل{% else %}Non-Registered{% endif %}
-                    </option>
+                <div class="form-group-modern">
+                  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الوضع القانوني{% else %}Legal Status{% endif %}</label>
+                  <select class="form-control-modern" name="choice_legal_status" onchange="markUnsaved()">
+                    <option value="1" {% if data_bi[0].buz_legal_status == 1 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}ملكية فردية{% else %}Sole Proprietorship{% endif %}</option>
+                    <option value="2" {% if data_bi[0].buz_legal_status == 2 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}شركة ذات مسؤولية محدودة{% else %}LLC{% endif %}</option>
+                    <option value="3" {% if data_bi[0].buz_legal_status == 3 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}شركة مساهمة{% else %}Joint Stock{% endif %}</option>
+                    <option value="4" {% if data_bi[0].buz_legal_status == 4 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}خارجية{% else %}Offshore{% endif %}</option>
+                    <option value="5" {% if data_bi[0].buz_legal_status == 5 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}مؤسسة اجتماعية{% else %}Social Enterprise{% endif %}</option>
+                    <option value="6" {% if data_bi[0].buz_legal_status == 6 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}غير ربحي{% else %}Non-Profit{% endif %}</option>
+                    <option value="7" {% if data_bi[0].buz_legal_status == 7 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}غير مسجل{% else %}Non-Registered{% endif %}</option>
                   </select>
                 </div>
               </div>
-            </div>
-
-            <!-- 2nd Row -->
-            <div class="row">
-              <div class="col-8">
-                <div class="input-group input-group-static mb-4">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      نموذج عمل عملائك
-                    {% else %}
-                      Your clients business model
-                    {% endif %}
+              <div class="form-group-modern" style="margin-top: 0.5rem;">
+                <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}نموذج العمل{% else %}Business Model{% endif %}</label>
+                <div class="multi-select-container">
+                  <label class="multi-select-pill {% if data_bi[0].buz_model and '1' in data_bi[0].buz_model %}active{% endif %}">
+                    <input type="checkbox" name="choice_business_model" value="1" {% if data_bi[0].buz_model and '1' in data_bi[0].buz_model %}checked{% endif %} style="display:none;" onchange="markUnsaved()">
+                    <i class="material-icons">person</i>B2C
                   </label>
-                </div>
-                <div class="input-group input-group-static mb-0">
-                  <select class="multisteps-form__input form-control" name="choice_business_model" id="choice_business_model" multiple>
-                    <option value="1" {% if "1" in data_bi[0].buz_model %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}عمل لعميل{% else %}Business to Client{% endif %}
-                    </option>
-                    <option value="2" {% if "2" in data_bi[0].buz_model %} selected {% endif %}>
-                      {% if session.get('lang', 'en') == 'ar' %}عمل لعمل{% else %}Business to Business{% endif %}
-                    </option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Products & Services Card -->
-        <div class="card my-3">
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-3">
-              {% if session.get('lang', 'en') == 'ar' %}
-                المنتجات والخدمات
-              {% else %}
-                Products & Services
-              {% endif %}
-            </h5>
-
-            <!-- Add Product/Service Form -->
-            <div class="row">
-              <div class="col">
-                <div class="card card-body bg-gray-100 px-4 py-2">
-                  <!-- 1st Row -->
-                  <div class="row">
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            اسم المنتج/الخدمة
-                          {% else %}
-                            Product/Service Name
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="multisteps-form__input form-control"
-                               type="text"
-                               name="product_service_name"
-                               placeholder=""
-                               autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            الوصف
-                          {% else %}
-                            Description
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="multisteps-form__input form-control"
-                               type="text"
-                               name="product_service_description"
-                               placeholder=""
-                               autocomplete="off">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-1 align-self-end">
-                <button class="btn bg-gradient-info btn-sm"
-                        data-bs-toggle="tooltip"
-                        type="submit"
-                        name="product_service_add"
-                        value="{{ bplan_id }}"
-                        title="{% if session.get('lang', 'en') == 'ar' %}إضافة منتج/خدمة{% else %}Add Product/Service{% endif %}">
-                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
-                </button>
-              </div>
-            </div>
-
-            <br>
-              <!-- Display Existing Product/Services -->
-            <!-- Products & Services Table -->
-            <div class="ajax-table-container" id="products-services-table-container">
-                <div class="ajax-table-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-dark font-weight-bold">
-                            <i class="material-icons me-2">inventory_2</i>
-                            {% if session.get('lang', 'en') == 'ar' %}قائمة المنتجات والخدمات{% else %}Products & Services List{% endif %}
-                        </h6>
-                        <span class="badge bg-dark text-white">{{ data_bps|length }}</span>
-                    </div>
-                </div>
-
-                <div class="ajax-table-body">
-                    <div class="table-responsive">
-                        <table class="table ajax-table align-items-center">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
-                                        {% if session.get('lang', 'en') == 'ar' %}المنتج/الخدمة{% else %}Product/Service{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}الوصف{% else %}Description{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
-                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in data_bps %}
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <div class="d-flex flex-column justify-content-center">
-                                            <h6 class="mb-0 text-sm text-dark font-weight-bold">{{ row.product_service_name }}</h6>
-                                        </div>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <p class="mb-0 text-sm text-muted">{{ row.product_service_description }}</p>
-                                    </td>
-                                    <td class="text-center py-3">
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-product-service-btn"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المنتج/الخدمة{% else %}Delete Product/Service{% endif %}"
-                                                data-item-id="{{ row.product_service_id }}">
-                                            <i class="material-icons text-xs">delete</i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-
-                                {% if not data_bps %}
-                                <tr>
-                                    <td colspan="3" class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="material-icons display-4 text-gray-300 mb-2">inventory_2</i>
-                                            <h6 class="text-gray-500 mb-1">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    لا توجد منتجات أو خدمات مضافة
-                                                {% else %}
-                                                    No products or services added
-                                                {% endif %}
-                                            </h6>
-                                            <p class="text-xs text-gray-400 mb-0">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    ابدأ بإضافة منتجك أو خدمتك الأولى
-                                                {% else %}
-                                                    Start by adding your first product or service
-                                                {% endif %}
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {% if data_bps %}
-                <div class="ajax-table-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p class="text-sm text-muted mb-0">
-                            <i class="material-icons text-xs me-1">info</i>
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                إجمالي المنتجات والخدمات: <strong>{{ data_bps|length }}</strong>
-                            {% else %}
-                                Total products & services: <strong>{{ data_bps|length }}</strong>
-                            {% endif %}
-                        </p>
-                        <small class="text-muted">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                💡 انقر على أيقونة الحذف للإزالة
-                            {% else %}
-                                💡 Click delete icon to remove
-                            {% endif %}
-                        </small>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-          </div>
-        </div>
-
-        <!-- Staff Card -->
-        <div class="card my-3">
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-3">
-              {% if session.get('lang', 'en') == 'ar' %}
-                قائمة الموظفين الحاليين
-              {% else %}
-                List your existing staff
-              {% endif %}
-            </h5>
-
-            <!-- Add Staff Form -->
-            <div class="row">
-              <div class="col">
-                <div class="card card-body bg-gray-100 px-4 py-2">
-                  <!-- 1st Row -->
-                  <div class="row">
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            المنصب
-                          {% else %}
-                            Position
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="form-control" type="text" name="staff_position" placeholder="" autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            وقت العمل
-                          {% else %}
-                            Work Time
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <select class="multisteps-form__input form-control" name="choice_work_time" id="choice_work_time">
-                          <option value="Full time" selected>
-                            {% if session.get('lang', 'en') == 'ar' %}دوام كامل{% else %}Full time{% endif %}
-                          </option>
-                          <option value="Part time">
-                            {% if session.get('lang', 'en') == 'ar' %}دوام جزئي{% else %}Part time{% endif %}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            الراتب الشهري (دولار)
-                          {% else %}
-                            Monthly Salary (USD)
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="multisteps-form__input form-control" type="number" name="staff_salary" placeholder="" autocomplete="off">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-1 align-self-end">
-                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="staff_add" value="{{ bplan_id }}">
-                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
-                </button>
-              </div>
-            </div>
-            <br>
-            <!-- Staff Table -->
-            <div class="ajax-table-container" id="staff-table-container">
-                <div class="ajax-table-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-dark font-weight-bold">
-                            <i class="material-icons me-2">groups</i>
-                            {% if session.get('lang', 'en') == 'ar' %}قائمة الموظفين{% else %}Staff List{% endif %}
-                        </h6>
-                        <span class="badge bg-dark text-white">{{ data_bs|length }}</span>
-                    </div>
-                </div>
-
-                <div class="ajax-table-body">
-                    <div class="table-responsive">
-                        <table class="table ajax-table align-items-center">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
-                                        {% if session.get('lang', 'en') == 'ar' %}المنصب{% else %}Position{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}وقت العمل{% else %}Work Time{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}الراتب الشهري{% else %}Monthly Salary{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}المجموع (سنوي){% else %}Total (Yearly){% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
-                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in data_bs %}
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <h6 class="mb-0 text-sm text-dark">{{ row.staff_position }}</h6>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <span class="badge {% if row.work_time == 'Full time' %}bg-info{% else %}bg-warning{% endif %} text-white">
-                                            {% if session.get('lang', 'en') == 'ar' %}
-                                                {% if row.work_time == 'Full time' %}دوام كامل
-                                                {% elif row.work_time == 'Part time' %}دوام جزئي
-                                                {% else %}{{ row.work_time }}{% endif %}
-                                            {% else %}
-                                                {{ row.work_time }}
-                                            {% endif %}
-                                        </span>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <p class="text-sm font-weight-bold text-dark mb-0">{{ "${:,}".format(row.staff_salary) }}</p>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <p class="text-sm font-weight-bold text-success mb-0">{{ "${:,}".format(row.total_salary) }}</p>
-                                    </td>
-                                    <td class="text-center py-3">
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-staff-btn"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف الموظف{% else %}Delete Staff{% endif %}"
-                                                data-item-id="{{ row.staff_id }}">
-                                            <i class="material-icons text-xs">delete</i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-
-                                {% if not data_bs %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="material-icons display-4 text-gray-300 mb-2">groups</i>
-                                            <h6 class="text-gray-500 mb-1">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    لا توجد موظفين مضافين
-                                                {% else %}
-                                                    No staff members added
-                                                {% endif %}
-                                            </h6>
-                                            <p class="text-xs text-gray-400 mb-0">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    ابدأ بإضافة موظفك الأول
-                                                {% else %}
-                                                    Start by adding your first staff member
-                                                {% endif %}
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {% if data_bs %}
-                <div class="ajax-table-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p class="text-sm text-muted mb-0">
-                            <i class="material-icons text-xs me-1">calculate</i>
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                إجمالي الرواتب السنوية: <strong class="text-success">{{ "${:,}".format(data_bs_total) }}</strong>
-                            {% else %}
-                                Total yearly salaries: <strong class="text-success">{{ "${:,}".format(data_bs_total) }}</strong>
-                            {% endif %}
-                        </p>
-                        <small class="text-muted">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                💡 انقر على أيقونة الحذف للإزالة
-                            {% else %}
-                                💡 Click delete icon to remove
-                            {% endif %}
-                        </small>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-          </div>
-        </div>
-
-        <!-- Resources Card -->
-        <div class="card my-3">
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-3">
-              {% if session.get('lang', 'en') == 'ar' %}
-                قائمة الموارد الحالية
-              {% else %}
-                List your existing resources
-              {% endif %}
-            </h5>
-
-            <!-- Add Resource Form -->
-            <div class="row">
-              <div class="col">
-                <div class="card card-body bg-gray-100 px-4 py-2">
-                  <!-- 1st Row -->
-                  <div class="row">
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            النوع
-                          {% else %}
-                            Type
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <select class="multisteps-form__input form-control" name="choice_type" id="choice_type" onchange="populate(this.id,'choice_subtype')">
-                          <option value="" disabled selected>
-                            {% if session.get('lang', 'en') == 'ar' %}-- اختر الصنف --{% else %}-- Choose Industry --{% endif %}
-                          </option>
-                          <option value="Assets">
-                            {% if session.get('lang', 'en') == 'ar' %}الأصول{% else %}Assets{% endif %}
-                          </option>
-                          <option value="Human Resouces">
-                            {% if session.get('lang', 'en') == 'ar' %}الموارد البشرية{% else %}Human Resources{% endif %}
-                          </option>
-                          <option value="Financial Resources">
-                            {% if session.get('lang', 'en') == 'ar' %}الموارد المالية{% else %}Financial Resources{% endif %}
-                          </option>
-                          <option value="Intellectual Property">
-                            {% if session.get('lang', 'en') == 'ar' %}الملكية الفكرية{% else %}Intellectual Property{% endif %}
-                          </option>
-                          <option value="Information Technology">
-                            {% if session.get('lang', 'en') == 'ar' %}تكنولوجيا المعلومات{% else %}Information Technology{% endif %}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            النوع الفرعي
-                          {% else %}
-                            Subtype
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <select class="form-control" name="choice_subtype" id="choice_subtype">
-                          <option value=""></option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            قيمة المورد
-                          {% else %}
-                            Resource Value
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="form-control" type="number" name="resource_value" placeholder="" autocomplete="off">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-1 align-self-end">
-                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="resource_add" value="{{ bplan_id }}">
-                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
-                </button>
-              </div>
-            </div>
-
-            <br>
-            <!-- Resources Table -->
-            <div class="ajax-table-container" id="resources-table-container">
-                <div class="ajax-table-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-dark font-weight-bold">
-                            <i class="material-icons me-2">business_center</i>
-                            {% if session.get('lang', 'en') == 'ar' %}قائمة الموارد{% else %}Resources List{% endif %}
-                        </h6>
-                        <span class="badge bg-dark text-white">{{ data_br|length }}</span>
-                    </div>
-                </div>
-
-                <div class="ajax-table-body">
-                    <div class="table-responsive">
-                        <table class="table ajax-table align-items-center">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
-                                        {% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}النوع الفرعي{% else %}Subtype{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}قيمة المورد{% else %}Resource Value{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
-                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in data_br %}
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <h6 class="mb-0 text-sm text-dark">
-                                            {% if session.get('lang', 'en') == 'ar' %}
-                                                {% if row.resource_type == 'Assets' %}الأصول
-                                                {% elif row.resource_type == 'Human Resouces' %}الموارد البشرية
-                                                {% elif row.resource_type == 'Financial Resources' %}الموارد المالية
-                                                {% elif row.resource_type == 'Intellectual Property' %}الملكية الفكرية
-                                                {% elif row.resource_type == 'Information Technology' %}تكنولوجيا المعلومات
-                                                {% else %}{{ row.resource_type }}{% endif %}
-                                            {% else %}
-                                                {{ row.resource_type }}
-                                            {% endif %}
-                                        </h6>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <h6 class="mb-0 text-sm text-dark">
-                                            {% if session.get('lang', 'en') == 'ar' %}
-                                                {% if row.resource_subtype == 'Cash' %}نقد
-                                                {% elif row.resource_subtype == 'Bank Account' %}حساب بنكي
-                                                {% elif row.resource_subtype == 'Investments' %}استثمارات
-                                                {% elif row.resource_subtype == 'Real Estate' %}عقارات
-                                                {% elif row.resource_subtype == 'Vehicles' %}مركبات
-                                                {% elif row.resource_subtype == 'Equipment' %}معدات
-                                                {% elif row.resource_subtype == 'Employees' %}موظفين
-                                                {% elif row.resource_subtype == 'Consultants' %}مستشارين
-                                                {% elif row.resource_subtype == 'Patents' %}براءات اختراع
-                                                {% elif row.resource_subtype == 'Trademarks' %}علامات تجارية
-                                                {% elif row.resource_subtype == 'Software' %}برمجيات
-                                                {% elif row.resource_subtype == 'Hardware' %}أجهزة
-                                                {% else %}{{ row.resource_subtype }}{% endif %}
-                                            {% else %}
-                                                {{ row.resource_subtype }}
-                                            {% endif %}
-                                        </h6>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <p class="text-sm font-weight-bold text-success mb-0">{{ "${:,}".format(row.resource_value) }}</p>
-                                    </td>
-                                    <td class="text-center py-3">
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-resource-btn"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف المورد{% else %}Delete Resource{% endif %}"
-                                                data-item-id="{{ row.resource_id }}">
-                                            <i class="material-icons text-xs">delete</i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-
-                                {% if not data_br %}
-                                <tr>
-                                    <td colspan="4" class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="material-icons display-4 text-gray-300 mb-2">business_center</i>
-                                            <h6 class="text-gray-500 mb-1">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    لا توجد موارد مضافة
-                                                {% else %}
-                                                    No resources added
-                                                {% endif %}
-                                            </h6>
-                                            <p class="text-xs text-gray-400 mb-0">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    ابدأ بإضافة موردك الأول
-                                                {% else %}
-                                                    Start by adding your first resource
-                                                {% endif %}
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {% if data_br %}
-                <div class="ajax-table-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p class="text-sm text-muted mb-0">
-                            <i class="material-icons text-xs me-1">calculate</i>
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                القيمة الإجمالية: <strong class="text-success">{{ "${:,}".format(data_br_total) }}</strong>
-                            {% else %}
-                                Total value: <strong class="text-success">{{ "${:,}".format(data_br_total) }}</strong>
-                            {% endif %}
-                        </p>
-                        <small class="text-muted">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                💡 انقر على أيقونة الحذف للإزالة
-                            {% else %}
-                                💡 Click delete icon to remove
-                            {% endif %}
-                        </small>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-          </div>
-        </div>
-
-        <!-- Financial History Card -->
-        <div class="card my-3">
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-3">
-              {% if session.get('lang', 'en') == 'ar' %}
-                السجل المالي
-              {% else %}
-                Financial History
-              {% endif %}
-            </h5>
-
-            <!-- Add Financial History Form -->
-            <div class="row">
-              <div class="col">
-                <div class="card card-body bg-gray-100 px-4 py-2">
-                  <!-- 1st Row -->
-                  <div class="row">
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            السنة
-                          {% else %}
-                            Year
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="form-control" type="text" name="financial_year" placeholder="" autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            المبيعات
-                          {% else %}
-                            Sales
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="form-control" type="number" name="financial_sales" placeholder="" autocomplete="off">
-                      </div>
-                    </div>
-
-                    <div class="col">
-                      <div class="input-group input-group-static mb-4">
-                        <label class="form-label text-dark">
-                          {% if session.get('lang', 'en') == 'ar' %}
-                            الربح
-                          {% else %}
-                            Profit
-                          {% endif %}
-                        </label>
-                      </div>
-                      <div class="input-group input-group-static mb-0">
-                        <input class="form-control" type="number" name="financial_profit" placeholder="" autocomplete="off">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-1 align-self-end">
-                <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="financial_add" value="{{ bplan_id }}">
-                  {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
-                </button>
-              </div>
-            </div>
-
-            <br>
-            <!-- Financial History Table -->
-            <div class="ajax-table-container" id="financial-history-table-container">
-                <div class="ajax-table-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-dark font-weight-bold">
-                            <i class="material-icons me-2">trending_up</i>
-                            {% if session.get('lang', 'en') == 'ar' %}السجل المالي{% else %}Financial History{% endif %}
-                        </h6>
-                        <span class="badge bg-dark text-white">{{ data_fin|length }}</span>
-                    </div>
-                </div>
-
-                <div class="ajax-table-body">
-                    <div class="table-responsive">
-                        <table class="table ajax-table align-items-center">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
-                                        {% if session.get('lang', 'en') == 'ar' %}السنة{% else %}Year{% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}المبيعات (دولار){% else %}Sales (USD){% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                        {% if session.get('lang', 'en') == 'ar' %}الربح (دولار){% else %}Profit (USD){% endif %}
-                                    </th>
-                                    <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
-                                        {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in data_fin %}
-                                <tr>
-                                    <td class="ps-4 py-3">
-                                        <h6 class="mb-0 text-sm text-dark font-weight-bold">{{ row.financial_year }}</h6>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <p class="text-sm font-weight-bold text-info mb-0">{{ "${:,}".format(row.financial_sales) }}</p>
-                                    </td>
-                                    <td class="ps-3 py-3">
-                                        <p class="text-sm font-weight-bold text-success mb-0">{{ "${:,}".format(row.financial_profit) }}</p>
-                                    </td>
-                                    <td class="text-center py-3">
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-financial-btn"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف السجل المالي{% else %}Delete Financial Record{% endif %}"
-                                                data-item-id="{{ row.financial_id }}">
-                                            <i class="material-icons text-xs">delete</i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-
-                                {% if not data_fin %}
-                                <tr>
-                                    <td colspan="4" class="text-center py-4">
-                                        <div class="text-muted">
-                                            <i class="material-icons display-4 text-gray-300 mb-2">trending_up</i>
-                                            <h6 class="text-gray-500 mb-1">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    لا توجد سجلات مالية
-                                                {% else %}
-                                                    No financial records
-                                                {% endif %}
-                                            </h6>
-                                            <p class="text-xs text-gray-400 mb-0">
-                                                {% if session.get('lang', 'en') == 'ar' %}
-                                                    ابدأ بإضافة سجلك المالي الأول
-                                                {% else %}
-                                                    Start by adding your first financial record
-                                                {% endif %}
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                {% if data_fin %}
-                <div class="ajax-table-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p class="text-sm text-muted mb-0">
-                            <i class="material-icons text-xs me-1">history</i>
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                إجمالي السجلات: <strong>{{ data_fin|length }}</strong>
-                            {% else %}
-                                Total records: <strong>{{ data_fin|length }}</strong>
-                            {% endif %}
-                        </p>
-                        <small class="text-muted">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                                💡 انقر على أيقونة الحذف للإزالة
-                            {% else %}
-                                💡 Click delete icon to remove
-                            {% endif %}
-                        </small>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-          </div>
-        </div>
-
-        <!-- Source of Fundings Card -->
-        <div class="card my-3">
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-3">
-              {% if session.get('lang', 'en') == 'ar' %}
-                مصادر التمويل
-              {% else %}
-                Source of Fundings
-              {% endif %}
-            </h5>
-
-            <!-- Source of Funds Toggle -->
-            <div class="row">
-              <div class="col mt-3">
-                <div class="form-check form-switch">
-                    {% if data_bor: %}
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheck_funds" name="flexSwitchCheck_funds" data-bs-toggle="collapse" data-bs-target="#collapseFund" aria-expanded="false" checked autocomplete="off">
-                    {% else %}
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheck_funds" name="flexSwitchCheck_funds" data-bs-toggle="collapse" data-bs-target="#collapseFund" aria-expanded="false" autocomplete="off">
-                    {% endif %}
-                  <label class="form-check-label" for="flexSwitchCheck_funds">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      مصادر تمويل أخرى؟
-                    {% else %}
-                      Other source of funds?
-                    {% endif %}
+                  <label class="multi-select-pill {% if data_bi[0].buz_model and '2' in data_bi[0].buz_model %}active{% endif %}">
+                    <input type="checkbox" name="choice_business_model" value="2" {% if data_bi[0].buz_model and '2' in data_bi[0].buz_model %}checked{% endif %} style="display:none;" onchange="markUnsaved()">
+                    <i class="material-icons">business</i>B2B
                   </label>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div class="col-8 mt-3">
-                {% if data_bor: %}
-                    <div class="collapse show" id="collapseFund">
+          <!-- PRODUCTS & SERVICES CARD -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title"><i class="material-icons">inventory_2</i>{% if session.get('lang', 'en') == 'ar' %}المنتجات والخدمات{% else %}Products & Services{% endif %}</h6>
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title"><i class="material-icons">add_circle</i>{% if session.get('lang', 'en') == 'ar' %}إضافة منتج/خدمة{% else %}Add Product/Service{% endif %}</span>
+                  <button type="button" class="btn-add-item" id="btn-add-product-service"><i class="material-icons">add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}</button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern" style="margin-bottom: 0;">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الاسم{% else %}Name{% endif %}</label>
+                    <input class="form-control-modern" type="text" name="product_service_name" id="product_service_name" placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل الاسم{% else %}Enter name{% endif %}" autocomplete="off"/>
+                  </div>
+                  <div class="form-group-modern" style="margin-bottom: 0;">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المميز{% else %}Differentiator{% endif %}</label>
+                    <select class="form-control-modern" name="product_service_differentiator" id="product_service_differentiator" onchange="toggleOtherDifferentiator()">
+                      <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
+                      <option value="Price">{% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price{% endif %}</option>
+                      <option value="Quality">{% if session.get('lang', 'en') == 'ar' %}الجودة{% else %}Quality{% endif %}</option>
+                      <option value="Innovation">{% if session.get('lang', 'en') == 'ar' %}الابتكار{% else %}Innovation{% endif %}</option>
+                      <option value="Customer Service">{% if session.get('lang', 'en') == 'ar' %}خدمة العملاء{% else %}Customer Service{% endif %}</option>
+                      <option value="Speed">{% if session.get('lang', 'en') == 'ar' %}السرعة{% else %}Speed{% endif %}</option>
+                      <option value="Customization">{% if session.get('lang', 'en') == 'ar' %}التخصيص{% else %}Customization{% endif %}</option>
+                      <option value="Brand">{% if session.get('lang', 'en') == 'ar' %}العلامة التجارية{% else %}Brand{% endif %}</option>
+                      <option value="Location">{% if session.get('lang', 'en') == 'ar' %}الموقع{% else %}Location{% endif %}</option>
+                      <option value="Other">{% if session.get('lang', 'en') == 'ar' %}أخرى{% else %}Other{% endif %}</option>
+                    </select>
+                    <div class="other-input-container" id="other-differentiator-container">
+                      <input class="form-control-modern" type="text" name="product_service_differentiator_other" id="product_service_differentiator_other" placeholder="{% if session.get('lang', 'en') == 'ar' %}حدد{% else %}Specify{% endif %}" autocomplete="off"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="data-table-container" id="products-services-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title"><i class="material-icons">list</i>{% if session.get('lang', 'en') == 'ar' %}القائمة{% else %}List{% endif %}</span>
+                  <span class="data-table-count">{{ data_bps|length }}</span>
+                </div>
+                {% if data_bps and data_bps|length > 0 %}
+                <table class="data-table">
+                  <thead><tr><th>{% if session.get('lang', 'en') == 'ar' %}المنتج/الخدمة{% else %}Product/Service{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}المميز{% else %}Differentiator{% endif %}</th><th style="width:80px;text-align:center;">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th></tr></thead>
+                  <tbody id="products-services-tbody">
+                    {% for row in data_bps %}
+                    <tr><td><strong>{{ row.product_service_name }}</strong></td><td><span class="badge-modern badge-info">{{ row.product_service_description or 'N/A' }}</span></td><td style="text-align:center;"><button type="button" class="btn-delete-row delete-product-service-btn" data-item-id="{{ row.product_service_id }}"><i class="material-icons">delete</i></button></td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
                 {% else %}
-                    <div class="collapse" id="collapseFund">
+                <div class="empty-table-state"><i class="material-icons empty-table-icon">inventory_2</i><p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا توجد منتجات{% else %}No products added{% endif %}</p></div>
                 {% endif %}
-                  <div class="card card-body px-4 py-2">
-                    <!-- Add Funding Source Form -->
-                    <div class="row">
-                      <div class="col">
-                        <div class="input-group input-group-static mb-4">
-                          <label class="form-label text-dark">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                              مصدر الأموال؟
-                            {% else %}
-                              Source of the funds?
-                            {% endif %}
-                          </label>
-                        </div>
-                        <div class="input-group input-group-static mb-0">
-                          <select class="form-control" name="choice_fund" id="choice_fund">
-                            <option value="Loan">
-                              {% if session.get('lang', 'en') == 'ar' %}قرض{% else %}Loan{% endif %}
-                            </option>
-                            <option value="Grant">
-                              {% if session.get('lang', 'en') == 'ar' %}منحة{% else %}Grant{% endif %}
-                            </option>
-                            <option value="Investment">
-                              {% if session.get('lang', 'en') == 'ar' %}استثمار{% else %}Investment{% endif %}
-                            </option>
-                          </select>
-                        </div>
-                      </div>
+              </div>
+            </div>
+          </div>
 
-                      <div class="col">
-                        <div class="input-group input-group-static mb-4">
-                          <label class="form-label text-dark">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                              نسبة المساهمة
-                            {% else %}
-                              % of contribution
-                            {% endif %}
-                          </label>
-                        </div>
-                        <div class="input-group input-group-static mb-0">
-                          <input class="form-control" type="number" name="fund_contribution" autocomplete="off">
-                        </div>
-                      </div>
+          <!-- STAFF CARD -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title"><i class="material-icons">groups</i>{% if session.get('lang', 'en') == 'ar' %}الموظفون{% else %}Staff{% endif %}</h6>
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title"><i class="material-icons">person_add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة موظف{% else %}Add Staff{% endif %}</span>
+                  <button type="button" class="btn-add-item" id="btn-add-staff"><i class="material-icons">add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}</button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المنصب{% else %}Position{% endif %}</label><input class="form-control-modern" type="text" name="staff_position" id="staff_position" placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: مدير{% else %}e.g. Manager{% endif %}" autocomplete="off"/></div>
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}عدد الموظفين{% else %}Number of Staff{% endif %}</label><input class="form-control-modern" type="number" name="number_of_staff" id="number_of_staff" value="1" min="1"/></div>
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}نوع العمل{% else %}Work Time{% endif %}</label><select class="form-control-modern" name="choice_work_time" id="choice_work_time"><option value="Full time">{% if session.get('lang', 'en') == 'ar' %}دوام كامل{% else %}Full time{% endif %}</option><option value="Part time">{% if session.get('lang', 'en') == 'ar' %}دوام جزئي{% else %}Part time{% endif %}</option></select></div>
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الراتب الشهري (الإجمالي){% else %}Monthly Salary (Total){% endif %}</label><input class="form-control-modern" type="number" name="staff_salary" id="staff_salary" placeholder="{% if session.get('lang', 'en') == 'ar' %}الإجمالي{% else %}Total{% endif %}"/></div>
+                </div>
+              </div>
+              <div class="data-table-container" id="staff-table-container">
+                <div class="data-table-header"><span class="data-table-title"><i class="material-icons">badge</i>{% if session.get('lang', 'en') == 'ar' %}القائمة{% else %}Staff List{% endif %}</span><span class="data-table-count">{{ data_bs|length }}</span></div>
+                {% if data_bs and data_bs|length > 0 %}
+                <table class="data-table">
+                  <thead><tr><th>{% if session.get('lang', 'en') == 'ar' %}المنصب{% else %}Position{% endif %}</th><th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}العدد{% else %}Count{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}نوع العمل{% else %}Work Time{% endif %}</th><th style="text-align:right;">{% if session.get('lang', 'en') == 'ar' %}الراتب الشهري{% else %}Monthly{% endif %}</th><th style="text-align:right;">{% if session.get('lang', 'en') == 'ar' %}السنوي{% else %}Yearly{% endif %}</th><th style="width:80px;text-align:center;">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th></tr></thead>
+                  <tbody id="staff-tbody">
+                    {% for row in data_bs %}
+                    <tr><td><strong>{{ row.staff_position }}</strong></td><td style="text-align:center;"><span class="staff-count-badge">{{ row.number_of_staff or 1 }}</span></td><td><span class="badge-modern badge-{% if row.work_time == 'Full time' %}success{% else %}warning{% endif %}">{{ row.work_time }}</span></td><td style="text-align:right;">${{ "{:,.0f}".format(row.staff_salary or 0) }}</td><td style="text-align:right;"><strong>${{ "{:,.0f}".format(row.total_salary or 0) }}</strong></td><td style="text-align:center;"><button type="button" class="btn-delete-row delete-staff-btn" data-item-id="{{ row.staff_id }}"><i class="material-icons">delete</i></button></td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="table-footer-totals"><div class="total-row"><span class="total-label">{% if session.get('lang', 'en') == 'ar' %}الإجمالي السنوي{% else %}Total Annual{% endif %}</span><span class="total-value">${{ "{:,.0f}".format(data_bs_total or 0) }}</span></div></div>
+                {% else %}
+                <div class="empty-table-state"><i class="material-icons empty-table-icon">groups</i><p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا يوجد موظفون{% else %}No staff added{% endif %}</p></div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
 
-                      <div class="col-2 align-self-end">
-                        <button class="btn bg-gradient-info btn-sm" data-bs-toggle="tooltip" type="submit" name="fund_add" value="{{ bplan_id }}">
-                          {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+          <!-- RESOURCES CARD -->
+          <div class="profile-card">
+            <div class="profile-card-body">
+              <h6 class="section-title"><i class="material-icons">account_balance</i>{% if session.get('lang', 'en') == 'ar' %}الموارد{% else %}Resources{% endif %}</h6>
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title"><i class="material-icons">add_business</i>{% if session.get('lang', 'en') == 'ar' %}إضافة مورد{% else %}Add Resource{% endif %}</span>
+                  <button type="button" class="btn-add-item" id="btn-add-resource"><i class="material-icons">add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}</button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</label><select class="form-control-modern" name="choice_type" id="choice_type" onchange="populateSubtype()"><option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option><option value="Assets">{% if session.get('lang', 'en') == 'ar' %}الأصول{% else %}Assets{% endif %}</option><option value="Financial Resources">{% if session.get('lang', 'en') == 'ar' %}الموارد المالية{% else %}Financial Resources{% endif %}</option><option value="Intellectual Property">{% if session.get('lang', 'en') == 'ar' %}الملكية الفكرية{% else %}Intellectual Property{% endif %}</option><option value="Information Technology">{% if session.get('lang', 'en') == 'ar' %}تكنولوجيا المعلومات{% else %}Information Technology{% endif %}</option></select></div>
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}النوع الفرعي{% else %}Subtype{% endif %}</label><select class="form-control-modern" name="choice_subtype" id="choice_subtype"><option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر النوع أولاً --{% else %}-- Select Type First --{% endif %}</option></select></div>
+                  <div class="form-group-modern" style="margin-bottom:0;"><label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}القيمة{% else %}Value{% endif %}</label><input class="form-control-modern" type="number" name="resource_value" id="resource_value" placeholder="{% if session.get('lang', 'en') == 'ar' %}القيمة{% else %}Value{% endif %}"/></div>
+                </div>
+              </div>
+              <div class="data-table-container" id="resources-table-container">
+                <div class="data-table-header"><span class="data-table-title"><i class="material-icons">list_alt</i>{% if session.get('lang', 'en') == 'ar' %}القائمة{% else %}Resources List{% endif %}</span><span class="data-table-count">{{ data_br|length }}</span></div>
+                {% if data_br and data_br|length > 0 %}
+                <table class="data-table">
+                  <thead><tr><th>{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</th><th>{% if session.get('lang', 'en') == 'ar' %}النوع الفرعي{% else %}Subtype{% endif %}</th><th style="text-align:right;">{% if session.get('lang', 'en') == 'ar' %}القيمة{% else %}Value{% endif %}</th><th style="width:80px;text-align:center;">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th></tr></thead>
+                  <tbody id="resources-tbody">
+                    {% for row in data_br %}
+                    <tr><td><span class="badge-modern badge-primary">{{ row.resource_type }}</span></td><td><strong>{{ row.resource_subtype }}</strong></td><td style="text-align:right;">${{ "{:,.0f}".format(row.resource_value or 0) }}</td><td style="text-align:center;"><button type="button" class="btn-delete-row delete-resource-btn" data-item-id="{{ row.resource_id }}"><i class="material-icons">delete</i></button></td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="table-footer-totals"><div class="total-row"><span class="total-label">{% if session.get('lang', 'en') == 'ar' %}الإجمالي{% else %}Total{% endif %}</span><span class="total-value">${{ "{:,.0f}".format(data_br_total or 0) }}</span></div></div>
+                {% else %}
+                <div class="empty-table-state"><i class="material-icons empty-table-icon">account_balance</i><p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا توجد موارد{% else %}No resources added{% endif %}</p></div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        <!-- FINANCIAL HISTORY CARD -->
+        <div class="profile-card">
+          <div class="profile-card-body">
+            <h6 class="section-title"><i class="material-icons">trending_up</i>{% if session.get('lang', 'en') == 'ar' %}التاريخ المالي{% else %}Financial History{% endif %}</h6>
+
+            <!-- Toggle -->
+            <div class="toggle-section">
+              <div class="toggle-switch-wrapper">
+                <label class="custom-toggle">
+                  <input type="checkbox" id="toggle_financial" onchange="toggleSection('financial')" {% if data_fin and data_fin|length > 0 %}checked{% endif %}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-content">
+                <div class="toggle-label">{% if session.get('lang', 'en') == 'ar' %}هل لديك تاريخ مالي؟{% else %}Do you have financial history?{% endif %}</div>
+                <div class="toggle-hint">{% if session.get('lang', 'en') == 'ar' %}السنوات تُنشأ تلقائياً من تاريخ التأسيس{% else %}Years are auto-generated from establishment date{% endif %}</div>
+              </div>
+            </div>
+
+            <!-- Financial History Fields -->
+            <div class="toggle-fields {% if data_fin and data_fin|length > 0 %}show{% endif %}" id="financial-fields">
+
+              <!-- Financial History Table -->
+              <div class="data-table-container" id="financial-history-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title"><i class="material-icons">assessment</i>{% if session.get('lang', 'en') == 'ar' %}سجل التاريخ المالي{% else %}Financial History Records{% endif %}</span>
+                  <span class="data-table-count">{{ data_fin|length }}</span>
+                </div>
+                {% if data_fin and data_fin|length > 0 %}
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}السنة{% else %}Year{% endif %}</th>
+                      <th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}المبيعات{% else %}Sales{% endif %}</th>
+                      <th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}الربح{% else %}Profit{% endif %}</th>
+                      <th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}النمو{% else %}Growth{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}السبب{% else %}Reason{% endif %}</th>
+                    </tr>
+                  </thead>
+                  <tbody id="financial-history-tbody">
+                    {% for row in data_fin %}
+                    <tr data-financial-id="{{ row.financial_id }}" data-year="{{ row.financial_year }}" data-index="{{ loop.index0 }}">
+                      <td><span class="year-badge"><i class="material-icons">calendar_today</i>{{ row.financial_year }}</span></td>
+                      <td style="text-align:center;">
+                        <input type="number" class="editable-input financial-sales"
+                               data-financial-id="{{ row.financial_id }}"
+                               value="{{ row.financial_sales or 0 }}"/>
+                      </td>
+                      <td style="text-align:center;">
+                        <input type="number" class="editable-input financial-profit"
+                               data-financial-id="{{ row.financial_id }}"
+                               value="{{ row.financial_profit or 0 }}"/>
+                      </td>
+                      <td class="growth-cell" style="text-align:center;">
+                        <span class="growth-indicator neutral">--</span>
+                      </td>
+                      <td>
+                        <select class="editable-select growth-reason"
+                                data-financial-id="{{ row.financial_id }}"
+                                data-current-value="{{ row.growth_reason or '' }}">
+                          <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
+                        </select>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% else %}
+                <div class="empty-table-state">
+                  <i class="material-icons empty-table-icon">trending_up</i>
+                  <p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا يوجد تاريخ مالي{% else %}No financial history{% endif %}</p>
+                  <p class="empty-table-hint">{% if session.get('lang', 'en') == 'ar' %}حدد تاريخ التأسيس لإنشاء السنوات تلقائياً{% else %}Set establishment date to auto-generate years{% endif %}</p>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Financial Chart -->
+              <div class="chart-container" id="chart-container" style="{% if not data_fin or data_fin|length == 0 %}display:none;{% endif %}">
+                <div class="chart-title"><i class="material-icons">bar_chart</i>{% if session.get('lang', 'en') == 'ar' %}الرسم البياني للأداء المالي{% else %}Financial Performance Chart{% endif %}</div>
+                <canvas id="financialChart"></canvas>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- FUNDING SOURCES CARD -->
+        <div class="profile-card">
+          <div class="profile-card-body">
+            <h6 class="section-title"><i class="material-icons">attach_money</i>{% if session.get('lang', 'en') == 'ar' %}مصادر التمويل{% else %}Funding Sources{% endif %}</h6>
+
+            <!-- Toggle -->
+            <div class="toggle-section">
+              <div class="toggle-switch-wrapper">
+                <label class="custom-toggle">
+                  <input type="checkbox" id="toggle_funds" onchange="toggleSection('funds')" {% if data_bor and data_bor|length > 0 %}checked{% endif %}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-content">
+                <div class="toggle-label">{% if session.get('lang', 'en') == 'ar' %}هل لديك مصادر تمويل؟{% else %}Do you have funding sources?{% endif %}</div>
+                <div class="toggle-hint">{% if session.get('lang', 'en') == 'ar' %}يجب أن يكون مجموع نسب المساهمة 100%{% else %}Total contribution must equal 100%{% endif %}</div>
+              </div>
+            </div>
+
+            <!-- Funding Sources Fields -->
+            <div class="toggle-fields {% if data_bor and data_bor|length > 0 %}show{% endif %}" id="funds-fields">
+
+              <!-- Add Funding Source Form -->
+              <div class="add-item-card">
+                <div class="add-item-header">
+                  <span class="add-item-title"><i class="material-icons">add_card</i>{% if session.get('lang', 'en') == 'ar' %}إضافة مصدر تمويل{% else %}Add Funding Source{% endif %}</span>
+                  <button type="button" class="btn-add-item" id="btn-add-fund"><i class="material-icons">add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}</button>
+                </div>
+                <div class="add-item-fields">
+                  <div class="form-group-modern" style="margin-bottom:0;">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}مصدر التمويل{% else %}Funding Source{% endif %}</label>
+                    <select class="form-control-modern" name="choice_fund" id="choice_fund">
+                      <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
+                      <optgroup label="{% if session.get('lang', 'en') == 'ar' %}مصادر شخصية{% else %}Personal Sources{% endif %}">
+                        <option value="Personal Savings">{% if session.get('lang', 'en') == 'ar' %}مدخرات شخصية{% else %}Personal Savings{% endif %}</option>
+                        <option value="Family & Friends">{% if session.get('lang', 'en') == 'ar' %}العائلة والأصدقاء{% else %}Family & Friends{% endif %}</option>
+                      </optgroup>
+                      <optgroup label="{% if session.get('lang', 'en') == 'ar' %}استثمارات خارجية{% else %}External Investments{% endif %}">
+                        <option value="Angel Investor">{% if session.get('lang', 'en') == 'ar' %}مستثمر ملاك{% else %}Angel Investor{% endif %}</option>
+                        <option value="Venture Capital">{% if session.get('lang', 'en') == 'ar' %}رأس مال مخاطر{% else %}Venture Capital{% endif %}</option>
+                        <option value="Private Equity">{% if session.get('lang', 'en') == 'ar' %}ملكية خاصة{% else %}Private Equity{% endif %}</option>
+                        <option value="Crowdfunding">{% if session.get('lang', 'en') == 'ar' %}تمويل جماعي{% else %}Crowdfunding{% endif %}</option>
+                      </optgroup>
+                      <optgroup label="{% if session.get('lang', 'en') == 'ar' %}قروض{% else %}Loans{% endif %}">
+                        <option value="Bank Loan">{% if session.get('lang', 'en') == 'ar' %}قرض بنكي{% else %}Bank Loan{% endif %}</option>
+                        <option value="Microfinance">{% if session.get('lang', 'en') == 'ar' %}تمويل صغير{% else %}Microfinance{% endif %}</option>
+                      </optgroup>
+                      <optgroup label="{% if session.get('lang', 'en') == 'ar' %}منح ودعم{% else %}Grants & Support{% endif %}">
+                        <option value="Government Grant">{% if session.get('lang', 'en') == 'ar' %}منحة حكومية{% else %}Government Grant{% endif %}</option>
+                        <option value="NGO Grant">{% if session.get('lang', 'en') == 'ar' %}منحة منظمة غير ربحية{% else %}NGO Grant{% endif %}</option>
+                        <option value="Incubator/Accelerator">{% if session.get('lang', 'en') == 'ar' %}حاضنة/مسرعة أعمال{% else %}Incubator/Accelerator{% endif %}</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div class="form-group-modern" style="margin-bottom:0;">
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}نسبة المساهمة (%){% else %}Contribution (%){% endif %}</label>
+                    <input class="form-control-modern" type="number" name="fund_contribution" id="fund_contribution" min="0" max="100" step="0.1" placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: 25{% else %}e.g. 25{% endif %}"/>
+                  </div>
+                </div>
+
+                <!-- Contribution Progress Bar -->
+                <div class="contribution-progress">
+                  <div class="contribution-header">
+                    <span class="contribution-label">{% if session.get('lang', 'en') == 'ar' %}إجمالي المساهمة{% else %}Total Contribution{% endif %}</span>
+                    <span class="contribution-value" id="contribution-value">0%</span>
+                  </div>
+                  <div class="contribution-bar">
+                    <div class="contribution-bar-fill" id="contribution-bar-fill" style="width: 0%;"></div>
+                  </div>
+                  <div class="contribution-message" id="contribution-message" style="margin-top: 0.5rem; font-size: 0.8125rem;"></div>
+                </div>
+              </div>
+
+              <!-- Funding Sources Table -->
+              <div class="data-table-container" id="funding-sources-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title"><i class="material-icons">account_balance_wallet</i>{% if session.get('lang', 'en') == 'ar' %}قائمة مصادر التمويل{% else %}Funding Sources List{% endif %}</span>
+                  <span class="data-table-count">{{ data_bor|length }}</span>
+                </div>
+                {% if data_bor and data_bor|length > 0 %}
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}مصدر التمويل{% else %}Funding Source{% endif %}</th>
+                      <th style="text-align:right;">{% if session.get('lang', 'en') == 'ar' %}نسبة المساهمة{% else %}Contribution{% endif %}</th>
+                      <th style="width:80px;text-align:center;">{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}</th>
+                    </tr>
+                  </thead>
+                  <tbody id="funding-sources-tbody">
+                    {% for row in data_bor %}
+                    <tr data-contribution="{{ row.contribution or 0 }}">
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <i class="material-icons" style="color: var(--primary-color); font-size: 20px;">
+                            {% if row.funds in ['Personal Savings', 'Family & Friends'] %}person{% elif row.funds in ['Bank Loan', 'Microfinance'] %}account_balance{% elif row.funds in ['Government Grant', 'NGO Grant', 'Incubator/Accelerator'] %}card_giftcard{% else %}trending_up{% endif %}
+                          </i>
+                          <strong>{{ row.funds }}</strong>
+                        </div>
+                      </td>
+                      <td style="text-align:right;">
+                        <span class="badge-modern badge-success">{{ row.contribution or 0 }}%</span>
+                      </td>
+                      <td style="text-align:center;">
+                        <button type="button" class="btn-delete-row delete-fund-btn" data-item-id="{{ row.other_resource_id }}">
+                          <i class="material-icons">delete</i>
                         </button>
-                      </div>
-                    </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
 
-                    <br>
-                    <!-- Funding Sources Table -->
-                    <!-- Funding Sources Table -->
-                    <div class="ajax-table-container" id="funding-sources-table-container">
-                        <div class="ajax-table-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0 text-dark font-weight-bold">
-                                    <i class="material-icons me-2">savings</i>
-                                    {% if session.get('lang', 'en') == 'ar' %}مصادر التمويل{% else %}Funding Sources{% endif %}
-                                </h6>
-                                <span class="badge bg-dark text-white">{{ data_bor|length }}</span>
-                            </div>
-                        </div>
-
-                        <div class="ajax-table-body">
-                            <div class="table-responsive">
-                                <table class="table ajax-table align-items-center">
-                                    <thead class="bg-gray-100">
-                                        <tr>
-                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-4">
-                                                {% if session.get('lang', 'en') == 'ar' %}المصدر{% else %}Source{% endif %}
-                                            </th>
-                                            <th class="text-uppercase text-dark text-xs font-weight-bolder ps-3">
-                                                {% if session.get('lang', 'en') == 'ar' %}المساهمة{% else %}Contribution{% endif %}
-                                            </th>
-                                            <th class="text-uppercase text-dark text-xs font-weight-bolder text-center">
-                                                {% if session.get('lang', 'en') == 'ar' %}الإجراء{% else %}Action{% endif %}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for row in data_bor %}
-                                        <tr>
-                                            <td class="ps-4 py-3">
-                                                <h6 class="mb-0 text-sm text-dark">
-                                                    {% if session.get('lang', 'en') == 'ar' %}
-                                                        {% if row.funds == 'Loan' %}قرض
-                                                        {% elif row.funds == 'Grant' %}منحة
-                                                        {% elif row.funds == 'Investment' %}استثمار
-                                                        {% else %}{{ row.funds }}{% endif %}
-                                                    {% else %}
-                                                        {{ row.funds }}
-                                                    {% endif %}
-                                                </h6>
-                                            </td>
-                                            <td class="ps-3 py-3">
-                                                <span class="badge bg-info text-white">
-                                                    {{ row.contribution }}%
-                                                </span>
-                                            </td>
-                                            <td class="text-center py-3">
-                                                <button type="button" class="btn btn-sm btn-outline-danger delete-fund-btn"
-                                                        data-bs-toggle="tooltip"
-                                                        data-bs-original-title="{% if session.get('lang', 'en') == 'ar' %}حذف مصدر التمويل{% else %}Delete Funding Source{% endif %}"
-                                                        data-item-id="{{ row.other_resource_id }}">
-                                                    <i class="material-icons text-xs">delete</i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-
-                                        {% if not data_bor %}
-                                        <tr>
-                                            <td colspan="3" class="text-center py-4">
-                                                <div class="text-muted">
-                                                    <i class="material-icons display-4 text-gray-300 mb-2">savings</i>
-                                                    <h6 class="text-gray-500 mb-1">
-                                                        {% if session.get('lang', 'en') == 'ar' %}
-                                                            لا توجد مصادر تمويل
-                                                        {% else %}
-                                                            No funding sources
-                                                        {% endif %}
-                                                    </h6>
-                                                    <p class="text-xs text-gray-400 mb-0">
-                                                        {% if session.get('lang', 'en') == 'ar' %}
-                                                            ابدأ بإضافة مصدر تمويلك الأول
-                                                        {% else %}
-                                                            Start by adding your first funding source
-                                                        {% endif %}
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {% if data_bor %}
-                        <div class="ajax-table-footer">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="text-sm text-muted mb-0">
-                                    <i class="material-icons text-xs me-1">info</i>
-                                    {% if session.get('lang', 'en') == 'ar' %}
-                                        إجمالي مصادر التمويل: <strong>{{ data_bor|length }}</strong>
-                                    {% else %}
-                                        Total funding sources: <strong>{{ data_bor|length }}</strong>
-                                    {% endif %}
-                                </p>
-                                <small class="text-muted">
-                                    {% if session.get('lang', 'en') == 'ar' %}
-                                        💡 انقر على أيقونة الحذف للإزالة
-                                    {% else %}
-                                        💡 Click delete icon to remove
-                                    {% endif %}
-                                </small>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+                <!-- Total Footer -->
+                <div class="table-footer-totals" id="funding-total-footer">
+                  <div class="total-row">
+                    <span class="total-label">{% if session.get('lang', 'en') == 'ar' %}إجمالي المساهمة{% else %}Total Contribution{% endif %}</span>
+                    <span class="total-value" id="total-contribution-display">0%</span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Save Button -->
-            <div class="button-row d-flex mt-4">
-              <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}" type="submit" name="action" value="save">
-                {% if session.get('lang', 'en') == 'ar' %}
-                  حفظ
                 {% else %}
-                  Save
+                <div class="empty-table-state">
+                  <i class="material-icons empty-table-icon">attach_money</i>
+                  <p class="empty-table-text">{% if session.get('lang', 'en') == 'ar' %}لا توجد مصادر تمويل{% else %}No funding sources added{% endif %}</p>
+                  <p class="empty-table-hint">{% if session.get('lang', 'en') == 'ar' %}أضف مصدر تمويلك الأول{% else %}Add your first funding source above{% endif %}</p>
+                </div>
                 {% endif %}
-              </button>
+              </div>
+
             </div>
           </div>
         </div>
-      </form>
+
+        <!-- FORM ACTIONS - Place this just before </form> -->
+        <div class="profile-card">
+          <div class="form-actions">
+            <div class="auto-save-status" id="auto-save-status">
+              <i class="material-icons">cloud_done</i>
+              <span>{% if session.get('lang', 'en') == 'ar' %}تم الحفظ{% else %}Saved{% endif %}</span>
+            </div>
+            <button type="button" class="btn-modern btn-primary-modern" id="btn-save-continue">
+              <i class="material-icons">check</i>
+              {% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}
+            </button>
+          </div>
+        </div>
+
+        </form>
+      </div>
     </div>
   </div>
 </div>
-
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE -->
 {% block javascripts %}
+<script>
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+const CONFIG = {
+  bplanId: '{{ bplan_id }}',
+  lang: '{{ session.get("lang", "en") }}',
+  isArabic: '{{ session.get("lang", "en") }}' === 'ar'
+};
 
-<script type="text/javascript">
-  function populate(s1, s2) {
-    var s1 = document.getElementById(s1);
-    var s2 = document.getElementById(s2);
-    s2.innerHTML = "";
+let hasUnsavedChanges = false;
+let isSaving = false;
+let financialChart = null;
 
-    if (s1.value == "Assets") {
-      var optionArray = [
-        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
-        '1|{% if session.get("lang", "en") == "ar" %}أرض{% else %}Land{% endif %}',
-        '2|{% if session.get("lang", "en") == "ar" %}مبنى{% else %}Building{% endif %}',
-        '3|{% if session.get("lang", "en") == "ar" %}هنغار{% else %}Hangar{% endif %}',
-        '4|{% if session.get("lang", "en") == "ar" %}آلات{% else %}Machinery{% endif %}',
-        '5|{% if session.get("lang", "en") == "ar" %}معدات{% else %}Equipment{% endif %}',
-        '6|{% if session.get("lang", "en") == "ar" %}مركبات{% else %}Vehicles{% endif %}',
-        '7|{% if session.get("lang", "en") == "ar" %}مخزون{% else %}Inventory{% endif %}',
-        '8|{% if session.get("lang", "en") == "ar" %}أثاث{% else %}Furniture{% endif %}',
-        '9|{% if session.get("lang", "en") == "ar" %}ذمم مدينة{% else %}Accounts Receivables{% endif %}',
-        '10|{% if session.get("lang", "en") == "ar" %}حظيرة{% else %}Barn{% endif %}',
-        '11|{% if session.get("lang", "en") == "ar" %}بيوت بلاستيكية{% else %}Greenhouses{% endif %}',
-        '12|{% if session.get("lang", "en") == "ar" %}نظام ري{% else %}Irrigation System{% endif %}',
-        '13|{% if session.get("lang", "en") == "ar" %}علف{% else %}Feed{% endif %}'
-      ];
-    } else if(s1.value == "Human Resouces") {
-      var optionArray = [
-        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
-        '1|{% if session.get("lang", "en") == "ar" %}موظفون{% else %}Employees{% endif %}',
-        '2|{% if session.get("lang", "en") == "ar" %}عمال{% else %}Workers{% endif %}',
-        '3|{% if session.get("lang", "en") == "ar" %}مدراء تنفيذيون{% else %}Executives{% endif %}'
-      ];
-    } else if(s1.value == "Financial Resources") {
-      var optionArray = [
-        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
-        '1|{% if session.get("lang", "en") == "ar" %}نقد{% else %}Cash{% endif %}',
-        '2|{% if session.get("lang", "en") == "ar" %}حساب بنكي{% else %}Bank Account{% endif %}',
-        '3|{% if session.get("lang", "en") == "ar" %}استثمار{% else %}Investment{% endif %}'
-      ];
-    } else if(s1.value == "Intellectual Property") {
-      var optionArray = [
-        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
-        '1|{% if session.get("lang", "en") == "ar" %}براءة اختراع{% else %}Patent{% endif %}',
-        '2|{% if session.get("lang", "en") == "ar" %}علامة تجارية{% else %}Trademark{% endif %}',
-        '3|{% if session.get("lang", "en") == "ar" %}حقوق نشر{% else %}Copyright{% endif %}',
-        '4|{% if session.get("lang", "en") == "ar" %}سر تجاري{% else %}Trade Secret{% endif %}',
-        '5|{% if session.get("lang", "en") == "ar" %}ترخيص{% else %}License{% endif %}'
-      ];
-    } else if(s1.value == "Information Technology") {
-      var optionArray = [
-        '0|-- {% if session.get("lang", "en") == "ar" %}اختر النوع الفرعي{% else %}Choose Subtype{% endif %} --',
-        '1|{% if session.get("lang", "en") == "ar" %}برمجيات{% else %}Software{% endif %}',
-        '2|{% if session.get("lang", "en") == "ar" %}حواسيب{% else %}Computers{% endif %}',
-        '3|{% if session.get("lang", "en") == "ar" %}بنية تحتية تكنولوجية{% else %}Technology Infrastructure{% endif %}',
-        '4|{% if session.get("lang", "en") == "ar" %}خوادم{% else %}Servers{% endif %}'
-      ];
-    }
+// Growth/Decline reason options
+const GROWTH_REASONS = {
+  growth: [
+    { value: 'market_expansion', en: 'Market Expansion', ar: 'توسع السوق' },
+    { value: 'new_products', en: 'New Products', ar: 'منتجات جديدة' },
+    { value: 'price_increase', en: 'Price Increase', ar: 'زيادة الأسعار' },
+    { value: 'marketing', en: 'Improved Marketing', ar: 'تحسين التسويق' },
+    { value: 'efficiency', en: 'Operational Efficiency', ar: 'كفاءة تشغيلية' }
+  ],
+  decline: [
+    { value: 'competition', en: 'Increased Competition', ar: 'زيادة المنافسة' },
+    { value: 'economic', en: 'Economic Conditions', ar: 'ظروف اقتصادية' },
+    { value: 'cost_increase', en: 'Cost Increase', ar: 'زيادة التكاليف' },
+    { value: 'market_saturation', en: 'Market Saturation', ar: 'تشبع السوق' },
+    { value: 'supply_issues', en: 'Supply Chain Issues', ar: 'مشاكل التوريد' }
+  ]
+};
 
-    for (var option in optionArray) {
-      var pair = optionArray[option].split("|");
-      var newoption = document.createElement("option");
-      newoption.value = pair[1];
-      newoption.innerHTML = pair[1];
-      s2.options.add(newoption);
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+function markUnsaved() {
+  hasUnsavedChanges = true;
+  updateAutoSaveStatus('unsaved');
+}
+
+function markSaved() {
+  hasUnsavedChanges = false;
+  updateAutoSaveStatus('saved');
+}
+
+function updateAutoSaveStatus(status) {
+  const el = document.getElementById('auto-save-status');
+  if (!el) return;
+  const icon = el.querySelector('i');
+  const text = el.querySelector('span');
+  el.classList.remove('saving', 'saved');
+
+  if (status === 'saving') {
+    el.classList.add('saving');
+    icon.textContent = 'sync';
+    text.textContent = CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...';
+  } else if (status === 'saved') {
+    el.classList.add('saved');
+    icon.textContent = 'cloud_done';
+    text.textContent = CONFIG.isArabic ? 'تم الحفظ' : 'Saved';
+  } else {
+    icon.textContent = 'cloud_off';
+    text.textContent = CONFIG.isArabic ? 'غير محفوظ' : 'Unsaved';
+  }
+}
+
+window.onbeforeunload = function(e) {
+  if (hasUnsavedChanges) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+};
+
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast-notification');
+  const icon = document.getElementById('toast-icon');
+  const iconSymbol = document.getElementById('toast-icon-symbol');
+  const messageEl = document.getElementById('toast-message');
+
+  if (!toast) return;
+
+  toast.classList.remove('success', 'error');
+  icon.classList.remove('success', 'error');
+  toast.classList.add(type);
+  icon.classList.add(type);
+  iconSymbol.textContent = type === 'success' ? 'check' : 'error';
+  messageEl.textContent = message;
+  toast.classList.add('show');
+
+  setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+function toggleSection(section) {
+  const fields = document.getElementById(section + '-fields');
+  const toggle = document.getElementById('toggle_' + section);
+  if (toggle && fields) {
+    if (toggle.checked) {
+      fields.classList.add('show');
+    } else {
+      fields.classList.remove('show');
     }
   }
-</script>
-
-<script>
-  // Initialize Choices.js for select elements
-  if (document.getElementById('choice_legal_status')) {
-    var tags = document.getElementById('choice_legal_status');
-    const examples = new Choices(tags, {
-      searchEnabled: false
-    });
-  };
-
-  if (document.getElementById('choice_business_model')) {
-    var tags = document.getElementById('choice_business_model');
-    const examples = new Choices(tags, {
-      searchEnabled: false,
-      removeItemButton: true
-    });
-  };
-
-  if (document.getElementById('choice_position')) {
-    var element = document.getElementById('choice_position');
-    const example = new Choices(element, {
-      searchEnabled: false
-    });
-  };
-
-  if (document.getElementById('choice_work_time')) {
-    var element = document.getElementById('choice_work_time');
-    const example = new Choices(element, {
-      searchEnabled: false
-    });
-  };
-
-  if (document.getElementById('choice_type')) {
-    var element = document.getElementById('choice_type');
-    const example = new Choices(element, {
-      searchEnabled: false
-    });
-  };
-
-  if (document.getElementById('choice_fund')) {
-    var element = document.getElementById('choice_fund');
-    const example = new Choices(element, {
-      searchEnabled: false
-    });
-  };
-</script>
-
-
-
-<!--Tables-->
-<style>
-/* UNIFIED TABLE STYLES - Only affects tables with these classes */
-.ajax-table-container {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease; /* Added container hover */
 }
 
-.ajax-table-container:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+function toggleOtherDifferentiator() {
+  const select = document.getElementById('product_service_differentiator');
+  const container = document.getElementById('other-differentiator-container');
+  if (select && container) {
+    if (select.value === 'Other') {
+      container.classList.add('show');
+    } else {
+      container.classList.remove('show');
+    }
+  }
 }
 
-.ajax-table-header {
-    background: #f8f9fa;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 1rem 1.5rem;
-    transition: all 0.3s ease; /* Added header transition */
+// ============================================================================
+// RESOURCE SUBTYPE POPULATION
+// ============================================================================
+function populateSubtype() {
+  const typeSelect = document.getElementById('choice_type');
+  const subtypeSelect = document.getElementById('choice_subtype');
+  if (!typeSelect || !subtypeSelect) return;
+
+  subtypeSelect.innerHTML = '';
+  const type = typeSelect.value;
+
+  if (!type) {
+    subtypeSelect.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر النوع أولاً --' : '-- Select Type First --') + '</option>';
+    return;
+  }
+
+  let options = [];
+  if (type === 'Assets') {
+    options = [
+      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
+      {value:'Land', label: CONFIG.isArabic ? 'أرض' : 'Land'},
+      {value:'Building', label: CONFIG.isArabic ? 'مبنى' : 'Building'},
+      {value:'Machinery', label: CONFIG.isArabic ? 'آلات' : 'Machinery'},
+      {value:'Equipment', label: CONFIG.isArabic ? 'معدات' : 'Equipment'},
+      {value:'Vehicles', label: CONFIG.isArabic ? 'مركبات' : 'Vehicles'},
+      {value:'Inventory', label: CONFIG.isArabic ? 'مخزون' : 'Inventory'},
+      {value:'Furniture', label: CONFIG.isArabic ? 'أثاث' : 'Furniture'}
+    ];
+  } else if (type === 'Financial Resources') {
+    options = [
+      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
+      {value:'Cash', label: CONFIG.isArabic ? 'نقد' : 'Cash'},
+      {value:'Bank Account', label: CONFIG.isArabic ? 'حساب بنكي' : 'Bank Account'},
+      {value:'Investment', label: CONFIG.isArabic ? 'استثمار' : 'Investment'}
+    ];
+  } else if (type === 'Intellectual Property') {
+    options = [
+      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
+      {value:'Patent', label: CONFIG.isArabic ? 'براءة اختراع' : 'Patent'},
+      {value:'Trademark', label: CONFIG.isArabic ? 'علامة تجارية' : 'Trademark'},
+      {value:'Copyright', label: CONFIG.isArabic ? 'حقوق نشر' : 'Copyright'},
+      {value:'Trade Secret', label: CONFIG.isArabic ? 'سر تجاري' : 'Trade Secret'},
+      {value:'License', label: CONFIG.isArabic ? 'ترخيص' : 'License'}
+    ];
+  } else if (type === 'Information Technology') {
+    options = [
+      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
+      {value:'Software', label: CONFIG.isArabic ? 'برمجيات' : 'Software'},
+      {value:'Computers', label: CONFIG.isArabic ? 'حواسيب' : 'Computers'},
+      {value:'Technology Infrastructure', label: CONFIG.isArabic ? 'بنية تحتية' : 'Tech Infrastructure'},
+      {value:'Servers', label: CONFIG.isArabic ? 'خوادم' : 'Servers'}
+    ];
+  }
+
+  options.forEach(opt => {
+    const option = document.createElement('option');
+    option.value = opt.value;
+    option.textContent = opt.label;
+    subtypeSelect.appendChild(option);
+  });
 }
 
-.ajax-table-body {
-    padding: 0;
+// ============================================================================
+// FINANCIAL HISTORY - AUTO GENERATE YEARS FROM ESTABLISHMENT DATE
+// ============================================================================
+function generateFinancialYears() {
+  const estDateInput = document.getElementById('buz_est_date');
+  if (!estDateInput || !estDateInput.value) return;
+
+  const estDate = new Date(estDateInput.value);
+  const startYear = estDate.getFullYear();
+  const currentYear = new Date().getFullYear();
+
+  // Only generate if establishment date is in the past
+  if (startYear >= currentYear) {
+    showToast(CONFIG.isArabic ? 'تاريخ التأسيس يجب أن يكون في الماضي' : 'Establishment date must be in the past', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('generate_financial_years', CONFIG.bplanId);
+  formData.append('start_year', startYear);
+  formData.append('end_year', currentYear - 1); // Up to last year (not current year)
+
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => {
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تم إنشاء السنوات المالية' : 'Financial years generated');
+      // Reload page to show new years
+      window.location.reload();
+    }
+  })
+  .catch(error => {
+    console.error('Error generating years:', error);
+  });
 }
 
-.ajax-table-footer {
-    background: #f8f9fa;
-    border-top: 1px solid #e2e8f0;
-    padding: 0.75rem 1.5rem;
-}
+// ============================================================================
+// FINANCIAL HISTORY - GROWTH CALCULATION & REASON DROPDOWN
+// ============================================================================
+function calculateGrowthAndUpdateReasons() {
+  const rows = document.querySelectorAll('#financial-history-tbody tr[data-financial-id]');
+  if (!rows || rows.length === 0) return;
 
-.ajax-table {
-    margin-bottom: 0;
-}
+  let previousSales = null;
 
-.ajax-table thead {
-    background: #f1f5f9;
-}
+  rows.forEach((row, index) => {
+    const salesInput = row.querySelector('.financial-sales');
+    const growthCell = row.querySelector('.growth-cell');
+    const reasonSelect = row.querySelector('.growth-reason');
 
-/* Enhanced row hover effects */
-.ajax-table tbody tr {
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-}
+    if (!salesInput || !growthCell || !reasonSelect) return;
 
-.ajax-table tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.04) !important;
-    border-left: 3px solid #007bff;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
+    const currentSales = parseFloat(salesInput.value) || 0;
+    const currentValue = reasonSelect.dataset.currentValue || '';
 
-/* Delete button hover effects */
-.delete-experience-btn,
-.delete-partner-btn,
-.delete-expense-btn {
-    transition: all 0.3s ease !important;
-    border: 1px solid transparent;
-}
+    let growthType = 'neutral';
+    let growthPercent = 0;
 
-.delete-experience-btn:hover,
-.delete-partner-btn:hover,
-.delete-expense-btn:hover {
-    transform: scale(1.15) !important;
-    background-color: #dc3545 !important;
-    border-color: #dc3545 !important;
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
+    if (index === 0 || previousSales === null || previousSales === 0) {
+      growthCell.innerHTML = '<span class="growth-indicator neutral">--</span>';
+      growthType = 'neutral';
+    } else {
+      growthPercent = ((currentSales - previousSales) / Math.abs(previousSales)) * 100;
 
-/* Badge hover effects */
-.ajax-table .badge {
-    transition: all 0.3s ease;
-}
-
-.ajax-table .badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Header badge hover */
-.ajax-table-header .badge {
-    transition: all 0.3s ease;
-}
-
-.ajax-table-header .badge:hover {
-    transform: scale(1.05);
-}
-
-/* Empty state styling */
-.ajax-table-empty {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: #6c757d;
-    transition: all 0.3s ease;
-}
-
-/* Table header hover effects */
-.ajax-table thead th {
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.ajax-table thead th:hover {
-    background-color: #e9ecef;
-    color: #0056b3;
-}
-
-.ajax-table thead th:hover::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, #007bff, #0056b3);
-}
-
-/* Footer hover effects */
-.ajax-table-footer {
-    transition: all 0.3s ease;
-}
-
-.ajax-table-footer:hover {
-    background-color: #e9ecef;
-}
-
-/* Number cells hover */
-.ajax-table td:has(.text-success):hover {
-    background-color: rgba(40, 167, 69, 0.05) !important;
-}
-
-/* Smooth transitions for all interactive elements */
-.ajax-table-container * {
-    transition: all 0.2s ease;
-}
-
-/* Badge styles for tables */
-.table-badge {
-    font-size: 0.7rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.table-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-</style>
-<script>
-// UNIVERSAL AJAX TABLE MANAGEMENT SYSTEM FOR BUSINESS PROFILE
-class BusinessProfileTableManager {
-    constructor() {
-        this.tables = {};
-        this.init();
+      if (growthPercent > 0) {
+        growthCell.innerHTML = '<span class="growth-indicator positive"><i class="material-icons" style="font-size:14px;">trending_up</i> +' + growthPercent.toFixed(1) + '%</span>';
+        growthType = 'growth';
+      } else if (growthPercent < 0) {
+        growthCell.innerHTML = '<span class="growth-indicator negative"><i class="material-icons" style="font-size:14px;">trending_down</i> ' + growthPercent.toFixed(1) + '%</span>';
+        growthType = 'decline';
+      } else {
+        growthCell.innerHTML = '<span class="growth-indicator neutral">0%</span>';
+        growthType = 'neutral';
+      }
     }
 
-    init() {
-        this.registerAllTables();
-        this.setupGlobalListeners();
-    }
+    // Update dropdown options based on growth type
+    updateReasonDropdown(reasonSelect, growthType, currentValue);
 
-    // Register all tables on the page
-    registerAllTables() {
-        // Products & Services Table
-        this.registerTable('products_services', {
-            container: '#products-services-table-container',
-            addButton: 'button[name="product_service_add"]',
-            deleteButton: '.delete-product-service-btn',
-            formFields: [
-                'product_service_name',
-                'product_service_description'
-            ],
-            deleteField: 'product_service_delete'
-        });
+    previousSales = currentSales;
+  });
+}
 
-        // Staff Table
-        this.registerTable('staff', {
-            container: '#staff-table-container',
-            addButton: 'button[name="staff_add"]',
-            deleteButton: '.delete-staff-btn',
-            formFields: [
-                'staff_position',
-                'choice_work_time',
-                'staff_salary'
-            ],
-            deleteField: 'staff_delete'
-        });
+function updateReasonDropdown(selectElement, growthType, currentValue) {
+  if (!selectElement) return;
 
-        // Resources Table
-        this.registerTable('resources', {
-            container: '#resources-table-container',
-            addButton: 'button[name="resource_add"]',
-            deleteButton: '.delete-resource-btn',
-            formFields: [
-                'choice_type',
-                'choice_subtype',
-                'resource_value'
-            ],
-            deleteField: 'resource_delete'
-        });
+  // Clear existing options
+  selectElement.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر --' : '-- Select --') + '</option>';
 
-        // Financial History Table
-        this.registerTable('financial_history', {
-            container: '#financial-history-table-container',
-            addButton: 'button[name="financial_add"]',
-            deleteButton: '.delete-financial-btn',
-            formFields: [
-                'financial_year',
-                'financial_sales',
-                'financial_profit'
-            ],
-            deleteField: 'financial_delete'
-        });
+  let reasons = [];
 
-        // Funding Sources Table
-        this.registerTable('funding_sources', {
-            container: '#funding-sources-table-container',
-            addButton: 'button[name="fund_add"]',
-            deleteButton: '.delete-fund-btn',
-            formFields: [
-                'choice_fund',
-                'fund_contribution'
-            ],
-            deleteField: 'fund_delete'
-        });
-    }
+  if (growthType === 'growth') {
+    reasons = GROWTH_REASONS.growth;
+  } else if (growthType === 'decline') {
+    reasons = GROWTH_REASONS.decline;
+  } else {
+    // For neutral (first year or 0% change), show all options
+    reasons = [...GROWTH_REASONS.growth, ...GROWTH_REASONS.decline];
+  }
 
-    registerTable(name, config) {
-        this.tables[name] = config;
-        this.setupTable(name);
-    }
+  reasons.forEach(reason => {
+    const option = document.createElement('option');
+    option.value = reason.value;
+    option.textContent = CONFIG.isArabic ? reason.ar : reason.en;
+    if (reason.value === currentValue) option.selected = true;
+    selectElement.appendChild(option);
+  });
+}
 
-    setupTable(tableName) {
-        const table = this.tables[tableName];
+// ============================================================================
+// FINANCIAL CHART - LINE CHART
+// ============================================================================
+function initFinancialChart() {
+  const ctx = document.getElementById('financialChart');
+  const chartContainer = document.getElementById('chart-container');
 
-        // Setup add button
-        const addButton = document.querySelector(table.addButton);
-        if (addButton) {
-            addButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleAdd(tableName);
-            });
+  if (!ctx) return;
+
+  const rows = document.querySelectorAll('#financial-history-tbody tr[data-financial-id]');
+
+  if (!rows || rows.length === 0) {
+    if (chartContainer) chartContainer.style.display = 'none';
+    return;
+  }
+
+  if (chartContainer) chartContainer.style.display = 'block';
+
+  const years = [];
+  const sales = [];
+  const profits = [];
+
+  rows.forEach(row => {
+    years.push(row.dataset.year);
+    const salesInput = row.querySelector('.financial-sales');
+    const profitInput = row.querySelector('.financial-profit');
+    sales.push(parseFloat(salesInput?.value) || 0);
+    profits.push(parseFloat(profitInput?.value) || 0);
+  });
+
+  // Destroy existing chart
+  if (financialChart) {
+    financialChart.destroy();
+    financialChart = null;
+  }
+
+  financialChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [
+        {
+          label: CONFIG.isArabic ? 'المبيعات' : 'Sales',
+          data: sales,
+          borderColor: 'rgba(79, 125, 243, 1)',
+          backgroundColor: 'rgba(79, 125, 243, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: 'rgba(79, 125, 243, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        },
+        {
+          label: CONFIG.isArabic ? 'الربح' : 'Profit',
+          data: profits,
+          borderColor: 'rgba(16, 185, 129, 1)',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8
         }
-
-        // Setup delete buttons
-        this.attachDeleteListeners(tableName);
-    }
-
-    // Universal refresh function for any table
-    async refreshTable(tableName) {
-        const table = this.tables[tableName];
-
-        try {
-            const response = await fetch(window.location.href);
-            const html = await response.text();
-
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            const newContainer = doc.querySelector(table.container);
-            if (newContainer) {
-                const currentContainer = document.querySelector(table.container);
-                currentContainer.innerHTML = newContainer.innerHTML;
-                this.attachDeleteListeners(tableName);
-
-                // Reinitialize any dynamic functionality
-                if (tableName === 'resources') {
-                    this.reinitializeResourceDropdowns();
-                }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          titleColor: '#1E293B',
+          bodyColor: '#64748B',
+          borderColor: '#E2E8F0',
+          borderWidth: 1,
+          padding: 12,
+          boxPadding: 6,
+          usePointStyle: true,
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
             }
-        } catch (error) {
-            console.error(`Error refreshing ${tableName} table:`, error);
-            window.location.reload();
+          }
         }
-    }
-
-    // Universal add handler
-    async handleAdd(tableName) {
-        const table = this.tables[tableName];
-        const formData = new FormData();
-
-        // Add the main action
-        const addButton = document.querySelector(table.addButton);
-        formData.append(table.addButton.replace('button[name="', '').replace('"]', ''), addButton.value);
-
-        // Add all form fields
-        table.formFields.forEach(fieldName => {
-            const element = document.querySelector(`[name="${fieldName}"]`);
-            if (element && element.value) {
-                if (element.type === 'select-multiple') {
-                    Array.from(element.selectedOptions).forEach(option => {
-                        formData.append(fieldName, option.value);
-                    });
-                } else {
-                    formData.append(fieldName, element.value);
-                }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            callback: function(value) {
+              return '$' + value.toLocaleString();
             }
-        });
-
-        try {
-            const response = await fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                this.clearFormFields(table.formFields);
-                await this.refreshTable(tableName);
-            } else {
-                throw new Error('Network response was not ok');
-            }
-        } catch (error) {
-            console.error(`Error adding to ${tableName}:`, error);
-            this.showError(`Error adding ${tableName}. Please try again.`);
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
         }
+      }
     }
-
-    // Universal delete handler
-    async handleDelete(tableName, itemId) {
-        const table = this.tables[tableName];
-        const confirmMessage = this.getDeleteMessage(tableName);
-
-        if (confirm(confirmMessage)) {
-            const formData = new FormData();
-            formData.append(table.deleteField, itemId);
-
-            try {
-                const response = await fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    await this.refreshTable(tableName);
-                } else {
-                    throw new Error('Network response was not ok');
-                }
-            } catch (error) {
-                console.error(`Error deleting from ${tableName}:`, error);
-                this.showError(`Error deleting ${tableName}. Please try again.`);
-            }
-        }
-    }
-
-    // Attach delete listeners to a specific table
-    attachDeleteListeners(tableName) {
-        const table = this.tables[tableName];
-        document.querySelectorAll(table.deleteButton).forEach(button => {
-            button.addEventListener('click', () => {
-                const itemId = button.getAttribute('data-item-id');
-                this.handleDelete(tableName, itemId);
-            });
-        });
-    }
-
-    // Utility functions
-    clearFormFields(fieldNames) {
-        fieldNames.forEach(fieldName => {
-            const element = document.querySelector(`[name="${fieldName}"]`);
-            if (element) {
-                if (element.type === 'select-multiple') {
-                    element.selectedIndex = -1;
-                } else if (element.type === 'number') {
-                    element.value = '';
-                } else {
-                    element.value = '';
-                }
-            }
-        });
-    }
-
-    reinitializeResourceDropdowns() {
-        // Reinitialize the resource dropdown functionality
-        if (typeof populate === 'function') {
-            // Reattach the populate function if needed
-            const typeSelect = document.getElementById('choice_type');
-            const subtypeSelect = document.getElementById('choice_subtype');
-            if (typeSelect && subtypeSelect) {
-                typeSelect.onchange = function() {
-                    populate('choice_type', 'choice_subtype');
-                };
-            }
-        }
-    }
-
-    getDeleteMessage(tableName) {
-        const messages = {
-            products_services: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المنتج/الخدمة؟{% else %}Are you sure you want to delete this product/service?{% endif %}",
-            staff: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا الموظف؟{% else %}Are you sure you want to delete this staff member?{% endif %}",
-            resources: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا المورد؟{% else %}Are you sure you want to delete this resource?{% endif %}",
-            financial_history: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف هذا السجل المالي؟{% else %}Are you sure you want to delete this financial record?{% endif %}",
-            funding_sources: "{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من أنك تريد حذف مصدر التمويل هذا؟{% else %}Are you sure you want to delete this funding source?{% endif %}"
-        };
-        return messages[tableName] || "Are you sure you want to delete this item?";
-    }
-
-    showError(message) {
-        alert(message);
-    }
-
-    setupGlobalListeners() {
-        window.addEventListener('error', (e) => {
-            console.error('Global error:', e.error);
-        });
-    }
+  });
 }
 
-// Initialize when DOM is loaded
+// ============================================================================
+// SAVE FINANCIAL RECORD
+// ============================================================================
+function saveFinancialRecord(financialId, sales, profit, reason) {
+  const formData = new FormData();
+  formData.append('financial_update', financialId);
+  formData.append('financial_sales', sales || 0);
+  formData.append('financial_profit', profit || 0);
+  formData.append('growth_reason', reason || '');
+
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('✅ Financial record saved:', financialId);
+      showToast(CONFIG.isArabic ? 'تم الحفظ' : 'Saved');
+    } else {
+      console.error('❌ Failed to save financial record');
+      showToast(CONFIG.isArabic ? 'فشل الحفظ' : 'Save failed', 'error');
+    }
+  })
+  .catch(error => {
+    console.error('❌ Error saving financial record:', error);
+    showToast(CONFIG.isArabic ? 'خطأ' : 'Error', 'error');
+  });
+}
+
+// ============================================================================
+// ATTACH FINANCIAL LISTENERS
+// ============================================================================
+function attachFinancialListeners() {
+  // Sales inputs
+  document.querySelectorAll('.financial-sales').forEach(input => {
+    input.addEventListener('change', function() {
+      const row = this.closest('tr');
+      const financialId = this.dataset.financialId;
+      const profitInput = row.querySelector('.financial-profit');
+      const reasonSelect = row.querySelector('.growth-reason');
+
+      // Recalculate growth for all rows
+      calculateGrowthAndUpdateReasons();
+
+      // Update chart
+      initFinancialChart();
+
+      // Save to database
+      saveFinancialRecord(financialId, this.value, profitInput.value, reasonSelect.value);
+    });
+  });
+
+  // Profit inputs
+  document.querySelectorAll('.financial-profit').forEach(input => {
+    input.addEventListener('change', function() {
+      const row = this.closest('tr');
+      const financialId = this.dataset.financialId;
+      const salesInput = row.querySelector('.financial-sales');
+      const reasonSelect = row.querySelector('.growth-reason');
+
+      // Update chart
+      initFinancialChart();
+
+      // Save to database
+      saveFinancialRecord(financialId, salesInput.value, this.value, reasonSelect.value);
+    });
+  });
+
+  // Reason selects
+  document.querySelectorAll('.growth-reason').forEach(select => {
+    select.addEventListener('change', function() {
+      const row = this.closest('tr');
+      const financialId = this.dataset.financialId;
+      const salesInput = row.querySelector('.financial-sales');
+      const profitInput = row.querySelector('.financial-profit');
+
+      // Update current value for tracking
+      this.dataset.currentValue = this.value;
+
+      // Save to database
+      saveFinancialRecord(financialId, salesInput.value, profitInput.value, this.value);
+    });
+  });
+}
+
+// ============================================================================
+// CONTRIBUTION TRACKING (FUNDING SOURCES) - 100% VALIDATION
+// ============================================================================
+function updateContributionProgress() {
+  const rows = document.querySelectorAll('#funding-sources-tbody tr[data-contribution]');
+  let total = 0;
+
+  rows.forEach(row => {
+    total += parseFloat(row.dataset.contribution) || 0;
+  });
+
+  const valueEl = document.getElementById('contribution-value');
+  const barFill = document.getElementById('contribution-bar-fill');
+  const messageEl = document.getElementById('contribution-message');
+  const totalDisplay = document.getElementById('total-contribution-display');
+
+  // Update progress bar
+  if (valueEl) valueEl.textContent = total.toFixed(1) + '%';
+  if (totalDisplay) totalDisplay.textContent = total.toFixed(1) + '%';
+  if (barFill) barFill.style.width = Math.min(total, 100) + '%';
+
+  // Remove all classes
+  if (valueEl) valueEl.classList.remove('valid', 'invalid');
+  if (totalDisplay) totalDisplay.classList.remove('valid', 'invalid', 'warning');
+  if (barFill) barFill.classList.remove('valid', 'invalid', 'warning');
+
+  // Update styling and message based on total
+  if (total === 100) {
+    // Perfect - exactly 100%
+    if (valueEl) valueEl.classList.add('valid');
+    if (totalDisplay) {
+      totalDisplay.classList.add('valid');
+      totalDisplay.style.color = 'var(--success-color)';
+    }
+    if (barFill) barFill.classList.add('valid');
+    if (messageEl) {
+      messageEl.innerHTML = '<span style="color: var(--success-color);"><i class="material-icons" style="font-size:16px;vertical-align:middle;">check_circle</i> ' + (CONFIG.isArabic ? 'مثالي! المجموع 100%' : 'Perfect! Total is 100%') + '</span>';
+    }
+  } else if (total > 100) {
+    // Over 100% - error
+    if (valueEl) valueEl.classList.add('invalid');
+    if (totalDisplay) {
+      totalDisplay.classList.add('invalid');
+      totalDisplay.style.color = 'var(--danger-color)';
+    }
+    if (barFill) barFill.classList.add('invalid');
+    if (messageEl) {
+      const excess = (total - 100).toFixed(1);
+      messageEl.innerHTML = '<span style="color: var(--danger-color);"><i class="material-icons" style="font-size:16px;vertical-align:middle;">error</i> ' + (CONFIG.isArabic ? 'تجاوز بـ ' + excess + '% - يرجى التعديل' : 'Exceeds by ' + excess + '% - please adjust') + '</span>';
+    }
+  } else {
+    // Under 100% - warning
+    if (valueEl) valueEl.classList.add('invalid');
+    if (totalDisplay) {
+      totalDisplay.classList.add('warning');
+      totalDisplay.style.color = 'var(--warning-color)';
+    }
+    if (barFill) barFill.classList.add('warning');
+    if (messageEl) {
+      const remaining = (100 - total).toFixed(1);
+      messageEl.innerHTML = '<span style="color: var(--warning-color);"><i class="material-icons" style="font-size:16px;vertical-align:middle;">info</i> ' + (CONFIG.isArabic ? 'المتبقي: ' + remaining + '%' : 'Remaining: ' + remaining + '%') + '</span>';
+    }
+  }
+
+  return total;
+}
+
+function validateContribution(newContribution) {
+  const currentTotal = updateContributionProgress();
+  const newTotal = currentTotal + parseFloat(newContribution || 0);
+
+  if (newTotal > 100) {
+    const remaining = (100 - currentTotal).toFixed(1);
+    showToast(
+      CONFIG.isArabic
+        ? 'لا يمكن أن يتجاوز المجموع 100%. المتبقي: ' + remaining + '%'
+        : 'Total cannot exceed 100%. Remaining: ' + remaining + '%',
+      'error'
+    );
+    return false;
+  }
+  return true;
+}
+
+async function addFund() {
+  const fund = document.getElementById('choice_fund')?.value;
+  const contribution = document.getElementById('fund_contribution')?.value;
+
+  if (!fund) {
+    showToast(CONFIG.isArabic ? 'يرجى اختيار مصدر التمويل' : 'Please select funding source', 'error');
+    return;
+  }
+
+  if (!contribution || parseFloat(contribution) <= 0) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال نسبة مساهمة صحيحة' : 'Please enter valid contribution percentage', 'error');
+    return;
+  }
+
+  if (parseFloat(contribution) > 100) {
+    showToast(CONFIG.isArabic ? 'النسبة لا يمكن أن تتجاوز 100%' : 'Percentage cannot exceed 100%', 'error');
+    return;
+  }
+
+  // Validate that adding this won't exceed 100%
+  if (!validateContribution(contribution)) {
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveBusinessInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('fund_add', CONFIG.bplanId);
+  formData.append('choice_fund', fund);
+  formData.append('fund_contribution', contribution);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
+      document.getElementById('choice_fund').value = '';
+      document.getElementById('fund_contribution').value = '';
+      markSaved();
+      await refreshTable('funding-sources-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+// ============================================================================
+// AJAX TABLE REFRESH
+// ============================================================================
+async function refreshTable(tableId) {
+  try {
+    const response = await fetch(window.location.href, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+    if (!response.ok) {
+      window.location.reload();
+      return;
+    }
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newContainer = doc.querySelector('#' + tableId);
+
+    if (newContainer) {
+      document.querySelector('#' + tableId).innerHTML = newContainer.innerHTML;
+      attachDeleteListeners();
+
+      if (tableId === 'financial-history-table-container') {
+        attachFinancialListeners();
+        calculateGrowthAndUpdateReasons();
+        initFinancialChart();
+      }
+
+      if (tableId === 'funding-sources-table-container') {
+        updateContributionProgress();
+      }
+    }
+  } catch (error) {
+    console.error('Error refreshing table:', error);
+    window.location.reload();
+  }
+}
+
+// ============================================================================
+// SAVE BUSINESS INFO SILENTLY
+// ============================================================================
+async function saveBusinessInfoSilently() {
+  const form = document.getElementById('business-profile-form');
+  if (!form) return false;
+
+  const formData = new FormData(form);
+
+  // Remove table-specific fields
+  const fieldsToRemove = [
+    'product_service_name', 'product_service_differentiator', 'product_service_differentiator_other',
+    'staff_position', 'number_of_staff', 'choice_work_time', 'staff_salary',
+    'choice_type', 'choice_subtype', 'resource_value',
+    'choice_fund', 'fund_contribution'
+  ];
+  fieldsToRemove.forEach(field => formData.delete(field));
+
+  formData.append('silent_save', 'true');
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      console.log('✅ Business info saved silently');
+      return true;
+    }
+  } catch (error) {
+    console.error('❌ Error saving business info:', error);
+  }
+  return false;
+}
+
+// ============================================================================
+// ADD OPERATIONS
+// ============================================================================
+async function addProductService() {
+  const nameInput = document.getElementById('product_service_name');
+  const diffSelect = document.getElementById('product_service_differentiator');
+  const diffOther = document.getElementById('product_service_differentiator_other');
+
+  const name = nameInput?.value;
+  let differentiator = diffSelect?.value;
+
+  if (differentiator === 'Other') {
+    differentiator = diffOther?.value;
+  }
+
+  if (!name) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال اسم المنتج/الخدمة' : 'Please enter product/service name', 'error');
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveBusinessInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('product_service_add', CONFIG.bplanId);
+  formData.append('product_service_name', name);
+  formData.append('product_service_description', differentiator || '');
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
+      nameInput.value = '';
+      diffSelect.value = '';
+      if (diffOther) diffOther.value = '';
+      document.getElementById('other-differentiator-container')?.classList.remove('show');
+      markSaved();
+      await refreshTable('products-services-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+async function addStaff() {
+  const position = document.getElementById('staff_position')?.value;
+  const numberOfStaff = document.getElementById('number_of_staff')?.value;
+  const workTime = document.getElementById('choice_work_time')?.value;
+  const salary = document.getElementById('staff_salary')?.value;
+
+  if (!position) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال المنصب' : 'Please enter position', 'error');
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveBusinessInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('staff_add', CONFIG.bplanId);
+  formData.append('staff_position', position);
+  formData.append('number_of_staff', numberOfStaff || 1);
+  formData.append('choice_work_time', workTime || 'Full time');
+  formData.append('staff_salary', salary || 0);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
+      document.getElementById('staff_position').value = '';
+      document.getElementById('number_of_staff').value = '1';
+      document.getElementById('staff_salary').value = '';
+      markSaved();
+      await refreshTable('staff-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+async function addResource() {
+  const type = document.getElementById('choice_type')?.value;
+  const subtype = document.getElementById('choice_subtype')?.value;
+  const value = document.getElementById('resource_value')?.value;
+
+  if (!type) {
+    showToast(CONFIG.isArabic ? 'يرجى اختيار النوع' : 'Please select type', 'error');
+    return;
+  }
+
+  if (!subtype) {
+    showToast(CONFIG.isArabic ? 'يرجى اختيار النوع الفرعي' : 'Please select subtype', 'error');
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveBusinessInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('resource_add', CONFIG.bplanId);
+  formData.append('choice_type', type);
+  formData.append('choice_subtype', subtype);
+  formData.append('resource_value', value || 0);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
+      document.getElementById('choice_type').value = '';
+      document.getElementById('choice_subtype').innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر النوع أولاً --' : '-- Select Type First --') + '</option>';
+      document.getElementById('resource_value').value = '';
+      markSaved();
+      await refreshTable('resources-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+async function addFund() {
+  const fund = document.getElementById('choice_fund')?.value;
+  const contribution = document.getElementById('fund_contribution')?.value;
+
+  if (!fund) {
+    showToast(CONFIG.isArabic ? 'يرجى اختيار مصدر التمويل' : 'Please select funding source', 'error');
+    return;
+  }
+
+  if (!contribution || contribution <= 0) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال نسبة مساهمة صحيحة' : 'Please enter valid contribution percentage', 'error');
+    return;
+  }
+
+  if (!validateContribution(contribution)) {
+    return;
+  }
+
+  if (hasUnsavedChanges) {
+    await saveBusinessInfoSilently();
+  }
+
+  const formData = new FormData();
+  formData.append('fund_add', CONFIG.bplanId);
+  formData.append('choice_fund', fund);
+  formData.append('fund_contribution', contribution);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
+      document.getElementById('choice_fund').value = '';
+      document.getElementById('fund_contribution').value = '';
+      markSaved();
+      await refreshTable('funding-sources-table-container');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+// ============================================================================
+// DELETE OPERATIONS
+// ============================================================================
+async function deleteItem(type, itemId) {
+  const confirmMsg = CONFIG.isArabic ? 'هل أنت متأكد من الحذف؟' : 'Are you sure you want to delete?';
+  if (!confirm(confirmMsg)) return;
+
+  const formData = new FormData();
+  formData.append(type + '_delete', itemId);
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      showToast(CONFIG.isArabic ? 'تم الحذف' : 'Deleted successfully');
+
+      const tableMap = {
+        'product_service': 'products-services-table-container',
+        'staff': 'staff-table-container',
+        'resource': 'resources-table-container',
+        'financial': 'financial-history-table-container',
+        'fund': 'funding-sources-table-container'
+      };
+
+      await refreshTable(tableMap[type]);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.reload();
+  }
+}
+
+function attachDeleteListeners() {
+  document.querySelectorAll('.delete-product-service-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('product_service', btn.dataset.itemId);
+  });
+
+  document.querySelectorAll('.delete-staff-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('staff', btn.dataset.itemId);
+  });
+
+  document.querySelectorAll('.delete-resource-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('resource', btn.dataset.itemId);
+  });
+
+  document.querySelectorAll('.delete-financial-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('financial', btn.dataset.itemId);
+  });
+
+  document.querySelectorAll('.delete-fund-btn').forEach(btn => {
+    btn.onclick = () => deleteItem('fund', btn.dataset.itemId);
+  });
+}
+
+// ============================================================================
+// SAVE & CONTINUE
+// ============================================================================
+async function saveAndContinue() {
+  if (isSaving) return;
+  isSaving = true;
+
+  window.onbeforeunload = null;
+  updateAutoSaveStatus('saving');
+
+  const form = document.getElementById('business-profile-form');
+  const formData = new FormData(form);
+  formData.set('action', 'save');
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else if (response.ok) {
+      markSaved();
+      showToast(CONFIG.isArabic ? 'تم الحفظ بنجاح' : 'Saved successfully');
+      window.location.href = '/business_premises/' + CONFIG.bplanId;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast(CONFIG.isArabic ? 'حدث خطأ' : 'Error occurred', 'error');
+    window.onbeforeunload = function(e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+  } finally {
+    isSaving = false;
+  }
+}
+
+// ============================================================================
+// LEAVE WARNING MODAL
+// ============================================================================
+let pendingNavigationUrl = null;
+
+function showLeaveModal(url) {
+  pendingNavigationUrl = url;
+  document.getElementById('leave-modal-overlay')?.classList.add('show');
+}
+
+function hideLeaveModal() {
+  document.getElementById('leave-modal-overlay')?.classList.remove('show');
+  pendingNavigationUrl = null;
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    window.businessTableManager = new BusinessProfileTableManager();
+  // Multi-select pills
+  document.querySelectorAll('.multi-select-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      const checkbox = this.querySelector('input[type="checkbox"]');
+      checkbox.checked = !checkbox.checked;
+      this.classList.toggle('active', checkbox.checked);
+      markUnsaved();
+    });
+  });
+
+  // Add button listeners
+  document.getElementById('btn-add-product-service')?.addEventListener('click', addProductService);
+  document.getElementById('btn-add-staff')?.addEventListener('click', addStaff);
+  document.getElementById('btn-add-resource')?.addEventListener('click', addResource);
+  document.getElementById('btn-add-fund')?.addEventListener('click', addFund);
+  document.getElementById('btn-save-continue')?.addEventListener('click', saveAndContinue);
+
+  // Delete listeners
+  attachDeleteListeners();
+
+  // Financial listeners
+  attachFinancialListeners();
+
+  // Initialize toggle states
+  if (document.getElementById('toggle_financial')?.checked) {
+    document.getElementById('financial-fields')?.classList.add('show');
+  }
+  if (document.getElementById('toggle_funds')?.checked) {
+    document.getElementById('funds-fields')?.classList.add('show');
+  }
+
+  // Initialize financial section
+  calculateGrowthAndUpdateReasons();
+  initFinancialChart();
+
+  // Initialize contribution progress
+  updateContributionProgress();
+
+  // Leave modal handlers
+  document.getElementById('btn-stay')?.addEventListener('click', hideLeaveModal);
+  document.getElementById('btn-leave')?.addEventListener('click', function() {
+    hasUnsavedChanges = false;
+    window.onbeforeunload = null;
+    if (pendingNavigationUrl) {
+      window.location.href = pendingNavigationUrl;
+    }
+  });
+
+  document.getElementById('leave-modal-overlay')?.addEventListener('click', function(e) {
+    if (e.target === this) hideLeaveModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hideLeaveModal();
+  });
+
+  // Intercept internal links
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.href.startsWith('javascript:') && !link.target) {
+      if (link.href.startsWith(window.location.origin) || link.href.startsWith('/')) {
+        if (hasUnsavedChanges) {
+          e.preventDefault();
+          showLeaveModal(link.href);
+        }
+      }
+    }
+  });
+
+  // RTL support
+  if (CONFIG.isArabic) {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+
+  console.log('✅ Business Profile page initialized');
 });
+
+
+// ============================================================================
+// SAVE & CONTINUE
+// ============================================================================
+async function saveAndContinue() {
+  if (isSaving) return;
+
+  // Check if funding sources total is 100% (if funding section is enabled)
+  const fundingToggle = document.getElementById('toggle_funds');
+  if (fundingToggle && fundingToggle.checked) {
+    const total = updateContributionProgress();
+    if (total !== 100) {
+      showToast(
+        CONFIG.isArabic
+          ? 'يجب أن يكون مجموع مصادر التمويل 100%'
+          : 'Funding sources must total 100%',
+        'error'
+      );
+      return;
+    }
+  }
+
+  isSaving = true;
+
+  // Disable button while saving
+  const saveBtn = document.getElementById('btn-save-continue');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="material-icons">sync</i> ' + (CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...');
+  }
+
+  // Remove beforeunload warning during save
+  window.onbeforeunload = null;
+  updateAutoSaveStatus('saving');
+
+  const form = document.getElementById('business-profile-form');
+  const formData = new FormData(form);
+  formData.set('action', 'save');
+
+  try {
+    const response = await fetch(window.location.href, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.redirected) {
+      window.location.href = response.url;
+    } else if (response.ok) {
+      markSaved();
+      showToast(CONFIG.isArabic ? 'تم الحفظ بنجاح' : 'Saved successfully');
+
+      // Redirect to next page
+      setTimeout(() => {
+        window.location.href = '/business_premises/' + CONFIG.bplanId;
+      }, 500);
+    } else {
+      throw new Error('Save failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast(CONFIG.isArabic ? 'حدث خطأ أثناء الحفظ' : 'Error while saving', 'error');
+    updateAutoSaveStatus('error');
+
+    // Re-enable beforeunload warning
+    window.onbeforeunload = function(e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    // Re-enable button
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="material-icons">check</i> ' + (CONFIG.isArabic ? 'حفظ ومتابعة' : 'Save & Continue');
+    }
+  } finally {
+    isSaving = false;
+  }
+}
+
+// ============================================================================
+// AUTO-SAVE STATUS UPDATE
+// ============================================================================
+function updateAutoSaveStatus(status) {
+  const el = document.getElementById('auto-save-status');
+  if (!el) return;
+
+  const icon = el.querySelector('i');
+  const text = el.querySelector('span');
+
+  el.classList.remove('saving', 'saved', 'error');
+
+  if (status === 'saving') {
+    el.classList.add('saving');
+    icon.textContent = 'sync';
+    text.textContent = CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...';
+  } else if (status === 'saved') {
+    el.classList.add('saved');
+    icon.textContent = 'cloud_done';
+    text.textContent = CONFIG.isArabic ? 'تم الحفظ' : 'Saved';
+  } else if (status === 'error') {
+    el.classList.add('error');
+    icon.textContent = 'cloud_off';
+    text.textContent = CONFIG.isArabic ? 'فشل الحفظ' : 'Save failed';
+  } else {
+    icon.textContent = 'cloud_off';
+    text.textContent = CONFIG.isArabic ? 'غير محفوظ' : 'Unsaved';
+  }
+}
 </script>
-
-
-<style>
- /* Target Arabic language specifically */
-html[lang="ar"] .choices[data-type*="select-one"]:after {
-    display: none !important;
-}
-
-html[lang="ar"] select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-</style>
-
 {% endblock javascripts %}

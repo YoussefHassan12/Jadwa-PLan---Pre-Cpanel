@@ -836,6 +836,120 @@ html[dir="rtl"] .toast-notification.error {
   font-size: 0.875rem;
   color: var(--text-primary);
 }
+
+
+/* Leave Warning Modal */
+.leave-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.leave-modal-overlay.show {
+  display: flex;
+}
+
+.leave-modal {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.leave-modal-icon {
+  width: 64px;
+  height: 64px;
+  background: #FEF3C7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.leave-modal-icon i {
+  font-size: 32px;
+  color: var(--warning-color);
+}
+
+.leave-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.leave-modal-message {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+.leave-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn-stay {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.btn-stay:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45);
+}
+
+.btn-leave {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: white;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-leave:hover {
+  background: var(--surface-color);
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
 </style>
 {% endblock stylesheets %}
 
@@ -845,18 +959,35 @@ html[dir="rtl"] .toast-notification.error {
     <div class="row justify-content-center">
       <div class="col-xl-10 col-lg-11">
 
-        <!-- Unsaved Changes Indicator -->
-        <div class="unsaved-indicator" id="unsaved-indicator">
-          <i class="material-icons">warning</i>
-          <span>{% if session.get('lang', 'en') == 'ar' %}لديك تغييرات غير محفوظة{% else %}You have unsaved changes{% endif %}</span>
-        </div>
-
         <!-- Toast Notification -->
         <div class="toast-notification" id="toast-notification">
           <div class="toast-icon" id="toast-icon">
             <i class="material-icons" id="toast-icon-symbol">check</i>
           </div>
           <span class="toast-message" id="toast-message"></span>
+        </div>
+
+        <!-- Custom Leave Warning Modal -->
+        <div class="leave-modal-overlay" id="leave-modal-overlay">
+          <div class="leave-modal">
+            <div class="leave-modal-icon">
+              <i class="material-icons">warning</i>
+            </div>
+            <h4 class="leave-modal-title">
+              {% if session.get('lang', 'en') == 'ar' %}مغادرة الملف الشخصي للعميل؟{% else %}Leaving Client's Profile?{% endif %}
+            </h4>
+            <p class="leave-modal-message">
+              {% if session.get('lang', 'en') == 'ar' %}التغييرات التي أجريتها قد لا يتم حفظها. تأكد من الحفظ في أسفل الصفحة.{% else %}Changes you made may not be saved. Make sure you save at the bottom of the page.{% endif %}
+            </p>
+            <div class="leave-modal-actions">
+              <button type="button" class="btn-stay" id="btn-stay">
+                {% if session.get('lang', 'en') == 'ar' %}البقاء{% else %}Stay{% endif %}
+              </button>
+              <button type="button" class="btn-leave" id="btn-leave">
+                {% if session.get('lang', 'en') == 'ar' %}مغادرة{% else %}Leave Anyway{% endif %}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Progress Section -->
@@ -1195,7 +1326,7 @@ html[dir="rtl"] .toast-notification.error {
                     </select>
                   </div>
                   <div class="form-group-modern">
-                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الخبرة{% else %}Experience{% endif %}</label>
+                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الخبرة{% else %}Field{% endif %}</label>
                     <input class="form-control-modern" type="text" name="partner_experience" id="partner_experience" autocomplete="off"/>
                   </div>
                   <div class="form-group-modern">
@@ -1530,13 +1661,11 @@ let isSaving = false;
 // ============================================================================
 function markUnsaved() {
   hasUnsavedChanges = true;
-  document.getElementById('unsaved-indicator').classList.add('show');
   updateAutoSaveStatus('unsaved');
 }
 
 function markSaved() {
   hasUnsavedChanges = false;
-  document.getElementById('unsaved-indicator').classList.remove('show');
   updateAutoSaveStatus('saved');
 }
 
@@ -1562,13 +1691,12 @@ function updateAutoSaveStatus(status) {
 }
 
 // Warn before leaving with unsaved changes
-window.addEventListener('beforeunload', function(e) {
+window.onbeforeunload = function(e) {
   if (hasUnsavedChanges) {
     e.preventDefault();
     e.returnValue = '';
   }
-});
-
+};
 // ============================================================================
 // TOAST NOTIFICATIONS
 // ============================================================================
@@ -1894,6 +2022,9 @@ async function saveAndContinue() {
   if (isSaving) return;
   isSaving = true;
 
+  // Remove beforeunload listener immediately to prevent warning
+  window.onbeforeunload = null;
+
   updateAutoSaveStatus('saving');
 
   const form = document.getElementById('client-profile-form');
@@ -1911,17 +2042,22 @@ async function saveAndContinue() {
     } else if (response.ok) {
       markSaved();
       showToast(CONFIG.isArabic ? 'تم الحفظ بنجاح' : 'Saved successfully');
-      // Redirect to next page
       window.location.href = '/bussiness_profile/' + CONFIG.bplanId;
     }
   } catch (error) {
     console.error('Error:', error);
     showToast(CONFIG.isArabic ? 'حدث خطأ' : 'Error occurred', 'error');
+    // Re-enable warning if save failed
+    window.onbeforeunload = function(e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
   } finally {
     isSaving = false;
   }
 }
-
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -1945,6 +2081,75 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   console.log('✅ Client Profile page initialized');
+});
+
+
+
+
+// ============================================================================
+// CUSTOM LEAVE WARNING MODAL
+// ============================================================================
+let pendingNavigationUrl = null;
+
+function showLeaveModal(url) {
+  pendingNavigationUrl = url;
+  document.getElementById('leave-modal-overlay').classList.add('show');
+}
+
+function hideLeaveModal() {
+  document.getElementById('leave-modal-overlay').classList.remove('show');
+  pendingNavigationUrl = null;
+}
+
+function handleNavigation(url) {
+  if (hasUnsavedChanges) {
+    showLeaveModal(url);
+    return false;
+  }
+  return true;
+}
+
+// Initialize modal buttons and intercept links
+document.addEventListener('DOMContentLoaded', function() {
+  // Stay button
+  document.getElementById('btn-stay').onclick = hideLeaveModal;
+
+  // Leave button
+  document.getElementById('btn-leave').onclick = function() {
+    hasUnsavedChanges = false;
+    window.onbeforeunload = null;
+    if (pendingNavigationUrl) {
+      window.location.href = pendingNavigationUrl;
+    }
+  };
+
+  // Close modal on overlay click
+  document.getElementById('leave-modal-overlay').onclick = function(e) {
+    if (e.target === this) {
+      hideLeaveModal();
+    }
+  };
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      hideLeaveModal();
+    }
+  });
+
+  // Intercept all internal links
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (link && link.href && !link.href.startsWith('javascript:') && !link.target) {
+      // Check if it's an internal link
+      if (link.href.startsWith(window.location.origin) || link.href.startsWith('/')) {
+        if (hasUnsavedChanges) {
+          e.preventDefault();
+          showLeaveModal(link.href);
+        }
+      }
+    }
+  });
 });
 </script>
 {% endblock javascripts %}
