@@ -8,552 +8,978 @@
   {% endif %}
 {% endblock %}
 
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
 
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+  --primary-gradient: linear-gradient(135deg, #4F7DF3 0%, #1A73E8 100%);
+  --primary-color: #4F7DF3;
+  --primary-dark: #1A73E8;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --info-color: #17c1e8;
+  --surface-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+.competitors-page-container {
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #F0F4FF 0%, #FFFFFF 100%);
+  min-height: 100vh;
+}
+
+/* Progress Section */
+.progress-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.progress-percentage {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.progress-bar-container {
+  height: 10px;
+  background: #E2E8F0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.progress-bar-fill.success { background: var(--success-color); }
+.progress-bar-fill.info { background: var(--info-color); }
+.progress-bar-fill.danger { background: var(--danger-color); }
+
+/* Profile Card */
+.profile-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-card-header {
+  background: var(--primary-gradient);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-card-header h5 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-card-body {
+  padding: 1.5rem;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(79, 125, 243, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Form Elements */
+.form-group-modern {
+  margin-bottom: 1.25rem;
+}
+
+.form-label-modern {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.form-control-modern {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-control-modern:hover {
+  border-color: #CBD5E1;
+}
+
+.form-control-modern:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15);
+}
+
+select.form-control-modern {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+html[dir="rtl"] select.form-control-modern {
+  background-position: left 1rem center;
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+}
+
+/* Grid System */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+@media (max-width: 992px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .competitors-page-container { padding: 1rem; }
+}
+
+/* Preference Selection Card */
+.preference-selection-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.preference-selection-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-gradient);
+}
+
+.preference-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.preference-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.preference-card-title i {
+  color: var(--primary-color);
+}
+
+.preference-badge {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.preference-card-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.preference-select-item {
+  background: white;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.preference-select-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.preference-select-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Data Table */
+.data-table-container {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.data-table-header {
+  background: var(--text-primary);
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.data-table-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.data-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.data-table thead {
+  background: #F1F5F9;
+}
+
+.data-table th {
+  padding: 0.875rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border: none;
+  text-align: center;
+}
+
+.data-table th:first-child {
+  text-align: left;
+  padding-left: 1.5rem;
+}
+
+.data-table td {
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  text-align: center;
+}
+
+.data-table td:first-child {
+  text-align: left;
+  padding-left: 1.5rem;
+}
+
+.data-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(79, 125, 243, 0.04);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr.hidden-row {
+  display: none;
+}
+
+html[dir="rtl"] .data-table th,
+html[dir="rtl"] .data-table td {
+  text-align: center;
+}
+
+html[dir="rtl"] .data-table th:first-child,
+html[dir="rtl"] .data-table td:first-child {
+  text-align: right;
+  padding-left: 1rem;
+  padding-right: 1.5rem;
+}
+
+/* Table Input */
+.table-input {
+  width: 80px;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.table-input:hover {
+  border-color: #CBD5E1;
+}
+
+.table-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15);
+}
+
+/* Market Rate Badge */
+.market-rate-badge {
+  background: #F1F5F9;
+  color: var(--text-primary);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Preference Name in Table */
+.preference-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  color: #CBD5E1;
+  margin-bottom: 1rem;
+}
+
+.empty-state-text {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.empty-state-hint {
+  font-size: 0.8125rem;
+  color: #94A3B8;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+/* Buttons */
+.btn-modern {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary-modern {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.btn-primary-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45);
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1060;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.toast-notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-notification.success { border-left: 4px solid var(--success-color); }
+.toast-notification.error { border-left: 4px solid var(--danger-color); }
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-icon.success { background: #D1FAE5; color: var(--success-color); }
+.toast-icon.error { background: #FEE2E2; color: var(--danger-color); }
+
+/* RTL Support */
+html[dir="rtl"] .section-title,
+html[dir="rtl"] .preference-card-title,
+html[dir="rtl"] .data-table-title,
+html[dir="rtl"] .btn-modern {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .toast-notification {
+  right: auto;
+  left: 20px;
+}
+
+html[dir="rtl"] .toast-notification.success {
+  border-left: none;
+  border-right: 4px solid var(--success-color);
+}
+
+html[dir="rtl"] .toast-notification.error {
+  border-left: none;
+  border-right: 4px solid var(--danger-color);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+</style>
+{% endblock stylesheets %}
 {% block content %}
+<div class="competitors-page-container">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
 
-<div class="container-fluid pl-5 pt-3">
-  <div class="row">
-    <div class="col-10">
+        <!-- Toast Notification -->
+        <div class="toast-notification" id="toast-notification">
+          <div class="toast-icon" id="toast-icon"><i class="fas fa-check" id="toast-icon-symbol"></i></div>
+          <span class="toast-message" id="toast-message"></span>
+        </div>
 
-      <form role="form" method="POST" action="/competitors/{{ bplan_id }}" id="competitors-form">
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="alert alert-danger">
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        <div class="row px-8 pt-0 pb-3">
-          <span class="me-2 text-xxs font-weight-bold">
-            {% if session.get('lang', 'en') == 'ar' %}
-              تم الإكمال بنسبة
-            {% endif %}
-            {{ data_comp[0].completion }}%
-            {% if session.get('lang', 'en') == 'ar' %}
-              من الملف
-            {% else %}
-              Completed
-            {% endif %}
-          </span>
-          <div class="progress">
-            {% if data_comp[0].completion == 100: %}
-            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
-            {% elif data_comp[0].completion >= 50: %}
-              <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
-            {% else %}
-              <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="{{ data_comp[0].completion }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ data_comp[0].completion }}%;"></div>
-            {% endif %}
+        <!-- Progress Section -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">{% if session.get('lang', 'en') == 'ar' %}تقدم الملف{% else %}Profile Completion{% endif %}</span>
+            <span class="progress-percentage">{{ data_comp[0].completion }}%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill {% if data_comp[0].completion == 100 %}success{% elif data_comp[0].completion >= 50 %}info{% else %}danger{% endif %}" style="width: {{ data_comp[0].completion }}%;"></div>
           </div>
         </div>
 
-        <!-- Title + Competitors card -->
-        <div class="card my-3">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
-              <h5 class="text-white text-capitalize ps-3 mx-3">
-                {% if session.get('lang', 'en') == 'ar' %}
-                  المنافسون
-                {% else %}
-                  Competitors
-                {% endif %}
-              </h5>
+        <!-- Main Form -->
+        <form id="competitors-form" method="POST" action="/competitors/{{ bplan_id }}">
+
+          <!-- COMPETITORS CARD -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <h5><i class="fas fa-users"></i>{% if session.get('lang', 'en') == 'ar' %}المنافسون{% else %}Competitors{% endif %}</h5>
             </div>
-          </div>
+            <div class="profile-card-body">
 
-          <div class="card-body px-6 pt-2">
-            <h5 class="font-weight-bolder text-info mt-4">
-              {% if session.get('lang', 'en') == 'ar' %}
-                المنافسون
-              {% else %}
-                Competitors
-              {% endif %}
-            </h5>
+              <!-- Competitor Names -->
+              <h6 class="section-title"><i class="fas fa-building"></i>{% if session.get('lang', 'en') == 'ar' %}أسماء المنافسين{% else %}Competitor Names{% endif %}</h6>
 
-            <!-- 1st row -->
-            <div class="row">
-              <div class="col">
-                <div class="input-group input-group-static mb-4">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      (الأول) اسم المنافس
-                    {% else %}
-                      (1st) Competitor Name
-                    {% endif %}
-                  </label>
+              <div class="grid-3">
+                <div class="form-group-modern">
+                  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المنافس الأول{% else %}1st Competitor{% endif %} <span style="color: var(--danger-color);">*</span></label>
+                  <input class="form-control-modern" type="text" name="first_competitor_name" id="first_competitor_name"
+                         value="{{ data_compname[0].competitor_name_1st }}"
+                         placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل اسم المنافس{% else %}Enter competitor name{% endif %}" required autocomplete="off">
                 </div>
-                <div class="input-group input-group-static mb-0">
-                  <input class="form-control" type="text" name="first_competitor_name" value="{{ data_compname[0].competitor_name_1st }}" placeholder="" autocomplete="off" required/>
-                </div>
-              </div>
 
-              <div class="col">
-                <div class="input-group input-group-static mb-4">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      (الثاني) اسم المنافس
-                    {% else %}
-                      (2nd) Competitor Name
-                    {% endif %}
-                  </label>
+                <div class="form-group-modern">
+                  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المنافس الثاني{% else %}2nd Competitor{% endif %} <span style="color: var(--danger-color);">*</span></label>
+                  <input class="form-control-modern" type="text" name="second_competitor_name" id="second_competitor_name"
+                         value="{{ data_compname[0].competitor_name_2nd }}"
+                         placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل اسم المنافس{% else %}Enter competitor name{% endif %}" required autocomplete="off">
                 </div>
-                <div class="input-group input-group-static mb-0">
-                  <input class="form-control" type="text" name="second_competitor_name" value="{{ data_compname[0].competitor_name_2nd }}" placeholder="" autocomplete="off" required/>
+
+                <div class="form-group-modern">
+                  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المنافس الثالث{% else %}3rd Competitor{% endif %} <span style="color: var(--danger-color);">*</span></label>
+                  <input class="form-control-modern" type="text" name="third_competitor_name" id="third_competitor_name"
+                         value="{{ data_compname[0].competitor_name_3rd }}"
+                         placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل اسم المنافس{% else %}Enter competitor name{% endif %}" required autocomplete="off">
                 </div>
               </div>
 
-              <div class="col">
-                <div class="input-group input-group-static mb-4">
-                  <label class="form-label text-dark">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      (الثالث) اسم المنافس
-                    {% else %}
-                      (3rd) Competitor Name
-                    {% endif %}
-                  </label>
+              <!-- Preference Selection -->
+              <div class="preference-selection-card" style="margin-top: 1.5rem;">
+                <div class="preference-card-header">
+                  <span class="preference-card-title">
+                    <i class="fas fa-sliders-h"></i>
+                    {% if session.get('lang', 'en') == 'ar' %}اختر 3 تفضيلات رئيسية للمقارنة{% else %}Select 3 Key Preferences for Comparison{% endif %}
+                  </span>
+                  <span class="preference-badge">3 {% if session.get('lang', 'en') == 'ar' %}حد أقصى{% else %}max{% endif %}</span>
                 </div>
-                <div class="input-group input-group-static mb-0">
-                  <input class="form-control" type="text" name="third_competitor_name" value="{{ data_compname[0].competitor_name_3rd }}" placeholder="" autocomplete="off" required/>
-                </div>
-              </div>
-            </div>
+                <p class="preference-card-hint">
+                  {% if session.get('lang', 'en') == 'ar' %}
+                    اختر أهم 3 معايير للمقارنة بين منافسيك. سيتم تحديث الجدول تلقائياً.
+                  {% else %}
+                    Choose the top 3 criteria to compare your competitors. The table will update automatically.
+                  {% endif %}
+                </p>
 
-            <br>
-
-            <!-- Enhanced Preferences Selection -->
-            <div class="row mt-4">
-              <div class="col-12">
-                <div class="card border-0 shadow-sm bg-white border-radius-lg p-4 position-relative overflow-hidden">
-                  <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #21a0ff, #00d4ff); border-top-left-radius: 12px; border-top-right-radius: 12px;"></div>
-
-                  <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="d-flex align-items-center">
-                      <i class="material-icons text-info me-2 fs-4">tune</i>
-                      <h5 class="text-dark mb-0 fw-bold">
-                        {% if session.get('lang', 'en') == 'ar' %}
-                          اختر 3 تفضيلات رئيسية للمقارنة
-                        {% else %}
-                          Select 3 Key Preferences for Comparison
-                        {% endif %}
-                      </h5>
-                    </div>
-                    <span class="badge bg-info px-3 py-2 rounded-pill shadow-sm">
-                      3 {% if session.get('lang', 'en') == 'ar' %}حد أقصى{% else %}max{% endif %}
-                    </span>
-                  </div>
-
-                  <p class="text-muted small mb-4">
-                    {% if session.get('lang', 'en') == 'ar' %}
-                      اختر أهم 3 معايير للمقارنة بين منافسيك. سيتم عرضها فقط في الجدول أدناه لتركيز المقارنة.
-                    {% else %}
-                      Choose the top 3 criteria to compare your competitors. Only these will be displayed in the table below for focused comparison.
-                    {% endif %}
-                  </p>
-
-                  <!-- Preference Selection Wrapper (No Form) -->
-                  <div id="preferences-wrapper">
-                    <div class="row g-3">
-                      {% for i in range(1, 4) %}
-                      <div class="col-md-4">
-                        <div class="form-group border rounded-3 px-3 py-2 bg-white shadow-sm hover-shadow-sm transition">
-                          <label class="form-label text-dark fw-bold small mb-1">
-                            {% if session.get('lang', 'en') == 'ar' %}
-                              التفضيل {{ i }}
-                            {% else %}
-                              {{ i }}{% if i == 1 %}st{% elif i == 2 %}nd{% else %}rd{% endif %} Preference
-                            {% endif %}
-                          </label>
-                          <select class="form-select preference-select border-0 bg-light" name="preference_{{ i }}" required>
-                            <option value="">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                ← اختر التفضيل
-                              {% else %}
-                                Select preference →
-                              {% endif %}
-                            </option>
-                            {% for row in data_competitors %}
-                            <option value="{{ row.preference }}"
-                              {% if selected_preferences and selected_preferences[i-1] == row.preference %}selected{% endif %}>
-                              {{ row.preference }}
-                            </option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                      </div>
+                <div class="grid-3">
+                  <div class="preference-select-item">
+                    <span class="preference-select-label">{% if session.get('lang', 'en') == 'ar' %}التفضيل الأول{% else %}1st Preference{% endif %}</span>
+                    <select class="form-control-modern preference-select" name="preference_1" id="preference_1" required>
+                      <option value="">{% if session.get('lang', 'en') == 'ar' %}← اختر التفضيل{% else %}Select preference →{% endif %}</option>
+                      {% for row in data_competitors %}
+                      <option value="{{ row.preference }}" {% if selected_preferences and selected_preferences[0] == row.preference %}selected{% endif %}>
+                        {{ row.preference }}
+                      </option>
                       {% endfor %}
-                    </div>
+                    </select>
+                  </div>
 
-                    <div class="mt-4 d-flex justify-content-between align-items-center">
-                      <div>
-                        <small class="fw-semibold text-info">
-<!--                          <span id="selected-count">{{ selected_preferences|length if selected_preferences else 0 }}</span>/3-->
-<!--                          {% if session.get('lang', 'en') == 'ar' %}-->
-<!--                            تفضيلات مختارة-->
-<!--                          {% else %}-->
-<!--                            preferences selected-->
-<!--                          {% endif %}-->
-                        </small>
-                      </div>
-                      <button type="button" id="update-table-btn" class="btn btn-outline-info btn-sm">
-                        <i class="material-icons me-1" style="font-size: 16px;">refresh</i>
-                        {% if session.get('lang', 'en') == 'ar' %}
-                          تحديث الجدول
-                        {% else %}
-                          Update Table
-                        {% endif %}
-                      </button>
-                    </div>
+                  <div class="preference-select-item">
+                    <span class="preference-select-label">{% if session.get('lang', 'en') == 'ar' %}التفضيل الثاني{% else %}2nd Preference{% endif %}</span>
+                    <select class="form-control-modern preference-select" name="preference_2" id="preference_2" required>
+                      <option value="">{% if session.get('lang', 'en') == 'ar' %}← اختر التفضيل{% else %}Select preference →{% endif %}</option>
+                      {% for row in data_competitors %}
+                      <option value="{{ row.preference }}" {% if selected_preferences and selected_preferences[1] == row.preference %}selected{% endif %}>
+                        {{ row.preference }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="preference-select-item">
+                    <span class="preference-select-label">{% if session.get('lang', 'en') == 'ar' %}التفضيل الثالث{% else %}3rd Preference{% endif %}</span>
+                    <select class="form-control-modern preference-select" name="preference_3" id="preference_3" required>
+                      <option value="">{% if session.get('lang', 'en') == 'ar' %}← اختر التفضيل{% else %}Select preference →{% endif %}</option>
+                      {% for row in data_competitors %}
+                      <option value="{{ row.preference }}" {% if selected_preferences and selected_preferences[2] == row.preference %}selected{% endif %}>
+                        {{ row.preference }}
+                      </option>
+                      {% endfor %}
+                    </select>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Enhanced Comparison Table -->
-            <div class="row mt-4">
-              <div class="col-12">
-                <div class="card border-radius-lg shadow-sm overflow-hidden">
-                  <div class="card-header bg-gradient-dark py-3">
-                    <h6 class="text-white mb-0">
-                      <i class="material-icons text-white me-2">compare</i>
-                      {% if session.get('lang', 'en') == 'ar' %}
-                        جدول المقارنة
-                      {% else %}
-                        Comparison Table
-                      {% endif %}
-                    </h6>
-                  </div>
+              <!-- Comparison Table -->
+              <div class="data-table-container">
+                <div class="data-table-header">
+                  <span class="data-table-title"><i class="fas fa-table"></i>{% if session.get('lang', 'en') == 'ar' %}جدول المقارنة{% else %}Comparison Table{% endif %}</span>
+                </div>
 
-                  <div class="card-body p-0">
-                    <div class="table-responsive">
-                      <table class="table table-hover align-items-center mb-0" id="preferences-table">
-                        <thead class="bg-gray-100">
-                          <tr>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-4">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                معايير المقارنة
-                              {% else %}
-                                Comparison Criteria
-                              {% endif %}
-                            </th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                سعر السوق
-                              {% else %}
-                                Market Rate
-                              {% endif %}
-                            </th>
-                            <th id="comp1-header" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                {{ data_compname[0].competitor_name_1st or "المنافس الأول" }}
-                              {% else %}
-                                {{ data_compname[0].competitor_name_1st or "1st Comp." }}
-                              {% endif %}
-                            </th>
-                            <th id="comp2-header" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                {{ data_compname[0].competitor_name_2nd or "المنافس الثاني" }}
-                              {% else %}
-                                {{ data_compname[0].competitor_name_2nd or "2nd Comp." }}
-                              {% endif %}
-                            </th>
-                            <th id="comp3-header" class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                {{ data_compname[0].competitor_name_3rd or "المنافس الثالث" }}
-                              {% else %}
-                                {{ data_compname[0].competitor_name_3rd or "3rd Comp." }}
-                              {% endif %}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {% for row in data_competitors %}
-                          <tr class="preference-row" data-preference="{{ row.preference }}" data-selected="{{ row.is_selected|lower }}">
-                            <td class="ps-4">
-                              <div class="d-flex align-items-center">
-                                <span class="text-xs font-weight-bold">{{ row.preference }}</span>
-                              </div>
-                            </td>
-                            <td class="text-center">
-                              <span class="text-xs font-weight-bold text-dark bg-gray-200 px-2 py-1 rounded">{{ row.preference_value }}</span>
-                            </td>
-                            <td class="text-center">
-                              <input class="form-control form-control-sm text-xs text-center border-radius-lg competitor-input"
-                                   type="number"
-                                   name="{{ row.preference }}_1"
-                                   value="{{ row.competitor1_value }}"
-                                   placeholder="-"
-                                   autocomplete="off"
-                                   min="0" max="5"
-                                   oninput="validateRange(this)"
-                                   style="max-width: 100px; margin: 0 auto;"/>
-                            </td>
-                            <td class="text-center">
-                              <input class="form-control form-control-sm text-xs text-center border-radius-lg competitor-input"
-                                   type="number"
-                                   name="{{ row.preference }}_2"
-                                   value="{{ row.competitor2_value }}"
-                                   placeholder="-"
-                                   autocomplete="off"
-                                   min="0" max="5"
-                                   oninput="validateRange(this)"
-                                   style="max-width: 100px; margin: 0 auto;"/>
-                            </td>
-                            <td class="text-center">
-                              <input class="form-control form-control-sm text-xs text-center border-radius-lg competitor-input"
-                                   type="number"
-                                   name="{{ row.preference }}_3"
-                                   value="{{ row.competitor3_value }}"
-                                   placeholder="-"
-                                   autocomplete="off"
-                                   min="0" max="5"
-                                   oninput="validateRange(this)"
-                                   style="max-width: 100px; margin: 0 auto;"/>
-                            </td>
-                          </tr>
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
+                <table class="data-table" id="comparison-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 25%;">{% if session.get('lang', 'en') == 'ar' %}معايير المقارنة{% else %}Comparison Criteria{% endif %}</th>
+                      <th style="width: 15%;">{% if session.get('lang', 'en') == 'ar' %}سعر السوق{% else %}Market Rate{% endif %}</th>
+                      <th id="comp1-header" style="width: 20%;">{{ data_compname[0].competitor_name_1st or (session.get('lang', 'en') == 'ar' and 'المنافس الأول' or '1st Competitor') }}</th>
+                      <th id="comp2-header" style="width: 20%;">{{ data_compname[0].competitor_name_2nd or (session.get('lang', 'en') == 'ar' and 'المنافس الثاني' or '2nd Competitor') }}</th>
+                      <th id="comp3-header" style="width: 20%;">{{ data_compname[0].competitor_name_3rd or (session.get('lang', 'en') == 'ar' and 'المنافس الثالث' or '3rd Competitor') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comparison-tbody">
+                    {% for row in data_competitors %}
+                    <tr class="preference-row {% if not row.is_selected %}hidden-row{% endif %}" data-preference="{{ row.preference }}">
+                      <td>
+                        <span class="preference-name">{{ row.preference }}</span>
+                      </td>
+                      <td>
+                        <span class="market-rate-badge">{{ row.preference_value }}</span>
+                      </td>
+                      <td>
+                        <input class="table-input" type="number" name="{{ row.preference }}_1"
+                               value="{{ row.competitor1_value }}" min="0" max="5" autocomplete="off">
+                      </td>
+                      <td>
+                        <input class="table-input" type="number" name="{{ row.preference }}_2"
+                               value="{{ row.competitor2_value }}" min="0" max="5" autocomplete="off">
+                      </td>
+                      <td>
+                        <input class="table-input" type="number" name="{{ row.preference }}_3"
+                               value="{{ row.competitor3_value }}" min="0" max="5" autocomplete="off">
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
 
-                    <!-- Empty State -->
-                    <div id="empty-state" class="text-center py-5" style="display: none;">
-                      <i class="material-icons text-gray-300 mb-3" style="font-size: 48px;">filter_list</i>
-                      <h6 class="text-gray-500 mb-2">
-                        {% if session.get('lang', 'en') == 'ar' %}
-                          لم يتم اختيار أي تفضيلات
-                        {% else %}
-                          No preferences selected
-                        {% endif %}
-                      </h6>
-                      <p class="text-sm text-gray-400">
-                        {% if session.get('lang', 'en') == 'ar' %}
-                          اختر حتى 3 تفضيلات من الأعلى لعرضها في جدول المقارنة
-                        {% else %}
-                          Select up to 3 preferences from above to display in the comparison table
-                        {% endif %}
-                      </p>
-                    </div>
-                  </div>
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state" style="display: none;">
+                  <i class="fas fa-filter empty-state-icon"></i>
+                  <p class="empty-state-text">{% if session.get('lang', 'en') == 'ar' %}لم يتم اختيار أي تفضيلات{% else %}No preferences selected{% endif %}</p>
+                  <p class="empty-state-hint">{% if session.get('lang', 'en') == 'ar' %}اختر 3 تفضيلات من الأعلى لعرضها في جدول المقارنة{% else %}Select 3 preferences from above to display in the comparison table{% endif %}</p>
                 </div>
               </div>
+
             </div>
 
-            <!-- Save Button -->
-            <div class="button-row d-flex mt-4">
-              <button class="btn bg-gradient-primary ms-auto mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}" type="submit" name="action" value="save" id="save-btn">
-                {% if session.get('lang', 'en') == 'ar' %}
-                  حفظ
-                {% else %}
-                  Save
-                {% endif %}
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn-modern btn-primary-modern" name="action" value="save">
+                <i class="fas fa-save"></i>{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}
               </button>
             </div>
           </div>
-        </div>
-      </form>
+
+        </form>
+
+      </div>
     </div>
   </div>
 </div>
-
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-// Simple function to show only selected preferences
-function filterTableBySelectedPreferences() {
-    // Show rows where data-selected="true", hide others
-    const allRows = document.querySelectorAll('.preference-row');
-    let visibleCount = 0;
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+const CONFIG = {
+  bplanId: '{{ bplan_id }}',
+  lang: '{{ session.get("lang", "en") }}',
+  isArabic: '{{ session.get("lang", "en") }}' === 'ar'
+};
 
-    allRows.forEach(row => {
-        if (row.getAttribute('data-selected') === 'true') {
-            row.style.display = '';
-            visibleCount++;
-        } else {
-            row.style.display = 'none';
-        }
+// Store all available preferences
+const allPreferences = [
+  {% for row in data_competitors %}
+    "{{ row.preference }}",
+  {% endfor %}
+];
+
+// ============================================================================
+// TOAST NOTIFICATION
+// ============================================================================
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast-notification');
+  const icon = document.getElementById('toast-icon');
+  const iconSymbol = document.getElementById('toast-icon-symbol');
+  const messageEl = document.getElementById('toast-message');
+
+  if (!toast) return;
+
+  toast.classList.remove('success', 'error');
+  icon.classList.remove('success', 'error');
+  toast.classList.add(type);
+  icon.classList.add(type);
+  iconSymbol.className = type === 'success' ? 'fas fa-check' : 'fas fa-times';
+  messageEl.textContent = message;
+  toast.classList.add('show');
+
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================================================
+// CASCADING DROPDOWNS - Remove selected options from other dropdowns
+// ============================================================================
+function updateDropdownOptions() {
+  const select1 = document.getElementById('preference_1');
+  const select2 = document.getElementById('preference_2');
+  const select3 = document.getElementById('preference_3');
+
+  // Get current selections
+  const selected1 = select1.value;
+  const selected2 = select2.value;
+  const selected3 = select3.value;
+
+  const allSelects = [select1, select2, select3];
+  const allSelected = [selected1, selected2, selected3];
+
+  // For each select, update its options
+  allSelects.forEach((select, index) => {
+    const currentValue = select.value;
+
+    // Get options that are selected in OTHER dropdowns
+    const otherSelections = allSelected.filter((val, i) => i !== index && val !== '');
+
+    // Update each option's disabled state
+    Array.from(select.options).forEach(option => {
+      if (option.value === '' || option.value === currentValue) {
+        // Always enable empty option and currently selected value
+        option.disabled = false;
+        option.style.display = '';
+      } else if (otherSelections.includes(option.value)) {
+        // Disable and hide options selected in other dropdowns
+        option.disabled = true;
+        option.style.display = 'none';
+      } else {
+        // Enable all other options
+        option.disabled = false;
+        option.style.display = '';
+      }
     });
+  });
+}
 
-    // Show/hide empty state
-    const emptyState = document.getElementById('empty-state');
-    const tableBody = document.querySelector('tbody');
+// ============================================================================
+// UPDATE TABLE - Show only selected preferences
+// ============================================================================
+function updateTable() {
+  const selected1 = document.getElementById('preference_1').value;
+  const selected2 = document.getElementById('preference_2').value;
+  const selected3 = document.getElementById('preference_3').value;
 
-    if (visibleCount === 0) {
-        emptyState.style.display = 'block';
-        tableBody.style.display = 'none';
+  const selectedPreferences = [selected1, selected2, selected3].filter(p => p !== '');
+
+  const rows = document.querySelectorAll('.preference-row');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    const preference = row.dataset.preference;
+
+    if (selectedPreferences.includes(preference)) {
+      row.classList.remove('hidden-row');
+      row.style.animation = 'fadeIn 0.3s ease';
+      visibleCount++;
     } else {
-        emptyState.style.display = 'none';
-        tableBody.style.display = '';
+      row.classList.add('hidden-row');
     }
+  });
+
+  // Show/hide empty state
+  const emptyState = document.getElementById('empty-state');
+  const tbody = document.getElementById('comparison-tbody');
+
+  if (visibleCount === 0) {
+    emptyState.style.display = 'block';
+    tbody.style.display = 'none';
+  } else {
+    emptyState.style.display = 'none';
+    tbody.style.display = '';
+  }
 }
 
-// Initialize on page load
+// ============================================================================
+// UPDATE COMPETITOR HEADERS
+// ============================================================================
+function initCompetitorHeaders() {
+  const competitors = [
+    { input: 'first_competitor_name', header: 'comp1-header', defaultEn: '1st Competitor', defaultAr: 'المنافس الأول' },
+    { input: 'second_competitor_name', header: 'comp2-header', defaultEn: '2nd Competitor', defaultAr: 'المنافس الثاني' },
+    { input: 'third_competitor_name', header: 'comp3-header', defaultEn: '3rd Competitor', defaultAr: 'المنافس الثالث' }
+  ];
+
+  competitors.forEach(comp => {
+    const inputEl = document.getElementById(comp.input);
+    const headerEl = document.getElementById(comp.header);
+
+    if (!inputEl || !headerEl) return;
+
+    inputEl.addEventListener('input', function() {
+      const newName = this.value.trim();
+      headerEl.textContent = newName || (CONFIG.isArabic ? comp.defaultAr : comp.defaultEn);
+    });
+  });
+}
+
+// ============================================================================
+// VALIDATE TABLE INPUTS (0-5 range)
+// ============================================================================
+function initTableInputValidation() {
+  document.querySelectorAll('.table-input').forEach(input => {
+    input.addEventListener('input', function() {
+      let val = parseFloat(this.value);
+      if (isNaN(val)) return;
+      if (val < 0) this.value = 0;
+      if (val > 5) this.value = 5;
+    });
+  });
+}
+
+// ============================================================================
+// INIT PREFERENCE SELECTS
+// ============================================================================
+function initPreferenceSelects() {
+  const selects = document.querySelectorAll('.preference-select');
+
+  selects.forEach(select => {
+    select.addEventListener('change', function() {
+      // Update dropdown options (cascading)
+      updateDropdownOptions();
+
+      // Update table (interactive)
+      updateTable();
+
+      // Save preferences via AJAX (optional - for auto-save)
+      savePreferencesAjax();
+    });
+  });
+
+  // Initial setup
+  updateDropdownOptions();
+  updateTable();
+}
+
+// ============================================================================
+// SAVE PREFERENCES VIA AJAX (auto-save when preferences change)
+// ============================================================================
+function savePreferencesAjax() {
+  const selected1 = document.getElementById('preference_1').value;
+  const selected2 = document.getElementById('preference_2').value;
+  const selected3 = document.getElementById('preference_3').value;
+
+  // Only save if we have at least one selection
+  const selectedPrefs = [selected1, selected2, selected3].filter(p => p !== '');
+  if (selectedPrefs.length === 0) return;
+
+  const formData = new FormData();
+  formData.append('action', 'update_preferences');
+  formData.append('preference_1', selected1);
+  formData.append('preference_2', selected2);
+  formData.append('preference_3', selected3);
+
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Silently saved - no toast needed for auto-save
+      console.log('Preferences auto-saved');
+    }
+  })
+  .catch(error => {
+    console.error('Auto-save error:', error);
+  });
+}
+
+// ============================================================================
+// RTL SUPPORT
+// ============================================================================
+function initRTL() {
+  if (CONFIG.isArabic) {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    filterTableBySelectedPreferences();
+  // RTL Support
+  initRTL();
 
-    // Handle update table button click
-    document.getElementById('update-table-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        updatePreferences();
-    });
+  // Initialize preference selects (cascading + interactive table)
+  initPreferenceSelects();
 
-    // Update selection counter when selects change
-    document.querySelectorAll('.preference-select').forEach(select => {
-        select.addEventListener('change', function() {
-            const selectedCount = document.querySelectorAll('.preference-select option:checked[value!=""]').length;
-            document.getElementById('selected-count').textContent = selectedCount;
-        });
-    });
+  // Initialize competitor header updates
+  initCompetitorHeaders();
 
-    // Update competitor headers when names change
-    const competitors = [
-        { input: 'input[name="first_competitor_name"]', header: '#comp1-header', defaultEn: '1st Comp.', defaultAr: 'المنافس الأول' },
-        { input: 'input[name="second_competitor_name"]', header: '#comp2-header', defaultEn: '2nd Comp.', defaultAr: 'المنافس الثاني' },
-        { input: 'input[name="third_competitor_name"]', header: '#comp3-header', defaultEn: '3rd Comp.', defaultAr: 'المنافس الثالث' },
-    ];
+  // Initialize table input validation
+  initTableInputValidation();
 
-    competitors.forEach(c => {
-        const inputEl = document.querySelector(c.input);
-        const headerEl = document.querySelector(c.header);
-        if (!inputEl || !headerEl) return;
-
-        inputEl.addEventListener('input', function() {
-            const newName = inputEl.value.trim();
-            {% if session.get('lang', 'en') == 'ar' %}
-            headerEl.textContent = newName || c.defaultAr;
-            {% else %}
-            headerEl.textContent = newName || c.defaultEn;
-            {% endif %}
-        });
-    });
+  console.log('✅ Competitors page initialized');
 });
-
-// Update preferences via AJAX
-function updatePreferences() {
-    // Gather values from select elements
-    const preference1 = document.querySelector('select[name="preference_1"]').value;
-    const preference2 = document.querySelector('select[name="preference_2"]').value;
-    const preference3 = document.querySelector('select[name="preference_3"]').value;
-
-    // Validate selections
-    const selectedPreferences = [preference1, preference2, preference3].filter(p => p !== '');
-    const uniquePreferences = [...new Set(selectedPreferences)];
-
-    if (uniquePreferences.length !== 3) {
-        showAlert('{% if session.get("lang", "en") == "ar" %}الرجاء اختيار 3 تفضيلات فريدة{% else %}Please select exactly 3 unique preferences{% endif %}', 'error');
-        return;
-    }
-
-    const submitBtn = document.getElementById('update-table-btn');
-    const originalText = submitBtn.innerHTML;
-
-    // Show loading state
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '{% if session.get("lang", "en") == "ar" %}جاري التحديث...{% else %}Updating...{% endif %}';
-
-    // Prepare form data
-    const formData = new FormData();
-    formData.append('action', 'update_preferences');
-    formData.append('preference_1', preference1);
-    formData.append('preference_2', preference2);
-    formData.append('preference_3', preference3);
-
-    // Send AJAX request
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Update the data-selected attributes and refresh table
-            document.querySelectorAll('.preference-row').forEach(row => {
-                const preference = row.getAttribute('data-preference');
-                if (data.selected_preferences.includes(preference)) {
-                    row.setAttribute('data-selected', 'true');
-                } else {
-                    row.setAttribute('data-selected', 'false');
-                }
-            });
-
-            // Refresh table view
-            filterTableBySelectedPreferences();
-
-            // Show success message
-            showAlert('{% if session.get("lang", "en") == "ar" %}تم تحديث الجدول بنجاح{% else %}Table updated successfully{% endif %}', 'success');
-        } else {
-            showAlert(data.message || '{% if session.get("lang", "en") == "ar" %}فشل التحديث{% else %}Update failed{% endif %}', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('{% if session.get("lang", "en") == "ar" %}حدث خطأ أثناء التحديث{% else %}An error occurred during update{% endif %}', 'error');
-    })
-    .finally(() => {
-        // Reset button state
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    });
-}
-
-// Simple range validation
-function validateRange(input) {
-    if (input.value === "") return;
-    let val = parseFloat(input.value);
-    if (val < 0) input.value = 0;
-    if (val > 5) input.value = 5;
-}
-
-// Helper function to show alerts
-function showAlert(message, type) {
-    // Remove existing alerts
-    const existingAlert = document.querySelector('.ajax-alert');
-    if (existingAlert) {
-        existingAlert.remove();
-    }
-
-    // Create new alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} ajax-alert position-fixed`;
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        <div class="d-flex align-items-center">
-            <i class="material-icons me-2">${type === 'success' ? 'check_circle' : 'error'}</i>
-            <span>${message}</span>
-            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
-        </div>
-    `;
-
-    document.body.appendChild(alertDiv);
-
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        if (alertDiv.parentElement) {
-            alertDiv.remove();
-        }
-    }, 3000);
-}
 </script>
-
-<style>
-.hover-shadow-sm:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-}
-.transition {
-    transition: all 0.2s ease-in-out;
-}
-</style>
 {% endblock javascripts %}
