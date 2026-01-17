@@ -9,575 +9,522 @@
 {% endblock %}
 
 {% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
-/* ============================================
-   JADWAPLAN BRAND COLORS - Matching App Theme
-   Primary Blue: #49a3f1 (info gradient start)
-   Secondary Blue: #1A73E8 (info gradient end)
-   Charcoal: #2D2D2D
-   Light Gray: #F8F9FA
-   ============================================ */
-
 :root {
-    --jadwa-blue: #49a3f1;
-    --jadwa-blue-dark: #1A73E8;
-    --jadwa-charcoal: #2D2D2D;
-    --jadwa-light: #F8F9FA;
-    --jadwa-success: #34A853;
-    --jadwa-warning: #FBBC05;
-    --jadwa-danger: #EA4335;
+  --primary-gradient: linear-gradient(135deg, #4F7DF3 0%, #1A73E8 100%);
+  --primary-color: #4F7DF3;
+  --primary-dark: #1A73E8;
+  --success-color: #10B981;
+  --success-gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+  --info-color: #17c1e8;
+  --surface-color: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
-/* ============================================
-   QUICK STATS DASHBOARD
-   ============================================ */
-.quick-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
+.operations-page-container {
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #F0F4FF 0%, #FFFFFF 100%);
+  min-height: 100vh;
+}
+
+/* Progress Section */
+.progress-section {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.progress-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.progress-percentage {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.progress-bar-container {
+  height: 10px;
+  background: #E2E8F0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.progress-bar-fill.success { background: var(--success-color); }
+.progress-bar-fill.info { background: var(--info-color); }
+.progress-bar-fill.danger { background: var(--danger-color); }
+
+/* Profile Card */
+.profile-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-card-header {
+  background: var(--primary-gradient);
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-card-header h5 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-card-body {
+  padding: 1.5rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-align: center;
-    border: 2px solid #e5e7eb;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  border: 2px solid var(--border-color);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-gradient);
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(26, 115, 232, 0.2);
-    border-color: #1A73E8;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-color);
 }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-    font-size: 1.5rem;
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    color: white;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(26, 115, 232, 0.4);
-}
-
-.stat-icon i {
-    font-size: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
 }
 
 .stat-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--jadwa-charcoal);
-    line-height: 1;
-    margin-bottom: 0.5rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 0.5rem;
 }
 
 .stat-label {
-    font-size: 0.85rem;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
-/* ============================================
-   SECTION CARDS
-   ============================================ */
-.ops-section {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
+@media (max-width: 992px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-.ops-section-header {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    color: white;
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+@media (max-width: 576px) {
+  .stats-grid { grid-template-columns: 1fr; }
 }
 
-.ops-section-header.blue-header {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
+/* Section Card */
+.section-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
-.ops-section-header h5 {
-    margin: 0;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.1rem;
+.section-card-header {
+  background: var(--primary-gradient);
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.ops-section-header .section-badge {
-    background: rgba(255,255,255,0.2);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
+.section-card-header.success {
+  background: var(--success-gradient);
 }
 
-.ops-section-body {
-    padding: 1.5rem;
+.section-card-header h6 {
+  margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
 }
 
-/* ============================================
-   SUPPLIER CARDS
-   ============================================ */
+.section-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.section-card-body {
+  padding: 1.5rem;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(79, 125, 243, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Form Elements */
+.form-group-modern {
+  margin-bottom: 1.25rem;
+}
+
+.form-label-modern {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.form-control-modern {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-control-modern:hover {
+  border-color: #CBD5E1;
+}
+
+.form-control-modern:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.15);
+}
+
+select.form-control-modern {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+html[dir="rtl"] select.form-control-modern {
+  background-position: left 1rem center;
+  padding-right: 1rem;
+  padding-left: 2.5rem;
+}
+
+/* Grid System */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+
+@media (max-width: 992px) {
+  .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+  .operations-page-container { padding: 1rem; }
+}
+
+/* Supplier Card */
 .supplier-card {
-    background: var(--jadwa-light);
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
+  background: var(--surface-color);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .supplier-card:hover {
-    border-color: #1A73E8;
-    box-shadow: 0 4px 20px rgba(26, 115, 232, 0.15);
+  border-color: var(--primary-color);
 }
 
 .supplier-card-header {
-    background: white;
-    padding: 1rem 1.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    border-bottom: 1px solid transparent;
-    transition: all 0.3s ease;
+  background: white;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .supplier-card.expanded .supplier-card-header {
-    border-bottom-color: #e2e8f0;
-    background: linear-gradient(195deg, rgba(73, 163, 241, 0.05) 0%, rgba(26, 115, 232, 0.05) 100%);
+  background: rgba(79, 125, 243, 0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .supplier-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .supplier-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.25rem;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(26, 115, 232, 0.4);
+  width: 48px;
+  height: 48px;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+  flex-shrink: 0;
 }
 
 .supplier-details h6 {
-    margin: 0 0 6px 0;
-    font-weight: 700;
-    color: var(--jadwa-charcoal);
-    font-size: 1rem;
+  margin: 0 0 0.375rem 0;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1rem;
 }
 
 .supplier-meta {
-    display: flex;
-    gap: 15px;
-    font-size: 0.8rem;
-    color: #6b7280;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.supplier-meta span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.supplier-meta .meta-badge {
-    background: rgba(26, 115, 232, 0.1);
-    color: #1A73E8;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-weight: 500;
+.supplier-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
 }
 
 .supplier-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-/* Delete Button - Simple icon style like other pages */
-.btn-delete {
-    background: none;
-    border: 1px solid transparent;
-    color: #6b7280;
-    padding: 6px 10px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.btn-delete:hover {
-    background: #FEE2E2;
-    border-color: #FECACA;
-    color: var(--jadwa-danger);
-    transform: scale(1.1);
-}
-
-.btn-delete i {
-    font-size: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .supplier-toggle {
-    background: var(--jadwa-light);
-    border: 2px solid #e5e7eb;
-    color: var(--jadwa-charcoal);
-    cursor: pointer;
-    padding: 10px 12px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  background: var(--surface-color);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .supplier-toggle:hover {
-    background: #1A73E8;
-    border-color: #1A73E8;
-    color: white;
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
 }
 
 .supplier-toggle i {
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
+  font-size: 1.25rem;
 }
 
 .supplier-card.expanded .supplier-toggle i {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
-/* Products inside supplier */
+/* Supplier Products */
 .supplier-products {
-    padding: 1.25rem;
-    display: none;
-    background: white;
+  padding: 1.25rem;
+  display: none;
+  background: white;
 }
 
 .supplier-card.expanded .supplier-products {
-    display: block;
+  display: block;
 }
 
+/* Product Item */
 .product-item {
-    background: var(--jadwa-light);
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 0.875rem 1rem;
-    margin-bottom: 0.75rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s ease;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
 .product-item:hover {
-    border-color: #1A73E8;
-    background: white;
-    box-shadow: 0 2px 10px rgba(26, 115, 232, 0.1);
+  border-color: var(--primary-color);
+  background: white;
+  box-shadow: var(--shadow-sm);
 }
 
 .product-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .product-icon {
-    width: 36px;
-    height: 36px;
-    background: rgba(26, 115, 232, 0.1);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1A73E8;
+  width: 36px;
+  height: 36px;
+  background: rgba(79, 125, 243, 0.1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
 }
 
 .product-name {
-    font-weight: 600;
-    color: var(--jadwa-charcoal);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-/* Inline Add Product Form */
-.add-product-inline {
-    background: linear-gradient(195deg, rgba(73, 163, 241, 0.05) 0%, rgba(26, 115, 232, 0.08) 100%);
-    border: 2px dashed #1A73E8;
-    border-radius: 10px;
-    padding: 1.25rem;
-    margin-top: 1rem;
+/* Badge Modern */
+.badge-modern {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-/* Add Forms */
-.add-form-section {
-    background: linear-gradient(195deg, rgba(73, 163, 241, 0.03) 0%, rgba(26, 115, 232, 0.06) 100%);
-    border: 2px dashed #1A73E8;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-}
+.badge-primary { background: rgba(79, 125, 243, 0.15); color: var(--primary-color); }
+.badge-success { background: #D1FAE5; color: #065F46; }
+.badge-warning { background: #FEF3C7; color: #92400E; }
+.badge-danger { background: #FEE2E2; color: #991B1B; }
+.badge-info { background: #DBEAFE; color: #1E40AF; }
+.badge-secondary { background: #F1F5F9; color: var(--text-secondary); }
 
-.add-form-section h6 {
-    color: #1A73E8;
-    font-weight: 700;
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-}
-
-.add-form-section h6 i {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    color: white;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-/* Form Controls */
-.form-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--jadwa-charcoal);
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control {
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 0.625rem 0.875rem;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-}
-
-.form-control:focus {
-    border-color: #1A73E8;
-    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
-    outline: none;
-}
-
-/* Primary Button */
-.btn-jadwa {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    color: white;
-    border: none;
-    padding: 0.625rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-jadwa:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(26, 115, 232, 0.4);
-    color: white;
-}
-
-/* ============================================
-   PILL-STYLE SELECTORS (Enhancement & Support)
-   ============================================ */
-.pill-selector-section {
-    background: var(--jadwa-light);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-.pill-selector-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 1rem;
-}
-
-.pill-selector-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1rem;
-}
-
-.pill-selector-title {
-    font-weight: 700;
-    color: var(--jadwa-charcoal);
-    font-size: 1rem;
-    margin: 0;
-}
-
-.pill-selector-help {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-bottom: 1rem;
-    font-style: italic;
-}
-
-.pill-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.pill-option {
-    padding: 10px 18px;
-    border: 2px solid #e5e7eb;
-    border-radius: 25px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    color: #6b7280;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    user-select: none;
-}
-
-.pill-option:hover {
-    border-color: #1A73E8;
-    background: rgba(26, 115, 232, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
-}
-
-.pill-option.selected {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    border-color: transparent;
-    color: white;
-    font-weight: 500;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(26, 115, 232, 0.4);
-}
-
-.pill-option input[type="checkbox"] {
-    display: none;
-}
-
-.pill-option .pill-icon {
-    font-size: 1rem;
-}
-
-/* ============================================
-   SIMPLE CARDS (Production & Distribution)
-   ============================================ */
-.simple-card {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 0.75rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease;
-}
-
-.simple-card:hover {
-    border-color: #1A73E8;
-    box-shadow: 0 4px 15px rgba(26, 115, 232, 0.1);
-    transform: translateX(5px);
-}
-
-.simple-card-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.simple-card-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    background: rgba(26, 115, 232, 0.1);
-    color: #1A73E8;
-}
-
-.simple-card-icon.production {
-    background: rgba(52, 168, 83, 0.1);
-    color: var(--jadwa-success);
-}
-
-.simple-card-icon.distribution {
-    background: rgba(26, 115, 232, 0.1);
-    color: #1A73E8;
-}
-
-/* ============================================
-   BADGES
-   ============================================ */
-.badge-jadwa {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
+/* Quality Badge */
 .quality-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .quality-badge.high { background: #D1FAE5; color: #059669; }
 .quality-badge.good { background: #DBEAFE; color: #2563EB; }
 .quality-badge.consistent { background: #FEF3C7; color: #D97706; }
-.quality-badge.commercial { background: #E5E7EB; color: #374151; }
+.quality-badge.commercial { background: #F1F5F9; color: #64748B; }
 
+/* Price Badge */
 .price-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .price-badge.very-expensive { background: #FEE2E2; color: #DC2626; }
@@ -586,1017 +533,1376 @@
 .price-badge.affordable { background: #D1FAE5; color: #059669; }
 .price-badge.very-low { background: #D1FAE5; color: #047857; }
 
-/* ============================================
-   EMPTY STATE
-   ============================================ */
+/* Add Form Section */
+.add-form-section {
+  background: var(--surface-color);
+  border: 2px dashed var(--primary-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.add-form-section.success {
+  border-color: var(--success-color);
+}
+
+.add-form-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.add-form-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary-gradient);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+}
+
+.add-form-icon.success {
+  background: var(--success-gradient);
+}
+
+.add-form-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.add-form-title.success {
+  color: var(--success-color);
+}
+
+/* Inline Add Product */
+.add-product-inline {
+  background: rgba(79, 125, 243, 0.05);
+  border: 2px dashed rgba(79, 125, 243, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+/* Simple Item Card */
+.simple-item-card {
+  background: white;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.simple-item-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(4px);
+}
+
+html[dir="rtl"] .simple-item-card:hover {
+  transform: translateX(-4px);
+}
+
+.simple-item-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.simple-item-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+}
+
+.simple-item-icon.production {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.simple-item-icon.distribution {
+  background: rgba(79, 125, 243, 0.1);
+  color: var(--primary-color);
+}
+
+.simple-item-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Multi-Select Pills */
+.pill-section {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.pill-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.pill-section-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+}
+
+.pill-section-icon.success {
+  background: var(--success-gradient);
+}
+
+.pill-section-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.pill-section-hint {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.pill-option {
+  padding: 0.625rem 1.125rem;
+  border: 2px solid var(--border-color);
+  border-radius: 25px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.pill-option:hover {
+  border-color: var(--primary-color);
+  background: rgba(79, 125, 243, 0.05);
+  transform: translateY(-2px);
+}
+
+.pill-option.selected {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.pill-option input[type="checkbox"] {
+  display: none;
+}
+
+/* Buttons */
+.btn-modern {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary-modern {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 125, 243, 0.35);
+}
+
+.btn-primary-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 125, 243, 0.45);
+}
+
+.btn-success-modern {
+  background: var(--success-gradient);
+  color: white;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.btn-success-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.btn-delete-small {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #FECACA;
+  background: #FEF2F2;
+  color: var(--danger-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-delete-small:hover {
+  background: var(--danger-color);
+  border-color: var(--danger-color);
+  color: white;
+}
+
+/* Empty State */
 .empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: #6b7280;
+  text-align: center;
+  padding: 3rem 1.5rem;
 }
 
 .empty-state-icon {
-    width: 80px;
-    height: 80px;
-    background: var(--jadwa-light);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    font-size: 2rem;
-    color: #9ca3af;
+  width: 72px;
+  height: 72px;
+  background: var(--surface-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 2rem;
+  color: #CBD5E1;
 }
 
-.empty-state h6 {
-    color: var(--jadwa-charcoal);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+.empty-state-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 992px) {
-    .quick-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.empty-state-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-@media (max-width: 576px) {
-    .quick-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .supplier-card-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-
-    .supplier-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1060;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.toast-notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-notification.success { border-left: 4px solid var(--success-color); }
+.toast-notification.error { border-left: 4px solid var(--danger-color); }
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-icon.success { background: #D1FAE5; color: var(--success-color); }
+.toast-icon.error { background: #FEE2E2; color: var(--danger-color); }
 
 /* RTL Support */
-html[lang="ar"] .supplier-info,
-html[lang="ar"] .product-info,
-html[lang="ar"] .simple-card-info {
-    flex-direction: row-reverse;
+html[dir="rtl"] .section-title,
+html[dir="rtl"] .supplier-info,
+html[dir="rtl"] .product-info,
+html[dir="rtl"] .simple-item-info,
+html[dir="rtl"] .pill-section-header,
+html[dir="rtl"] .add-form-header,
+html[dir="rtl"] .btn-modern {
+  flex-direction: row-reverse;
 }
 
-html[lang="ar"] .simple-card:hover {
-    transform: translateX(-5px);
+html[dir="rtl"] .toast-notification {
+  right: auto;
+  left: 20px;
+  border-left: none;
+  border-right: 4px solid var(--success-color);
+}
+
+html[dir="rtl"] .toast-notification.error {
+  border-right-color: var(--danger-color);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+
+/* Save Indicator */
+.save-indicator {
+  display: none;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: auto;
+  padding: 0.25rem 0.625rem;
+  background: var(--surface-color);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.save-indicator i {
+  font-size: 0.75rem;
+}
+
+.save-indicator.success {
+  color: var(--success-color);
+  background: #D1FAE5;
+}
+
+.pill-section.saving {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+html[dir="rtl"] .save-indicator {
+  margin-left: 0;
+  margin-right: auto;
 }
 </style>
 {% endblock stylesheets %}
 
 {% block content %}
+<div class="operations-page-container">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
 
-<div class="container-fluid pl-5 pt-3">
-  <div class="row">
-    <div class="col-10">
-
-      <!-- Progress Bar -->
-      <div class="row px-8 pt-0 pb-3">
-        <span class="me-2 text-xxs font-weight-bold">
-          {% if session.get('lang', 'en') == 'ar' %}تم الإكمال بنسبة{% endif %}
-          {{ data_comp[0].completion }}%
-          {% if session.get('lang', 'en') == 'ar' %}من الملف{% else %}Completed{% endif %}
-        </span>
-        <div class="progress">
-          {% if data_comp[0].completion == 100 %}
-          <div class="progress-bar bg-gradient-success" role="progressbar" style="width: {{ data_comp[0].completion }}%;"></div>
-          {% elif data_comp[0].completion >= 50 %}
-          <div class="progress-bar" role="progressbar" style="width: {{ data_comp[0].completion }}%; background: var(--jadwa-blue);"></div>
-          {% else %}
-          <div class="progress-bar bg-gradient-danger" role="progressbar" style="width: {{ data_comp[0].completion }}%;"></div>
-          {% endif %}
+        <!-- Toast Notification -->
+        <div class="toast-notification" id="toast-notification">
+          <div class="toast-icon" id="toast-icon"><i class="fas fa-check" id="toast-icon-symbol"></i></div>
+          <span class="toast-message" id="toast-message"></span>
         </div>
-      </div>
 
-      <!-- MAIN FORM -->
-      <form role="form" method="POST" action="/operations_plan/{{ bplan_id }}" id="main-operations-form">
-
-        <!-- Page Header - Original Blue Style -->
-        <div class="card my-3">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-            <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
-              <h5 class="text-white text-capitalize ps-3 mx-3">
-                {% if session.get('lang', 'en') == 'ar' %}
-                  خطة التشغيل وإدارة المنتجات
-                {% else %}
-                  Operation Plan & Product Management
-                {% endif %}
-              </h5>
-            </div>
+        <!-- Progress Section -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">{% if session.get('lang', 'en') == 'ar' %}تقدم الملف{% else %}Profile Completion{% endif %}</span>
+            <span class="progress-percentage">{{ data_comp[0].completion }}%</span>
           </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill {% if data_comp[0].completion == 100 %}success{% elif data_comp[0].completion >= 50 %}info{% else %}danger{% endif %}" style="width: {{ data_comp[0].completion }}%;"></div>
+          </div>
+        </div>
 
-          <div class="card-body px-4 pt-4">
+        <!-- Main Form -->
+        <form id="main-operations-form" method="POST" action="/operations_plan/{{ bplan_id }}">
 
-            <!-- ============================================
-                 QUICK STATS DASHBOARD WITH ICONS
-                 ============================================ -->
-            <div class="quick-stats">
-              <div class="stat-card">
-                <div class="stat-icon">
-                  <i class="material-icons">local_shipping</i>
-                </div>
-                <div class="stat-value">{{ data_bs|length }}</div>
-                <div class="stat-label">
-                  {% if session.get('lang', 'en') == 'ar' %}الموردون{% else %}Suppliers{% endif %}
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">
-                  <i class="material-icons">inventory_2</i>
-                </div>
-                <div class="stat-value">
-                  {% set product_count = namespace(value=0) %}
-                  {% for supplier in data_bs %}
-                    {% set product_count.value = product_count.value + supplier.products|length %}
-                  {% endfor %}
-                  {{ product_count.value }}
-                </div>
-                <div class="stat-label">
-                  {% if session.get('lang', 'en') == 'ar' %}المنتجات{% else %}Products{% endif %}
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">
-                  <i class="material-icons">precision_manufacturing</i>
-                </div>
-                <div class="stat-value">{{ data_bp|length }}</div>
-                <div class="stat-label">
-                  {% if session.get('lang', 'en') == 'ar' %}خطوط الإنتاج{% else %}Production{% endif %}
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">
-                  <i class="material-icons">share</i>
-                </div>
-                <div class="stat-value">{{ data_bd|length }}</div>
-                <div class="stat-label">
-                  {% if session.get('lang', 'en') == 'ar' %}قنوات التوزيع{% else %}Distribution{% endif %}
-                </div>
-              </div>
+          <!-- MAIN CARD -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <h5><i class="fas fa-cogs"></i>{% if session.get('lang', 'en') == 'ar' %}خطة التشغيل وإدارة المنتجات{% else %}Operations Plan & Product Management{% endif %}</h5>
             </div>
+            <div class="profile-card-body">
 
-            <!-- ============================================
-                 SECTION 1: SUPPLIERS & PRODUCTS
-                 ============================================ -->
-            <div class="ops-section" id="suppliers-section">
-              <div class="ops-section-header blue-header">
-                <h5>
-                  <i class="material-icons">inventory</i>
-                  {% if session.get('lang', 'en') == 'ar' %}الموردون والمنتجات{% else %}Suppliers & Products{% endif %}
-                </h5>
-                <span class="section-badge">
-                  {{ data_bs|length }} {% if session.get('lang', 'en') == 'ar' %}مورد{% else %}suppliers{% endif %}
-                </span>
+              <!-- Quick Stats Dashboard -->
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                  <div class="stat-value">{{ data_bs|length }}</div>
+                  <div class="stat-label">{% if session.get('lang', 'en') == 'ar' %}الموردون{% else %}Suppliers{% endif %}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-box"></i></div>
+                  <div class="stat-value">
+                    {% set product_count = namespace(value=0) %}
+                    {% for supplier in data_bs %}
+                      {% set product_count.value = product_count.value + supplier.products|length %}
+                    {% endfor %}
+                    {{ product_count.value }}
+                  </div>
+                  <div class="stat-label">{% if session.get('lang', 'en') == 'ar' %}المنتجات{% else %}Products{% endif %}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon" style="background: var(--success-gradient);"><i class="fas fa-industry"></i></div>
+                  <div class="stat-value">{{ data_bp|length }}</div>
+                  <div class="stat-label">{% if session.get('lang', 'en') == 'ar' %}خطوط الإنتاج{% else %}Production{% endif %}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><i class="fas fa-share-alt"></i></div>
+                  <div class="stat-value">{{ data_bd|length }}</div>
+                  <div class="stat-label">{% if session.get('lang', 'en') == 'ar' %}قنوات التوزيع{% else %}Distribution{% endif %}</div>
+                </div>
               </div>
 
-              <div class="ops-section-body">
+              <!-- ========================================== -->
+              <!-- SECTION 1: SUPPLIERS & PRODUCTS -->
+              <!-- ========================================== -->
+              <div class="section-card" id="suppliers-section">
+                <div class="section-card-header">
+                  <h6><i class="fas fa-boxes"></i>{% if session.get('lang', 'en') == 'ar' %}الموردون والمنتجات{% else %}Suppliers & Products{% endif %}</h6>
+                  <span class="section-badge">{{ data_bs|length }} {% if session.get('lang', 'en') == 'ar' %}مورد{% else %}suppliers{% endif %}</span>
+                </div>
+                <div class="section-card-body">
 
-                {% if data_bs %}
-                  {% for supplier in data_bs %}
-                  <div class="supplier-card" id="supplier-{{ supplier.supplier_id }}">
-                    <!-- Supplier Header -->
-                    <div class="supplier-card-header" onclick="toggleSupplier('{{ supplier.supplier_id }}')">
-                      <div class="supplier-info">
-                        <div class="supplier-icon">
-                          <i class="material-icons">business</i>
-                        </div>
-                        <div class="supplier-details">
-                          <h6>{{ supplier.supplier_name }}</h6>
-                          <div class="supplier-meta">
-                            <span>
-                              <i class="material-icons" style="font-size: 14px;">schedule</i>
-                              <span class="meta-badge">{{ supplier.years_of_collaboration }} {% if session.get('lang', 'en') == 'ar' %}سنوات{% else %}yrs{% endif %}</span>
-                            </span>
-                            <span>
-                              <i class="material-icons" style="font-size: 14px;">star</i>
-                              <span class="quality-badge
-                                {% if supplier.quality == 'High quality' %}high
-                                {% elif supplier.quality == 'Good quality' %}good
-                                {% elif supplier.quality == 'Consistent' %}consistent
-                                {% else %}commercial{% endif %}">
-                                {% if session.get('lang', 'en') == 'ar' %}
-                                  {% if supplier.quality == 'High quality' %}عالية
-                                  {% elif supplier.quality == 'Good quality' %}جيدة
-                                  {% elif supplier.quality == 'Consistent' %}متسقة
-                                  {% else %}تجارية{% endif %}
-                                {% else %}
-                                  {{ supplier.quality|replace(' quality', '') }}
-                                {% endif %}
+                  {% if data_bs %}
+                    {% for supplier in data_bs %}
+                    <div class="supplier-card" id="supplier-{{ supplier.supplier_id }}">
+                      <!-- Supplier Header -->
+                      <div class="supplier-card-header" onclick="toggleSupplier('{{ supplier.supplier_id }}')">
+                        <div class="supplier-info">
+                          <div class="supplier-icon"><i class="fas fa-building"></i></div>
+                          <div class="supplier-details">
+                            <h6>{{ supplier.supplier_name }}</h6>
+                            <div class="supplier-meta">
+                              <span class="supplier-meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span class="badge-modern badge-primary">{{ supplier.years_of_collaboration }} {% if session.get('lang', 'en') == 'ar' %}سنوات{% else %}yrs{% endif %}</span>
                               </span>
-                            </span>
-                            <span>
-                              <i class="material-icons" style="font-size: 14px;">inventory</i>
-                              {{ supplier.products|length }} {% if session.get('lang', 'en') == 'ar' %}منتج{% else %}items{% endif %}
-                            </span>
+                              <span class="supplier-meta-item">
+                                <i class="fas fa-star"></i>
+                                <span class="quality-badge {% if supplier.quality == 'High quality' %}high{% elif supplier.quality == 'Good quality' %}good{% elif supplier.quality == 'Consistent' %}consistent{% else %}commercial{% endif %}">
+                                  {% if session.get('lang', 'en') == 'ar' %}
+                                    {% if supplier.quality == 'High quality' %}عالية{% elif supplier.quality == 'Good quality' %}جيدة{% elif supplier.quality == 'Consistent' %}متسقة{% else %}تجارية{% endif %}
+                                  {% else %}
+                                    {{ supplier.quality|replace(' quality', '') }}
+                                  {% endif %}
+                                </span>
+                              </span>
+                              <span class="supplier-meta-item">
+                                <i class="fas fa-cubes"></i>
+                                {{ supplier.products|length }} {% if session.get('lang', 'en') == 'ar' %}منتج{% else %}items{% endif %}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="supplier-actions">
-                        <button type="button" class="btn-delete"
-                                onclick="event.stopPropagation(); deleteSupplier('{{ supplier.supplier_id }}')"
-                                data-bs-toggle="tooltip"
-                                title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
-                          <i class="material-icons">delete</i>
-                        </button>
-                        <button type="button" class="supplier-toggle" onclick="event.stopPropagation(); toggleSupplier('{{ supplier.supplier_id }}')">
-                          <i class="material-icons">expand_more</i>
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Products inside supplier -->
-                    <div class="supplier-products">
-                      {% if supplier.products %}
-                        {% for product in supplier.products %}
-                        <div class="product-item">
-                          <div class="product-info">
-                            <div class="product-icon">
-                              <i class="material-icons">category</i>
-                            </div>
-                            <span class="product-name">{{ product.product_service }}</span>
-                            <span class="price-badge
-                              {% if product.prices == 'Very expensive' %}very-expensive
-                              {% elif product.prices == 'Expensive' %}expensive
-                              {% elif product.prices == 'Moderate' %}moderate
-                              {% elif product.prices == 'Affordable' %}affordable
-                              {% else %}very-low{% endif %}">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                {% if product.prices == 'Very expensive' %}مكلف جداً
-                                {% elif product.prices == 'Expensive' %}مكلف
-                                {% elif product.prices == 'Moderate' %}معتدل
-                                {% elif product.prices == 'Affordable' %}معقول
-                                {% else %}منخفض{% endif %}
-                              {% else %}
-                                {{ product.prices }}
-                              {% endif %}
-                            </span>
-                            <span class="badge {% if product.quantity == 'Consistent' %}bg-success{% else %}bg-warning text-dark{% endif %}">
-                              {% if session.get('lang', 'en') == 'ar' %}
-                                {% if product.quantity == 'Consistent' %}متسقة{% else %}غير متسقة{% endif %}
-                              {% else %}
-                                {{ product.quantity }}
-                              {% endif %}
-                            </span>
-                          </div>
-                          <button type="button" class="btn-delete"
-                                  onclick="deleteProduct('{{ supplier.supplier_id }}', '{{ product.product_id }}')"
-                                  data-bs-toggle="tooltip"
-                                  title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
-                            <i class="material-icons">delete</i>
+                        <div class="supplier-actions">
+                          <button type="button" class="btn-delete-small" onclick="event.stopPropagation(); deleteSupplier('{{ supplier.supplier_id }}')" title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                          <button type="button" class="supplier-toggle" onclick="event.stopPropagation(); toggleSupplier('{{ supplier.supplier_id }}')">
+                            <i class="fas fa-chevron-down"></i>
                           </button>
                         </div>
-                        {% endfor %}
-                      {% else %}
-                        <p class="text-muted text-center py-3 mb-0">
-                          <i class="material-icons" style="font-size: 16px; vertical-align: middle;">info</i>
-                          {% if session.get('lang', 'en') == 'ar' %}لا توجد منتجات - أضف أول منتج أدناه{% else %}No products yet - add your first below{% endif %}
-                        </p>
-                      {% endif %}
+                      </div>
 
-                      <!-- Inline Add Product -->
-                      <div class="add-product-inline">
-                        <div class="row g-2 align-items-end">
-                          <div class="col-md-4">
-                            <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}المنتج/الخدمة{% else %}Product/Service{% endif %}</label>
-                            <input type="text" class="form-control" name="inline_product_{{ supplier.supplier_id }}"
-                                   placeholder="{% if session.get('lang', 'en') == 'ar' %}اسم المنتج{% else %}Product name{% endif %}">
+                      <!-- Products inside supplier -->
+                      <div class="supplier-products">
+                        {% if supplier.products %}
+                          {% for product in supplier.products %}
+                          <div class="product-item">
+                            <div class="product-info">
+                              <div class="product-icon"><i class="fas fa-tag"></i></div>
+                              <span class="product-name">{{ product.product_service }}</span>
+                              <span class="price-badge {% if product.prices == 'Very expensive' %}very-expensive{% elif product.prices == 'Expensive' %}expensive{% elif product.prices == 'Moderate' %}moderate{% elif product.prices == 'Affordable' %}affordable{% else %}very-low{% endif %}">
+                                {% if session.get('lang', 'en') == 'ar' %}
+                                  {% if product.prices == 'Very expensive' %}مكلف جداً{% elif product.prices == 'Expensive' %}مكلف{% elif product.prices == 'Moderate' %}معتدل{% elif product.prices == 'Affordable' %}معقول{% else %}منخفض{% endif %}
+                                {% else %}
+                                  {{ product.prices }}
+                                {% endif %}
+                              </span>
+                              <span class="badge-modern {% if product.quantity == 'Consistent' %}badge-success{% else %}badge-warning{% endif %}">
+                                {% if session.get('lang', 'en') == 'ar' %}{% if product.quantity == 'Consistent' %}متسقة{% else %}غير متسقة{% endif %}{% else %}{{ product.quantity }}{% endif %}
+                              </span>
+                            </div>
+                            <button type="button" class="btn-delete-small" onclick="deleteProduct('{{ supplier.supplier_id }}', '{{ product.product_id }}')" title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
+                              <i class="fas fa-trash"></i>
+                            </button>
                           </div>
-                          <div class="col-md-3">
-                            <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price Level{% endif %}</label>
-                            <select class="form-control" name="inline_price_{{ supplier.supplier_id }}">
-                              <option value="Moderate">{% if session.get('lang', 'en') == 'ar' %}معتدل{% else %}Moderate{% endif %}</option>
-                              <option value="Very expensive">{% if session.get('lang', 'en') == 'ar' %}مكلف جداً{% else %}Very expensive{% endif %}</option>
-                              <option value="Expensive">{% if session.get('lang', 'en') == 'ar' %}مكلف{% else %}Expensive{% endif %}</option>
-                              <option value="Affordable">{% if session.get('lang', 'en') == 'ar' %}معقول{% else %}Affordable{% endif %}</option>
-                              <option value="Very low">{% if session.get('lang', 'en') == 'ar' %}منخفض{% else %}Very low{% endif %}</option>
-                            </select>
-                          </div>
-                          <div class="col-md-3">
-                            <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}الكمية{% else %}Availability{% endif %}</label>
-                            <select class="form-control" name="inline_quantity_{{ supplier.supplier_id }}">
-                              <option value="Consistent">{% if session.get('lang', 'en') == 'ar' %}متسقة{% else %}Consistent{% endif %}</option>
-                              <option value="Inconsistent">{% if session.get('lang', 'en') == 'ar' %}غير متسقة{% else %}Inconsistent{% endif %}</option>
-                            </select>
-                          </div>
-                          <div class="col-md-2">
-                            <button type="button" class="btn btn-jadwa w-100" onclick="addProductToSupplier('{{ supplier.supplier_id }}')">
-                              <i class="material-icons" style="font-size: 18px;">add</i>
-                              {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                          {% endfor %}
+                        {% else %}
+                          <p style="text-align: center; color: var(--text-secondary); padding: 1rem 0; margin: 0;">
+                            <i class="fas fa-info-circle"></i>
+                            {% if session.get('lang', 'en') == 'ar' %}لا توجد منتجات - أضف أول منتج أدناه{% else %}No products yet - add your first below{% endif %}
+                          </p>
+                        {% endif %}
+
+                        <!-- Inline Add Product -->
+                        <div class="add-product-inline">
+                          <div class="grid-4" style="align-items: end;">
+                            <div class="form-group-modern" style="margin-bottom: 0;">
+                              <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المنتج/الخدمة{% else %}Product/Service{% endif %}</label>
+                              <input type="text" class="form-control-modern" name="inline_product_{{ supplier.supplier_id }}" placeholder="{% if session.get('lang', 'en') == 'ar' %}اسم المنتج{% else %}Product name{% endif %}">
+                            </div>
+                            <div class="form-group-modern" style="margin-bottom: 0;">
+                              <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price Level{% endif %}</label>
+                              <select class="form-control-modern" name="inline_price_{{ supplier.supplier_id }}">
+                                <option value="Moderate">{% if session.get('lang', 'en') == 'ar' %}معتدل{% else %}Moderate{% endif %}</option>
+                                <option value="Very expensive">{% if session.get('lang', 'en') == 'ar' %}مكلف جداً{% else %}Very expensive{% endif %}</option>
+                                <option value="Expensive">{% if session.get('lang', 'en') == 'ar' %}مكلف{% else %}Expensive{% endif %}</option>
+                                <option value="Affordable">{% if session.get('lang', 'en') == 'ar' %}معقول{% else %}Affordable{% endif %}</option>
+                                <option value="Very low">{% if session.get('lang', 'en') == 'ar' %}منخفض{% else %}Very low{% endif %}</option>
+                              </select>
+                            </div>
+                            <div class="form-group-modern" style="margin-bottom: 0;">
+                              <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الكمية{% else %}Availability{% endif %}</label>
+                              <select class="form-control-modern" name="inline_quantity_{{ supplier.supplier_id }}">
+                                <option value="Consistent">{% if session.get('lang', 'en') == 'ar' %}متسقة{% else %}Consistent{% endif %}</option>
+                                <option value="Inconsistent">{% if session.get('lang', 'en') == 'ar' %}غير متسقة{% else %}Inconsistent{% endif %}</option>
+                              </select>
+                            </div>
+                            <button type="button" class="btn-modern btn-primary-modern" onclick="addProductToSupplier('{{ supplier.supplier_id }}')" style="height: 44px;">
+                              <i class="fas fa-plus"></i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
                             </button>
                           </div>
                         </div>
                       </div>
                     </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="empty-state">
+                      <div class="empty-state-icon"><i class="fas fa-truck"></i></div>
+                      <p class="empty-state-text">{% if session.get('lang', 'en') == 'ar' %}لا توجد موردون{% else %}No Suppliers Yet{% endif %}</p>
+                      <p class="empty-state-hint">{% if session.get('lang', 'en') == 'ar' %}أضف أول مورد لبدء إدارة سلسلة التوريد{% else %}Add your first supplier to start managing your supply chain{% endif %}</p>
+                    </div>
+                  {% endif %}
+
+                  <!-- Add New Supplier Form -->
+                  <div class="add-form-section">
+                    <div class="add-form-header">
+                      <div class="add-form-icon"><i class="fas fa-plus"></i></div>
+                      <h6 class="add-form-title">{% if session.get('lang', 'en') == 'ar' %}إضافة مورد جديد{% else %}Add New Supplier{% endif %}</h6>
+                    </div>
+                    <div class="grid-5" style="align-items: end;">
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}اسم المورد{% else %}Supplier Name{% endif %} *</label>
+                        <input type="text" class="form-control-modern" name="supplier_name" placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: شركة ABC{% else %}e.g., ABC Company{% endif %}">
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}سنوات التعاون{% else %}Years{% endif %}</label>
+                        <select class="form-control-modern" name="choice_collaboration">
+                          <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}اختر{% else %}Select{% endif %}</option>
+                          <option value="0-1">0-1</option>
+                          <option value="1-3">1-3</option>
+                          <option value="3-5">3-5</option>
+                          <option value="5-7">5-7</option>
+                          <option value="7-10">7-10</option>
+                          <option value="10+">10+</option>
+                        </select>
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الجودة{% else %}Quality{% endif %}</label>
+                        <select class="form-control-modern" name="choice_quality">
+                          <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}اختر{% else %}Select{% endif %}</option>
+                          <option value="High quality">{% if session.get('lang', 'en') == 'ar' %}جودة عالية{% else %}High quality{% endif %}</option>
+                          <option value="Good quality">{% if session.get('lang', 'en') == 'ar' %}جودة جيدة{% else %}Good quality{% endif %}</option>
+                          <option value="Consistent">{% if session.get('lang', 'en') == 'ar' %}متسقة{% else %}Consistent{% endif %}</option>
+                          <option value="Commercial">{% if session.get('lang', 'en') == 'ar' %}تجارية{% else %}Commercial{% endif %}</option>
+                        </select>
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الخدمة{% else %}Service{% endif %}</label>
+                        <select class="form-control-modern" name="choice_customer_service">
+                          <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}اختر{% else %}Select{% endif %}</option>
+                          <option value="Delivery">{% if session.get('lang', 'en') == 'ar' %}توصيل{% else %}Delivery{% endif %}</option>
+                          <option value="Easy payments terms">{% if session.get('lang', 'en') == 'ar' %}دفع سهل{% else %}Easy payments{% endif %}</option>
+                          <option value="Return policy">{% if session.get('lang', 'en') == 'ar' %}إرجاع{% else %}Returns{% endif %}</option>
+                          <option value="Maintenance">{% if session.get('lang', 'en') == 'ar' %}صيانة{% else %}Maintenance{% endif %}</option>
+                        </select>
+                      </div>
+                      <button type="button" onclick="addSupplier(event)" class="btn-modern btn-primary-modern" style="height: 44px;">
+                        <i class="fas fa-plus"></i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ========================================== -->
+              <!-- SECTION 2: PRODUCTION -->
+              <!-- ========================================== -->
+              <div class="section-card" id="production-section">
+                <div class="section-card-header success">
+                  <h6><i class="fas fa-industry"></i>{% if session.get('lang', 'en') == 'ar' %}الإنتاج{% else %}Production{% endif %}</h6>
+                  <span class="section-badge">{{ data_bp|length }} {% if session.get('lang', 'en') == 'ar' %}سجلات{% else %}records{% endif %}</span>
+                </div>
+                <div class="section-card-body">
+
+                  {% for row in data_bp %}
+                  <div class="simple-item-card">
+                    <div class="simple-item-info">
+                      <div class="simple-item-icon production"><i class="fas fa-cog"></i></div>
+                      <div>
+                        <span class="simple-item-text">{{ row.current_capacity }} → {{ row.max_expected_capacity }}</span>
+                        <span class="badge-modern badge-primary" style="margin-left: 0.5rem;">{{ row.production_unit }}</span>
+                        <span class="badge-modern badge-secondary" style="margin-left: 0.25rem;">/ {{ row.time_frame }}</span>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-delete-small" onclick="deleteProduction('{{ row.production_id }}')" title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </div>
                   {% endfor %}
-                {% else %}
-                  <div class="empty-state">
-                    <div class="empty-state-icon">
-                      <i class="material-icons">local_shipping</i>
-                    </div>
-                    <h6>{% if session.get('lang', 'en') == 'ar' %}لا توجد موردون{% else %}No Suppliers Yet{% endif %}</h6>
-                    <p>{% if session.get('lang', 'en') == 'ar' %}أضف أول مورد لبدء إدارة سلسلة التوريد{% else %}Add your first supplier to start managing your supply chain{% endif %}</p>
-                  </div>
-                {% endif %}
 
-                <!-- Add New Supplier Form -->
-                <div class="add-form-section">
-                  <h6>
-                    <i class="material-icons">add_circle</i>
-                    {% if session.get('lang', 'en') == 'ar' %}إضافة مورد جديد{% else %}Add New Supplier{% endif %}
-                  </h6>
-                  <div class="row g-3">
-                    <div class="col-md-3">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}اسم المورد{% else %}Supplier Name{% endif %} *</label>
-                      <input type="text" class="form-control" name="supplier_name"
-                             placeholder="{% if session.get('lang', 'en') == 'ar' %}مثال: شركة ABC{% else %}e.g., ABC Company{% endif %}">
+                  {% if not data_bp %}
+                  <div class="empty-state" style="padding: 2rem;">
+                    <div class="empty-state-icon" style="width: 56px; height: 56px; font-size: 1.5rem;"><i class="fas fa-industry"></i></div>
+                    <p class="empty-state-hint">{% if session.get('lang', 'en') == 'ar' %}لا توجد سجلات إنتاج{% else %}No production records yet{% endif %}</p>
+                  </div>
+                  {% endif %}
+
+                  <!-- Add Production Form -->
+                  <div class="add-form-section success">
+                    <div class="add-form-header">
+                      <div class="add-form-icon success"><i class="fas fa-plus"></i></div>
+                      <h6 class="add-form-title success">{% if session.get('lang', 'en') == 'ar' %}إضافة سجل إنتاج{% else %}Add Production Record{% endif %}</h6>
                     </div>
-                    <div class="col-md-2">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}سنوات التعاون{% else %}Years{% endif %}</label>
-                      <select class="form-control" name="choice_collaboration">
-                        <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}اختر{% else %}Select{% endif %}</option>
-                        <option value="0-1">0-1</option>
-                        <option value="1-3">1-3</option>
-                        <option value="3-5">3-5</option>
-                        <option value="5-7">5-7</option>
-                        <option value="7-10">7-10</option>
-                        <option value="10+">10+</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}الجودة{% else %}Quality{% endif %}</label>
-                      <select class="form-control" name="choice_quality">
-                        <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}اختر{% else %}Select{% endif %}</option>
-                        <option value="High quality">{% if session.get('lang', 'en') == 'ar' %}جودة عالية{% else %}High quality{% endif %}</option>
-                        <option value="Good quality">{% if session.get('lang', 'en') == 'ar' %}جودة جيدة{% else %}Good quality{% endif %}</option>
-                        <option value="Consistent">{% if session.get('lang', 'en') == 'ar' %}متسقة{% else %}Consistent{% endif %}</option>
-                        <option value="Commercial">{% if session.get('lang', 'en') == 'ar' %}تجارية{% else %}Commercial{% endif %}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-2">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}الخدمة{% else %}Service{% endif %}</label>
-                      <select class="form-control" name="choice_customer_service">
-                        <option value="" disabled selected>{% if session.get('lang', 'en') == 'ar' %}اختر{% else %}Select{% endif %}</option>
-                        <option value="Delivery">{% if session.get('lang', 'en') == 'ar' %}توصيل{% else %}Delivery{% endif %}</option>
-                        <option value="Easy payments terms">{% if session.get('lang', 'en') == 'ar' %}دفع سهل{% else %}Easy payments{% endif %}</option>
-                        <option value="Return policy">{% if session.get('lang', 'en') == 'ar' %}إرجاع{% else %}Returns{% endif %}</option>
-                        <option value="Maintenance">{% if session.get('lang', 'en') == 'ar' %}صيانة{% else %}Maintenance{% endif %}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                      <button type="button" onclick="addSupplier(event)" class="btn btn-jadwa w-100">
-                        <i class="material-icons" style="font-size: 18px;">add</i>
-                        {% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                    <div class="grid-5" style="align-items: end;">
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الوحدة{% else %}Unit{% endif %}</label>
+                        <select class="form-control-modern" name="choice_production_unit" id="choice_production_unit">
+                          <option value="Piece">{% if session.get('lang', 'en') == 'ar' %}قطعة{% else %}Piece{% endif %}</option>
+                          <option value="Kg">{% if session.get('lang', 'en') == 'ar' %}كغم{% else %}Kg{% endif %}</option>
+                          <option value="Liter">{% if session.get('lang', 'en') == 'ar' %}لتر{% else %}Liter{% endif %}</option>
+                          <option value="Service">{% if session.get('lang', 'en') == 'ar' %}خدمة{% else %}Service{% endif %}</option>
+                          <option value="Box">{% if session.get('lang', 'en') == 'ar' %}صندوق{% else %}Box{% endif %}</option>
+                          <option value="Ton">{% if session.get('lang', 'en') == 'ar' %}طن{% else %}Ton{% endif %}</option>
+                        </select>
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الإطار الزمني{% else %}Timeframe{% endif %}</label>
+                        <select class="form-control-modern" name="choice_time_frame" id="choice_time_frame">
+                          <option value="Hour">{% if session.get('lang', 'en') == 'ar' %}ساعة{% else %}Hour{% endif %}</option>
+                          <option value="Day">{% if session.get('lang', 'en') == 'ar' %}يوم{% else %}Day{% endif %}</option>
+                          <option value="Month">{% if session.get('lang', 'en') == 'ar' %}شهر{% else %}Month{% endif %}</option>
+                          <option value="Year">{% if session.get('lang', 'en') == 'ar' %}سنة{% else %}Year{% endif %}</option>
+                        </select>
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}السعة الحالية{% else %}Current{% endif %}</label>
+                        <input type="number" class="form-control-modern" name="current_capacity" placeholder="100">
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}السعة القصوى{% else %}Max Capacity{% endif %}</label>
+                        <input type="number" class="form-control-modern" name="max_expected_capacity" placeholder="500">
+                      </div>
+                      <button type="button" onclick="addProduction(event)" class="btn-modern btn-success-modern" style="height: 44px;">
+                        <i class="fas fa-plus"></i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
                       </button>
                     </div>
                   </div>
-                </div>
 
-              </div>
-            </div>
-
-            <!-- ============================================
-                 SECTION 2: PRODUCTION
-                 ============================================ -->
-            <div class="ops-section" id="production-section">
-              <div class="ops-section-header" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
-                <h5>
-                  <i class="material-icons">precision_manufacturing</i>
-                  {% if session.get('lang', 'en') == 'ar' %}الإنتاج{% else %}Production{% endif %}
-                </h5>
-                <span class="section-badge">{{ data_bp|length }} {% if session.get('lang', 'en') == 'ar' %}سجلات{% else %}records{% endif %}</span>
-              </div>
-
-              <div class="ops-section-body">
-                {% for row in data_bp %}
-                <div class="simple-card">
-                  <div class="simple-card-info">
-                    <div class="simple-card-icon production">
-                      <i class="material-icons">settings</i>
+                  <!-- Enhancement Pills -->
+                  <div class="pill-section" id="enhance-pills-section">
+                    <div class="pill-section-header">
+                      <div class="pill-section-icon success"><i class="fas fa-chart-line"></i></div>
+                      <h6 class="pill-section-title">{% if session.get('lang', 'en') == 'ar' %}كيفية تحسين الإنتاج؟{% else %}How to enhance production?{% endif %}</h6>
                     </div>
-                    <div>
-                      <strong style="color: var(--jadwa-charcoal);">{{ row.current_capacity }} → {{ row.max_expected_capacity }}</strong>
-                      <span class="badge-jadwa ms-2">{{ row.production_unit }}</span>
-                      <span class="badge bg-secondary ms-1">/ {{ row.time_frame }}</span>
+                    <p class="pill-section-hint">{% if session.get('lang', 'en') == 'ar' %}اختر الطرق التي تخطط لتحسين الإنتاج بها{% else %}Select the methods you plan to use for improving production{% endif %}</p>
+                    <div class="pill-container">
+                      {% set enhancements = [
+                        ('1', 'Recruiting', 'التوظيف', '👥'),
+                        ('2', 'Staff Training', 'تدريب الموظفين', '🎓'),
+                        ('3', 'Better Equipment', 'تحسين المعدات', '⚙️'),
+                        ('4', 'Inventory Mgmt', 'إدارة المخزون', '📦'),
+                        ('5', 'Quality Control', 'مراقبة الجودة', '✅'),
+                        ('6', 'Maintenance', 'الصيانة الدورية', '🔧'),
+                        ('7', 'Advanced Tech', 'تكنولوجيا متقدمة', '🤖')
+                      ] %}
+                      {% for value, en_label, ar_label, icon in enhancements %}
+                      <label class="pill-option {% if value in data_op[0].enhance_production %}selected{% endif %}">
+                        <input type="checkbox" name="choice_enhance" value="{{ value }}" {% if value in data_op[0].enhance_production %}checked{% endif %}>
+                        <span>{{ icon }}</span>
+                        <span>{% if session.get('lang', 'en') == 'ar' %}{{ ar_label }}{% else %}{{ en_label }}{% endif %}</span>
+                      </label>
+                      {% endfor %}
                     </div>
                   </div>
-                  <button type="button" class="btn-delete" onclick="deleteProduction('{{ row.production_id }}')"
-                          data-bs-toggle="tooltip"
-                          title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
-                    <i class="material-icons">delete</i>
-                  </button>
-                </div>
-                {% endfor %}
 
-                {% if not data_bp %}
-                <div class="empty-state" style="padding: 2rem;">
-                  <div class="empty-state-icon" style="width: 60px; height: 60px; font-size: 1.5rem;">
-                    <i class="material-icons">precision_manufacturing</i>
+                </div>
+              </div>
+
+              <!-- ========================================== -->
+              <!-- SECTION 3: DISTRIBUTION -->
+              <!-- ========================================== -->
+              <div class="section-card" id="distribution-section">
+                <div class="section-card-header">
+                  <h6><i class="fas fa-share-alt"></i>{% if session.get('lang', 'en') == 'ar' %}التوزيع{% else %}Distribution{% endif %}</h6>
+                  <span class="section-badge">{{ data_bd|length }} {% if session.get('lang', 'en') == 'ar' %}قنوات{% else %}channels{% endif %}</span>
+                </div>
+                <div class="section-card-body">
+
+                  {% for row in data_bd %}
+                  <div class="simple-item-card">
+                    <div class="simple-item-info">
+                      <div class="simple-item-icon distribution">
+                        {% if row.type == 'Wholesaler' %}<i class="fas fa-warehouse"></i>
+                        {% elif row.type == 'Retailer' %}<i class="fas fa-store"></i>
+                        {% elif row.type == 'Online' %}<i class="fas fa-globe"></i>
+                        {% elif row.type == 'Direct Sales' %}<i class="fas fa-handshake"></i>
+                        {% else %}<i class="fas fa-truck"></i>{% endif %}
+                      </div>
+                      <div>
+                        <span class="simple-item-text">{{ row.distribution_name or row.type }}</span>
+                        <span class="badge-modern badge-primary" style="margin-left: 0.5rem;">{{ row.type }}</span>
+                        <span style="margin-left: 0.5rem; font-size: 0.8125rem; color: var(--text-secondary);">{{ row.collaboration_years }} {% if session.get('lang', 'en') == 'ar' %}سنوات{% else %}yrs{% endif %}</span>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-delete-small" onclick="deleteDistribution('{{ row.distribution_id }}')" title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
+                      <i class="fas fa-trash"></i>
+                    </button>
                   </div>
-                  <p class="mb-0">{% if session.get('lang', 'en') == 'ar' %}لا توجد سجلات إنتاج{% else %}No production records yet{% endif %}</p>
-                </div>
-                {% endif %}
+                  {% endfor %}
 
-                <!-- Add Production Form -->
-                <div class="add-form-section" style="border-color: #10b981;">
-                  <h6 style="color: #059669;">
-                    <i class="material-icons" style="background: #059669;">add_circle</i>
-                    {% if session.get('lang', 'en') == 'ar' %}إضافة سجل إنتاج{% else %}Add Production Record{% endif %}
-                  </h6>
-                  <div class="row g-3">
-                    <div class="col-md-3">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}الوحدة{% else %}Unit{% endif %}</label>
-                      <select class="form-control" name="choice_production_unit" id="choice_production_unit">
-                        <option value="Piece">{% if session.get('lang', 'en') == 'ar' %}قطعة{% else %}Piece{% endif %}</option>
-                        <option value="Kg">{% if session.get('lang', 'en') == 'ar' %}كغم{% else %}Kg{% endif %}</option>
-                        <option value="Liter">{% if session.get('lang', 'en') == 'ar' %}لتر{% else %}Liter{% endif %}</option>
-                        <option value="Service">{% if session.get('lang', 'en') == 'ar' %}خدمة{% else %}Service{% endif %}</option>
-                        <option value="Box">{% if session.get('lang', 'en') == 'ar' %}صندوق{% else %}Box{% endif %}</option>
-                        <option value="Ton">{% if session.get('lang', 'en') == 'ar' %}طن{% else %}Ton{% endif %}</option>
-                      </select>
+                  {% if not data_bd %}
+                  <div class="empty-state" style="padding: 2rem;">
+                    <div class="empty-state-icon" style="width: 56px; height: 56px; font-size: 1.5rem;"><i class="fas fa-share-alt"></i></div>
+                    <p class="empty-state-hint">{% if session.get('lang', 'en') == 'ar' %}لا توجد قنوات توزيع{% else %}No distribution channels yet{% endif %}</p>
+                  </div>
+                  {% endif %}
+
+                  <!-- Add Distribution Form -->
+                  <div class="add-form-section">
+                    <div class="add-form-header">
+                      <div class="add-form-icon"><i class="fas fa-plus"></i></div>
+                      <h6 class="add-form-title">{% if session.get('lang', 'en') == 'ar' %}إضافة قناة توزيع{% else %}Add Distribution Channel{% endif %}</h6>
                     </div>
-                    <div class="col-md-2">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}الإطار الزمني{% else %}Timeframe{% endif %}</label>
-                      <select class="form-control" name="choice_time_frame" id="choice_time_frame">
-                        <option value="Hour">{% if session.get('lang', 'en') == 'ar' %}ساعة{% else %}Hour{% endif %}</option>
-                        <option value="Day">{% if session.get('lang', 'en') == 'ar' %}يوم{% else %}Day{% endif %}</option>
-                        <option value="Month">{% if session.get('lang', 'en') == 'ar' %}شهر{% else %}Month{% endif %}</option>
-                        <option value="Year">{% if session.get('lang', 'en') == 'ar' %}سنة{% else %}Year{% endif %}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-2">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}السعة الحالية{% else %}Current{% endif %}</label>
-                      <input type="number" class="form-control" name="current_capacity" placeholder="100">
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}السعة القصوى{% else %}Max Capacity{% endif %}</label>
-                      <input type="number" class="form-control" name="max_expected_capacity" placeholder="500">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                      <button type="button" onclick="addProduction(event)" class="btn w-100" style="background: #059669; color: white; border: none;">
-                        <i class="material-icons" style="font-size: 18px;">add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
+                    <div class="grid-4" style="align-items: end;">
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</label>
+                        <select class="form-control-modern" name="choice_type" id="choice_type">
+                          <option value="Wholesaler">{% if session.get('lang', 'en') == 'ar' %}موزع جملة{% else %}Wholesaler{% endif %}</option>
+                          <option value="Distributer">{% if session.get('lang', 'en') == 'ar' %}موزع{% else %}Distributer{% endif %}</option>
+                          <option value="Retailer">{% if session.get('lang', 'en') == 'ar' %}تاجر تجزئة{% else %}Retailer{% endif %}</option>
+                          <option value="Direct Sales">{% if session.get('lang', 'en') == 'ar' %}مبيعات مباشرة{% else %}Direct Sales{% endif %}</option>
+                          <option value="Online">{% if session.get('lang', 'en') == 'ar' %}عبر الإنترنت{% else %}Online{% endif %}</option>
+                        </select>
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;" id="distributor_name_col">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الاسم{% else %}Name{% endif %}</label>
+                        <input type="text" class="form-control-modern" name="distributor_name" placeholder="{% if session.get('lang', 'en') == 'ar' %}اسم الموزع{% else %}Distributor name{% endif %}">
+                      </div>
+                      <div class="form-group-modern" style="margin-bottom: 0;">
+                        <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}سنوات التعاون{% else %}Years{% endif %}</label>
+                        <input type="number" class="form-control-modern" name="dis_collaboration_years" placeholder="0">
+                      </div>
+                      <button type="button" onclick="addDistribution(event)" class="btn-modern btn-primary-modern" style="height: 44px;">
+                        <i class="fas fa-plus"></i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
                       </button>
                     </div>
                   </div>
-                </div>
 
-                <!-- PILL SELECTOR: Enhancement Options -->
-                <div class="pill-selector-section">
-                  <div class="pill-selector-header">
-                    <div class="pill-selector-icon" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
-                      <i class="material-icons">trending_up</i>
+                  <!-- Customer Support Pills -->
+                  <div class="pill-section" id="support-pills-section">
+                    <div class="pill-section-header">
+                      <div class="pill-section-icon"><i class="fas fa-headset"></i></div>
+                      <h6 class="pill-section-title">{% if session.get('lang', 'en') == 'ar' %}دعم العملاء{% else %}Customer Support{% endif %}</h6>
                     </div>
-                    <h6 class="pill-selector-title">
-                      {% if session.get('lang', 'en') == 'ar' %}كيفية تحسين الإنتاج؟{% else %}How to enhance production?{% endif %}
-                    </h6>
+                    <p class="pill-section-hint">{% if session.get('lang', 'en') == 'ar' %}اختر خدمات دعم العملاء التي تقدمها{% else %}Select the customer support services you offer{% endif %}</p>
+                    <div class="pill-container">
+                      {% set supports = [
+                        ('1', 'Return Policy', 'سياسة الإرجاع', '↩️'),
+                        ('2', 'Maintenance', 'صيانة', '🔧'),
+                        ('3', 'Warranty', 'ضمان', '🛡️'),
+                        ('4', 'Customer Feedback', 'ملاحظات العملاء', '💬')
+                      ] %}
+                      {% for value, en_label, ar_label, icon in supports %}
+                      <label class="pill-option {% if value in data_op[0].customer_support %}selected{% endif %}">
+                        <input type="checkbox" name="choice_customer_support" value="{{ value }}" {% if value in data_op[0].customer_support %}checked{% endif %}>
+                        <span>{{ icon }}</span>
+                        <span>{% if session.get('lang', 'en') == 'ar' %}{{ ar_label }}{% else %}{{ en_label }}{% endif %}</span>
+                      </label>
+                      {% endfor %}
+                    </div>
                   </div>
-                  <p class="pill-selector-help">
-                    {% if session.get('lang', 'en') == 'ar' %}اختر الطرق التي تخطط لتحسين الإنتاج بها{% else %}Select the methods you plan to use for improving production{% endif %}
-                  </p>
-                  <div class="pill-container" id="enhance-pills">
-                    <label class="pill-option {% if '1' in data_op[0].enhance_production %}selected{% endif %}" data-value="1">
-                      <input type="checkbox" name="choice_enhance" value="1" {% if '1' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">👥</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}التوظيف{% else %}Recruiting{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '2' in data_op[0].enhance_production %}selected{% endif %}" data-value="2">
-                      <input type="checkbox" name="choice_enhance" value="2" {% if '2' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">🎓</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}تدريب الموظفين{% else %}Staff Training{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '3' in data_op[0].enhance_production %}selected{% endif %}" data-value="3">
-                      <input type="checkbox" name="choice_enhance" value="3" {% if '3' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">⚙️</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}تحسين المعدات{% else %}Better Equipment{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '4' in data_op[0].enhance_production %}selected{% endif %}" data-value="4">
-                      <input type="checkbox" name="choice_enhance" value="4" {% if '4' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">📦</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}إدارة المخزون{% else %}Inventory Mgmt{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '5' in data_op[0].enhance_production %}selected{% endif %}" data-value="5">
-                      <input type="checkbox" name="choice_enhance" value="5" {% if '5' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">✅</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}مراقبة الجودة{% else %}Quality Control{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '6' in data_op[0].enhance_production %}selected{% endif %}" data-value="6">
-                      <input type="checkbox" name="choice_enhance" value="6" {% if '6' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">🔧</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}الصيانة الدورية{% else %}Maintenance{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '7' in data_op[0].enhance_production %}selected{% endif %}" data-value="7">
-                      <input type="checkbox" name="choice_enhance" value="7" {% if '7' in data_op[0].enhance_production %}checked{% endif %}>
-                      <span class="pill-icon">🤖</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}تكنولوجيا متقدمة{% else %}Advanced Tech{% endif %}</span>
-                    </label>
-                  </div>
+
                 </div>
               </div>
+
             </div>
 
-            <!-- ============================================
-                 SECTION 3: DISTRIBUTION
-                 ============================================ -->
-            <div class="ops-section" id="distribution-section">
-              <div class="ops-section-header blue-header">
-                <h5>
-                  <i class="material-icons">share</i>
-                  {% if session.get('lang', 'en') == 'ar' %}التوزيع{% else %}Distribution{% endif %}
-                </h5>
-                <span class="section-badge">{{ data_bd|length }} {% if session.get('lang', 'en') == 'ar' %}قنوات{% else %}channels{% endif %}</span>
-              </div>
-
-              <div class="ops-section-body">
-                {% for row in data_bd %}
-                <div class="simple-card">
-                  <div class="simple-card-info">
-                    <div class="simple-card-icon distribution">
-                      {% if row.type == 'Wholesaler' %}<i class="material-icons">warehouse</i>
-                      {% elif row.type == 'Retailer' %}<i class="material-icons">storefront</i>
-                      {% elif row.type == 'Online' %}<i class="material-icons">language</i>
-                      {% elif row.type == 'Direct Sales' %}<i class="material-icons">handshake</i>
-                      {% else %}<i class="material-icons">local_shipping</i>{% endif %}
-                    </div>
-                    <div>
-                      <strong style="color: var(--jadwa-charcoal);">{{ row.distribution_name or row.type }}</strong>
-                      <span class="badge-jadwa ms-2">{{ row.type }}</span>
-                      <span class="text-muted small ms-2">{{ row.collaboration_years }} {% if session.get('lang', 'en') == 'ar' %}سنوات{% else %}yrs{% endif %}</span>
-                    </div>
-                  </div>
-                  <button type="button" class="btn-delete" onclick="deleteDistribution('{{ row.distribution_id }}')"
-                          data-bs-toggle="tooltip"
-                          title="{% if session.get('lang', 'en') == 'ar' %}حذف{% else %}Delete{% endif %}">
-                    <i class="material-icons">delete</i>
-                  </button>
-                </div>
-                {% endfor %}
-
-                {% if not data_bd %}
-                <div class="empty-state" style="padding: 2rem;">
-                  <div class="empty-state-icon" style="width: 60px; height: 60px; font-size: 1.5rem;">
-                    <i class="material-icons">share</i>
-                  </div>
-                  <p class="mb-0">{% if session.get('lang', 'en') == 'ar' %}لا توجد قنوات توزيع{% else %}No distribution channels yet{% endif %}</p>
-                </div>
-                {% endif %}
-
-                <!-- Add Distribution Form -->
-                <div class="add-form-section">
-                  <h6>
-                    <i class="material-icons">add_circle</i>
-                    {% if session.get('lang', 'en') == 'ar' %}إضافة قناة توزيع{% else %}Add Distribution Channel{% endif %}
-                  </h6>
-                  <div class="row g-3">
-                    <div class="col-md-3">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}النوع{% else %}Type{% endif %}</label>
-                      <select class="form-control" name="choice_type" id="choice_type">
-                        <option value="Wholesaler">{% if session.get('lang', 'en') == 'ar' %}موزع جملة{% else %}Wholesaler{% endif %}</option>
-                        <option value="Distributer">{% if session.get('lang', 'en') == 'ar' %}موزع{% else %}Distributer{% endif %}</option>
-                        <option value="Retailer">{% if session.get('lang', 'en') == 'ar' %}تاجر تجزئة{% else %}Retailer{% endif %}</option>
-                        <option value="Direct Sales">{% if session.get('lang', 'en') == 'ar' %}مبيعات مباشرة{% else %}Direct Sales{% endif %}</option>
-                        <option value="Online">{% if session.get('lang', 'en') == 'ar' %}عبر الإنترنت{% else %}Online{% endif %}</option>
-                      </select>
-                    </div>
-                    <div class="col-md-4" id="distributor_name_col">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}الاسم{% else %}Name{% endif %}</label>
-                      <input type="text" class="form-control" name="distributor_name" placeholder="{% if session.get('lang', 'en') == 'ar' %}اسم الموزع{% else %}Distributor name{% endif %}">
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">{% if session.get('lang', 'en') == 'ar' %}سنوات التعاون{% else %}Years{% endif %}</label>
-                      <input type="number" class="form-control" name="dis_collaboration_years" placeholder="0">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                      <button type="button" onclick="addDistribution(event)" class="btn btn-jadwa w-100">
-                        <i class="material-icons" style="font-size: 18px;">add</i>{% if session.get('lang', 'en') == 'ar' %}إضافة{% else %}Add{% endif %}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- PILL SELECTOR: Customer Support -->
-                <div class="pill-selector-section">
-                  <div class="pill-selector-header">
-                    <div class="pill-selector-icon">
-                      <i class="material-icons">support_agent</i>
-                    </div>
-                    <h6 class="pill-selector-title">
-                      {% if session.get('lang', 'en') == 'ar' %}دعم العملاء{% else %}Customer Support{% endif %}
-                    </h6>
-                  </div>
-                  <p class="pill-selector-help">
-                    {% if session.get('lang', 'en') == 'ar' %}اختر خدمات دعم العملاء التي تقدمها{% else %}Select the customer support services you offer{% endif %}
-                  </p>
-                  <div class="pill-container" id="support-pills">
-                    <label class="pill-option {% if '1' in data_op[0].customer_support %}selected{% endif %}" data-value="1">
-                      <input type="checkbox" name="choice_customer_support" value="1" {% if '1' in data_op[0].customer_support %}checked{% endif %}>
-                      <span class="pill-icon">↩️</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}سياسة الإرجاع{% else %}Return Policy{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '2' in data_op[0].customer_support %}selected{% endif %}" data-value="2">
-                      <input type="checkbox" name="choice_customer_support" value="2" {% if '2' in data_op[0].customer_support %}checked{% endif %}>
-                      <span class="pill-icon">🔧</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}صيانة{% else %}Maintenance{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '3' in data_op[0].customer_support %}selected{% endif %}" data-value="3">
-                      <input type="checkbox" name="choice_customer_support" value="3" {% if '3' in data_op[0].customer_support %}checked{% endif %}>
-                      <span class="pill-icon">🛡️</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}ضمان{% else %}Warranty{% endif %}</span>
-                    </label>
-                    <label class="pill-option {% if '4' in data_op[0].customer_support %}selected{% endif %}" data-value="4">
-                      <input type="checkbox" name="choice_customer_support" value="4" {% if '4' in data_op[0].customer_support %}checked{% endif %}>
-                      <span class="pill-icon">💬</span>
-                      <span>{% if session.get('lang', 'en') == 'ar' %}ملاحظات العملاء{% else %}Customer Feedback{% endif %}</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Save Button -->
-            <div class="d-flex justify-content-end mt-4 mb-3">
-              <button type="submit" name="action" value="save" class="btn btn-lg px-5 btn-jadwa" style="border-radius: 10px;">
-                <i class="material-icons" style="font-size: 20px;">save</i>
-                {% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="submit" name="action" value="save" class="btn-modern btn-primary-modern" style="padding: 1rem 2rem;">
+                <i class="fas fa-save"></i>{% if session.get('lang', 'en') == 'ar' %}حفظ ومتابعة{% else %}Save & Continue{% endif %}
               </button>
             </div>
-
           </div>
-        </div>
 
-      </form>
+        </form>
+
+        <!-- Hidden forms for operations -->
+        <form id="deleteSupplierForm" method="POST" style="display:none;">
+          <input type="hidden" name="supplier_delete" id="supplier_delete_id">
+        </form>
+        <form id="deleteProductForm" method="POST" style="display:none;">
+          <input type="hidden" name="supplier_product_delete" id="product_delete_id">
+        </form>
+        <form id="deleteProductionForm" method="POST" style="display:none;">
+          <input type="hidden" name="production_delete" id="production_delete_id">
+        </form>
+        <form id="deleteDistributionForm" method="POST" style="display:none;">
+          <input type="hidden" name="distribution_delete" id="distribution_delete_id">
+        </form>
+        <form id="addProductForm" method="POST" style="display:none;">
+          <input type="hidden" name="product_add" value="{{ bplan_id }}">
+          <input type="hidden" name="supplier_id" id="add_product_supplier_id">
+          <input type="hidden" name="product_service" id="add_product_name">
+          <input type="hidden" name="choice_prices" id="add_product_price">
+          <input type="hidden" name="choice_quantity" id="add_product_quantity">
+        </form>
+
+      </div>
     </div>
   </div>
 </div>
-
-<!-- Hidden forms for operations -->
-<form id="deleteSupplierForm" method="POST" style="display:none;">
-  <input type="hidden" name="supplier_delete" id="supplier_delete_id">
-</form>
-<form id="deleteProductForm" method="POST" style="display:none;">
-  <input type="hidden" name="supplier_product_delete" id="product_delete_id">
-</form>
-<form id="deleteProductionForm" method="POST" style="display:none;">
-  <input type="hidden" name="production_delete" id="production_delete_id">
-</form>
-<form id="deleteDistributionForm" method="POST" style="display:none;">
-  <input type="hidden" name="distribution_delete" id="distribution_delete_id">
-</form>
-<form id="addProductForm" method="POST" style="display:none;">
-  <input type="hidden" name="product_add" value="{{ bplan_id }}">
-  <input type="hidden" name="supplier_id" id="add_product_supplier_id">
-  <input type="hidden" name="product_service" id="add_product_name">
-  <input type="hidden" name="choice_prices" id="add_product_price">
-  <input type="hidden" name="choice_quantity" id="add_product_quantity">
-</form>
-
 {% endblock content %}
 
 {% block javascripts %}
 <script>
-// ============================================
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+const CONFIG = {
+  bplanId: '{{ bplan_id }}',
+  lang: '{{ session.get("lang", "en") }}',
+  isArabic: '{{ session.get("lang", "en") }}' === 'ar'
+};
+
+// ============================================================================
+// TOAST NOTIFICATION
+// ============================================================================
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast-notification');
+  const icon = document.getElementById('toast-icon');
+  const iconSymbol = document.getElementById('toast-icon-symbol');
+  const messageEl = document.getElementById('toast-message');
+
+  if (!toast) return;
+
+  toast.classList.remove('success', 'error');
+  icon.classList.remove('success', 'error');
+  toast.classList.add(type);
+  icon.classList.add(type);
+  iconSymbol.className = type === 'success' ? 'fas fa-check' : 'fas fa-times';
+  messageEl.textContent = message;
+  toast.classList.add('show');
+
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================================================
 // SUPPLIER CARD TOGGLE
-// ============================================
+// ============================================================================
 function toggleSupplier(supplierId) {
-    const card = document.getElementById('supplier-' + supplierId);
+  const card = document.getElementById('supplier-' + supplierId);
+  if (card) {
     card.classList.toggle('expanded');
+  }
 }
 
-// ============================================
+// ============================================================================
 // AJAX HELPER FUNCTION
-// ============================================
+// ============================================================================
 function submitFormAjax(formId, scrollTargetId) {
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
+  const form = document.getElementById(formId);
+  const formData = new FormData(form);
+  const scrollTarget = scrollTargetId ? document.getElementById(scrollTargetId) : null;
+  const scrollPosition = window.scrollY;
 
-    // Store scroll position or target element
-    const scrollTarget = scrollTargetId ? document.getElementById(scrollTargetId) : null;
-    const scrollPosition = window.scrollY;
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.text())
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newContent = doc.querySelector('.profile-card-body');
+    const currentContent = document.querySelector('.profile-card-body');
 
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+    if (newContent && currentContent) {
+      currentContent.innerHTML = newContent.innerHTML;
+      initPillSelectors();
+      initDistributionTypeHandler();
+
+      setTimeout(() => {
+        if (scrollTarget) {
+          const newTarget = document.getElementById(scrollTargetId);
+          if (newTarget) {
+            newTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        } else {
+          window.scrollTo(0, scrollPosition);
         }
-    })
-    .then(response => response.text())
-    .then(html => {
-        // Parse the response and update the page content
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        // Update the main card body content
-        const newContent = doc.querySelector('.card-body');
-        const currentContent = document.querySelector('.card-body');
-
-        if (newContent && currentContent) {
-            currentContent.innerHTML = newContent.innerHTML;
-
-            // Re-initialize pill selectors
-            initPillSelectors();
-
-            // Restore scroll position
-            setTimeout(() => {
-                if (scrollTarget) {
-                    const newTarget = document.getElementById(scrollTargetId);
-                    if (newTarget) {
-                        newTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                } else {
-                    window.scrollTo(0, scrollPosition);
-                }
-            }, 50);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Fallback to regular form submission
-        form.submit();
-    });
+      }, 50);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    form.submit();
+  });
 }
 
-// ============================================
-// DELETE FUNCTIONS WITH AJAX
-// ============================================
+// ============================================================================
+// DELETE FUNCTIONS
+// ============================================================================
 function deleteSupplier(supplierId) {
-    if (confirm("{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف هذا المورد وجميع منتجاته؟{% else %}Delete this supplier and all its products?{% endif %}")) {
-        document.getElementById('supplier_delete_id').value = supplierId;
-        submitFormAjax('deleteSupplierForm', 'suppliers-section');
-    }
+  const confirmMsg = CONFIG.isArabic ? 'هل أنت متأكد من حذف هذا المورد وجميع منتجاته؟' : 'Delete this supplier and all its products?';
+  if (confirm(confirmMsg)) {
+    document.getElementById('supplier_delete_id').value = supplierId;
+    submitFormAjax('deleteSupplierForm', 'suppliers-section');
+    showToast(CONFIG.isArabic ? 'تم حذف المورد' : 'Supplier deleted');
+  }
 }
 
 function deleteProduct(supplierId, productId) {
-    if (confirm("{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف هذا المنتج؟{% else %}Delete this product?{% endif %}")) {
-        document.getElementById('product_delete_id').value = supplierId + '_' + productId;
-        submitFormAjax('deleteProductForm', 'supplier-' + supplierId);
-    }
+  const confirmMsg = CONFIG.isArabic ? 'هل أنت متأكد من حذف هذا المنتج؟' : 'Delete this product?';
+  if (confirm(confirmMsg)) {
+    document.getElementById('product_delete_id').value = supplierId + '_' + productId;
+    submitFormAjax('deleteProductForm', 'supplier-' + supplierId);
+    showToast(CONFIG.isArabic ? 'تم حذف المنتج' : 'Product deleted');
+  }
 }
 
 function deleteProduction(productionId) {
-    if (confirm("{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف هذا السجل؟{% else %}Delete this record?{% endif %}")) {
-        document.getElementById('production_delete_id').value = productionId;
-        submitFormAjax('deleteProductionForm', 'production-section');
-    }
+  const confirmMsg = CONFIG.isArabic ? 'هل أنت متأكد من حذف هذا السجل؟' : 'Delete this record?';
+  if (confirm(confirmMsg)) {
+    document.getElementById('production_delete_id').value = productionId;
+    submitFormAjax('deleteProductionForm', 'production-section');
+    showToast(CONFIG.isArabic ? 'تم حذف السجل' : 'Record deleted');
+  }
 }
 
 function deleteDistribution(distributionId) {
-    if (confirm("{% if session.get('lang', 'en') == 'ar' %}هل أنت متأكد من حذف قناة التوزيع هذه؟{% else %}Delete this channel?{% endif %}")) {
-        document.getElementById('distribution_delete_id').value = distributionId;
-        submitFormAjax('deleteDistributionForm', 'distribution-section');
-    }
+  const confirmMsg = CONFIG.isArabic ? 'هل أنت متأكد من حذف قناة التوزيع هذه؟' : 'Delete this channel?';
+  if (confirm(confirmMsg)) {
+    document.getElementById('distribution_delete_id').value = distributionId;
+    submitFormAjax('deleteDistributionForm', 'distribution-section');
+    showToast(CONFIG.isArabic ? 'تم حذف القناة' : 'Channel deleted');
+  }
 }
 
-// ============================================
-// ADD PRODUCT TO SUPPLIER WITH AJAX
-// ============================================
+// ============================================================================
+// ADD PRODUCT TO SUPPLIER
+// ============================================================================
 function addProductToSupplier(supplierId) {
-    const productName = document.querySelector('input[name="inline_product_' + supplierId + '"]').value;
-    const price = document.querySelector('select[name="inline_price_' + supplierId + '"]').value;
-    const quantity = document.querySelector('select[name="inline_quantity_' + supplierId + '"]').value;
+  const productName = document.querySelector('input[name="inline_product_' + supplierId + '"]').value;
+  const price = document.querySelector('select[name="inline_price_' + supplierId + '"]').value;
+  const quantity = document.querySelector('select[name="inline_quantity_' + supplierId + '"]').value;
 
-    if (!productName.trim()) {
-        alert("{% if session.get('lang', 'en') == 'ar' %}يرجى إدخال اسم المنتج{% else %}Please enter a product name{% endif %}");
-        return;
+  if (!productName.trim()) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال اسم المنتج' : 'Please enter a product name', 'error');
+    return;
+  }
+
+  document.getElementById('add_product_supplier_id').value = supplierId;
+  document.getElementById('add_product_name').value = productName;
+  document.getElementById('add_product_price').value = price;
+  document.getElementById('add_product_quantity').value = quantity;
+
+  const form = document.getElementById('addProductForm');
+  const formData = new FormData(form);
+
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.text())
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newContent = doc.querySelector('.profile-card-body');
+    const currentContent = document.querySelector('.profile-card-body');
+
+    if (newContent && currentContent) {
+      currentContent.innerHTML = newContent.innerHTML;
+      initPillSelectors();
+      initDistributionTypeHandler();
+
+      setTimeout(() => {
+        const supplierCard = document.getElementById('supplier-' + supplierId);
+        if (supplierCard) {
+          supplierCard.classList.add('expanded');
+          supplierCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
     }
-
-    document.getElementById('add_product_supplier_id').value = supplierId;
-    document.getElementById('add_product_name').value = productName;
-    document.getElementById('add_product_price').value = price;
-    document.getElementById('add_product_quantity').value = quantity;
-
-    // Submit with AJAX and keep the supplier expanded
-    const form = document.getElementById('addProductForm');
-    const formData = new FormData(form);
-
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.text())
-    .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        const newContent = doc.querySelector('.card-body');
-        const currentContent = document.querySelector('.card-body');
-
-        if (newContent && currentContent) {
-            currentContent.innerHTML = newContent.innerHTML;
-            initPillSelectors();
-
-            // Re-expand the supplier card after update
-            setTimeout(() => {
-                const supplierCard = document.getElementById('supplier-' + supplierId);
-                if (supplierCard) {
-                    supplierCard.classList.add('expanded');
-                    supplierCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 50);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        form.submit();
-    });
+    showToast(CONFIG.isArabic ? 'تمت إضافة المنتج' : 'Product added');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    form.submit();
+  });
 }
 
-// ============================================
-// ADD SUPPLIER WITH AJAX
-// ============================================
+// ============================================================================
+// ADD SUPPLIER
+// ============================================================================
 function addSupplier(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const form = document.getElementById('main-operations-form');
-    const formData = new FormData();
+  const supplierName = document.querySelector('input[name="supplier_name"]').value;
+  if (!supplierName.trim()) {
+    showToast(CONFIG.isArabic ? 'يرجى إدخال اسم المورد' : 'Please enter supplier name', 'error');
+    return;
+  }
 
-    // Get supplier fields
-    formData.append('supplier_add', '{{ bplan_id }}');
-    formData.append('supplier_name', document.querySelector('input[name="supplier_name"]').value);
-    formData.append('choice_collaboration', document.querySelector('select[name="choice_collaboration"]').value);
-    formData.append('choice_quality', document.querySelector('select[name="choice_quality"]').value);
-    formData.append('choice_customer_service', document.querySelector('select[name="choice_customer_service"]').value);
+  const formData = new FormData();
+  formData.append('supplier_add', CONFIG.bplanId);
+  formData.append('supplier_name', supplierName);
+  formData.append('choice_collaboration', document.querySelector('select[name="choice_collaboration"]').value);
+  formData.append('choice_quality', document.querySelector('select[name="choice_quality"]').value);
+  formData.append('choice_customer_service', document.querySelector('select[name="choice_customer_service"]').value);
 
-    if (!formData.get('supplier_name').trim()) {
-        alert("{% if session.get('lang', 'en') == 'ar' %}يرجى إدخال اسم المورد{% else %}Please enter supplier name{% endif %}");
-        return;
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.text())
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newContent = doc.querySelector('.profile-card-body');
+    const currentContent = document.querySelector('.profile-card-body');
+
+    if (newContent && currentContent) {
+      currentContent.innerHTML = newContent.innerHTML;
+      initPillSelectors();
+      initDistributionTypeHandler();
+
+      setTimeout(() => {
+        const section = document.getElementById('suppliers-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
     }
-
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.text())
-    .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        const newContent = doc.querySelector('.card-body');
-        const currentContent = document.querySelector('.card-body');
-
-        if (newContent && currentContent) {
-            currentContent.innerHTML = newContent.innerHTML;
-            initPillSelectors();
-
-            // Scroll to suppliers section
-            setTimeout(() => {
-                const section = document.getElementById('suppliers-section');
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 50);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Fallback - submit normally
-        const btn = document.createElement('input');
-        btn.type = 'hidden';
-        btn.name = 'supplier_add';
-        btn.value = '{{ bplan_id }}';
-        form.appendChild(btn);
-        form.submit();
-    });
+    showToast(CONFIG.isArabic ? 'تمت إضافة المورد' : 'Supplier added');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
 }
 
-// ============================================
-// ADD PRODUCTION WITH AJAX
-// ============================================
+// ============================================================================
+// ADD PRODUCTION
+// ============================================================================
 function addProduction(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const formData = new FormData();
-    formData.append('production_add', '{{ bplan_id }}');
-    formData.append('choice_production_unit', document.getElementById('choice_production_unit').value);
-    formData.append('choice_time_frame', document.getElementById('choice_time_frame').value);
-    formData.append('current_capacity', document.querySelector('input[name="current_capacity"]').value);
-    formData.append('max_expected_capacity', document.querySelector('input[name="max_expected_capacity"]').value);
+  const formData = new FormData();
+  formData.append('production_add', CONFIG.bplanId);
+  formData.append('choice_production_unit', document.getElementById('choice_production_unit').value);
+  formData.append('choice_time_frame', document.getElementById('choice_time_frame').value);
+  formData.append('current_capacity', document.querySelector('input[name="current_capacity"]').value);
+  formData.append('max_expected_capacity', document.querySelector('input[name="max_expected_capacity"]').value);
 
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.text())
-    .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.text())
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newContent = doc.querySelector('.profile-card-body');
+    const currentContent = document.querySelector('.profile-card-body');
 
-        const newContent = doc.querySelector('.card-body');
-        const currentContent = document.querySelector('.card-body');
+    if (newContent && currentContent) {
+      currentContent.innerHTML = newContent.innerHTML;
+      initPillSelectors();
+      initDistributionTypeHandler();
 
-        if (newContent && currentContent) {
-            currentContent.innerHTML = newContent.innerHTML;
-            initPillSelectors();
-
-            setTimeout(() => {
-                const section = document.getElementById('production-section');
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 50);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-// ============================================
-// ADD DISTRIBUTION WITH AJAX
-// ============================================
-function addDistribution(event) {
-    event.preventDefault();
-
-    const formData = new FormData();
-    formData.append('distribution_add', '{{ bplan_id }}');
-    formData.append('choice_type', document.getElementById('choice_type').value);
-    formData.append('distributor_name', document.querySelector('input[name="distributor_name"]').value || '');
-    formData.append('dis_collaboration_years', document.querySelector('input[name="dis_collaboration_years"]').value);
-
-    fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.text())
-    .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        const newContent = doc.querySelector('.card-body');
-        const currentContent = document.querySelector('.card-body');
-
-        if (newContent && currentContent) {
-            currentContent.innerHTML = newContent.innerHTML;
-            initPillSelectors();
-
-            setTimeout(() => {
-                const section = document.getElementById('distribution-section');
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 50);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
-// ============================================
-// PILL SELECTOR FUNCTIONALITY
-// ============================================
-function initPillSelectors() {
-    document.querySelectorAll('.pill-option').forEach(function(pill) {
-        pill.addEventListener('click', function() {
-            const checkbox = this.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            this.classList.toggle('selected', checkbox.checked);
-        });
-    });
-}
-
-// ============================================
-// INITIALIZE ON PAGE LOAD
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize pill selectors
-    initPillSelectors();
-
-    // Distribution type handler
-    const typeSelect = document.getElementById('choice_type');
-    const nameCol = document.getElementById('distributor_name_col');
-
-    if (typeSelect && nameCol) {
-        typeSelect.addEventListener('change', function() {
-            if (this.value === 'Online' || this.value === 'Direct Sales') {
-                nameCol.style.display = 'none';
-            } else {
-                nameCol.style.display = 'block';
-            }
-        });
+      setTimeout(() => {
+        const section = document.getElementById('production-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
     }
+    showToast(CONFIG.isArabic ? 'تمت إضافة سجل الإنتاج' : 'Production record added');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
 
-    // NOTE: All suppliers are CLOSED by default - no auto-expand
+// ============================================================================
+// ADD DISTRIBUTION
+// ============================================================================
+function addDistribution(event) {
+  event.preventDefault();
+
+  const formData = new FormData();
+  formData.append('distribution_add', CONFIG.bplanId);
+  formData.append('choice_type', document.getElementById('choice_type').value);
+  formData.append('distributor_name', document.querySelector('input[name="distributor_name"]').value || '');
+  formData.append('dis_collaboration_years', document.querySelector('input[name="dis_collaboration_years"]').value);
+
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.text())
+  .then(html => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const newContent = doc.querySelector('.profile-card-body');
+    const currentContent = document.querySelector('.profile-card-body');
+
+    if (newContent && currentContent) {
+      currentContent.innerHTML = newContent.innerHTML;
+      initPillSelectors();
+      initDistributionTypeHandler();
+
+      setTimeout(() => {
+        const section = document.getElementById('distribution-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    }
+    showToast(CONFIG.isArabic ? 'تمت إضافة قناة التوزيع' : 'Distribution channel added');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+// ============================================================================
+// PILL SELECTOR FUNCTIONALITY WITH AUTO-SAVE
+// ============================================================================
+function initPillSelectors() {
+  // Enhancement pills (Production section)
+  const enhanceSection = document.getElementById('enhance-pills-section');
+  if (enhanceSection) {
+    enhanceSection.querySelectorAll('.pill-option').forEach(pill => {
+      // Remove existing listeners to prevent duplicates
+      const newPill = pill.cloneNode(true);
+      pill.parentNode.replaceChild(newPill, pill);
+
+      newPill.addEventListener('click', function(e) {
+        e.preventDefault();
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        this.classList.toggle('selected', checkbox.checked);
+
+        // Auto-save
+        savePillsAjax('enhance', 'choice_enhance', 'enhance-pills-section');
+      });
+    });
+  }
+
+  // Customer support pills (Distribution section)
+  const supportSection = document.getElementById('support-pills-section');
+  if (supportSection) {
+    supportSection.querySelectorAll('.pill-option').forEach(pill => {
+      // Remove existing listeners to prevent duplicates
+      const newPill = pill.cloneNode(true);
+      pill.parentNode.replaceChild(newPill, pill);
+
+      newPill.addEventListener('click', function(e) {
+        e.preventDefault();
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        this.classList.toggle('selected', checkbox.checked);
+
+        // Auto-save
+        savePillsAjax('support', 'choice_customer_support', 'support-pills-section');
+      });
+    });
+  }
+}
+
+// ============================================================================
+// AUTO-SAVE PILLS VIA AJAX
+// ============================================================================
+function savePillsAjax(pillType, inputName, sectionId) {
+  const checkedInputs = document.querySelectorAll('input[name="' + inputName + '"]:checked');
+  const selectedValues = Array.from(checkedInputs).map(input => input.value);
+
+  const formData = new FormData();
+  formData.append('action', 'save_pills');
+  formData.append('pill_type', pillType);
+  selectedValues.forEach(value => {
+    formData.append('selected_values[]', value);
+  });
+
+  // Show saving indicator
+  showSavingIndicator(sectionId);
+
+  fetch(window.location.href, {
+    method: 'POST',
+    body: formData,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showPillSaveSuccess(sectionId);
+    } else {
+      showToast(CONFIG.isArabic ? 'فشل في الحفظ' : 'Failed to save', 'error');
+      hideSavingIndicator(sectionId);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showToast(CONFIG.isArabic ? 'حدث خطأ' : 'An error occurred', 'error');
+    hideSavingIndicator(sectionId);
+  });
+}
+
+// ============================================================================
+// SAVING INDICATOR FUNCTIONS
+// ============================================================================
+function showSavingIndicator(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  section.classList.add('saving');
+
+  let indicator = section.querySelector('.save-indicator');
+  if (!indicator) {
+    indicator = document.createElement('span');
+    indicator.className = 'save-indicator';
+    const header = section.querySelector('.pill-section-header');
+    if (header) {
+      header.appendChild(indicator);
+    }
+  }
+
+  indicator.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> ' +
+    (CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...');
+  indicator.style.display = 'inline-flex';
+  indicator.classList.remove('success');
+}
+
+function showPillSaveSuccess(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  section.classList.remove('saving');
+
+  const indicator = section.querySelector('.save-indicator');
+  if (indicator) {
+    indicator.innerHTML = '<i class="fas fa-check"></i> ' +
+      (CONFIG.isArabic ? 'تم الحفظ' : 'Saved');
+    indicator.classList.add('success');
+
+    // Hide after 2 seconds
+    setTimeout(() => {
+      indicator.style.display = 'none';
+      indicator.classList.remove('success');
+    }, 2000);
+  }
+}
+
+function hideSavingIndicator(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  section.classList.remove('saving');
+
+  const indicator = section.querySelector('.save-indicator');
+  if (indicator) {
+    indicator.style.display = 'none';
+  }
+}
+
+// ============================================================================
+// DISTRIBUTION TYPE HANDLER
+// ============================================================================
+function initDistributionTypeHandler() {
+  const typeSelect = document.getElementById('choice_type');
+  const nameCol = document.getElementById('distributor_name_col');
+
+  if (typeSelect && nameCol) {
+    typeSelect.addEventListener('change', function() {
+      if (this.value === 'Online' || this.value === 'Direct Sales') {
+        nameCol.style.display = 'none';
+      } else {
+        nameCol.style.display = 'block';
+      }
+    });
+
+    // Initial check
+    if (typeSelect.value === 'Online' || typeSelect.value === 'Direct Sales') {
+      nameCol.style.display = 'none';
+    }
+  }
+}
+
+// ============================================================================
+// RTL SUPPORT
+// ============================================================================
+function initRTL() {
+  if (CONFIG.isArabic) {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  }
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  initRTL();
+  initPillSelectors();
+  initDistributionTypeHandler();
+
+  console.log('✅ Operations Plan page initialized');
 });
 </script>
 {% endblock javascripts %}

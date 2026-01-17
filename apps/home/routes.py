@@ -2705,6 +2705,48 @@ def update_buz_operation_plan ( enhance_production, customer_support, bplan_id):
             conn.close()
     return
 
+def update_operations_enhance_production(bplan_id, enhance_production):
+    """Update only enhance_production field in buz_operation_plan table"""
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        sql = "UPDATE public.buz_operation_plan SET enhance_production = %s WHERE bplan_id = %s;"
+        cur.execute(sql, (enhance_production, bplan_id))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return ("", "")
+
+
+def update_operations_customer_support(bplan_id, customer_support):
+    """Update only customer_support field in buz_operation_plan table"""
+    conn = None
+    try:
+        db_params = config()
+        conn = psycopg2.connect(**db_params)
+        cur = conn.cursor()
+
+        sql = "UPDATE public.buz_operation_plan SET customer_support = %s WHERE bplan_id = %s;"
+        cur.execute(sql, (customer_support, bplan_id))
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        return ("*", error)
+    finally:
+        if conn is not None:
+            conn.commit()
+            conn.close()
+    return ("", "")
 ############################################################################################################################### youssef
 def get_buz_supplier(bplan_id):
     """Get suppliers without products"""
@@ -3046,85 +3088,117 @@ def get_buz_fund_details(bplan_id):
             conn.close()
     return (results, "")
 
-def update_buz_fund_details ( project_objectives, project_purposes, fund_type, amount, equity, interest_rate, period, grace_period,  bplan_id):
+def update_buz_fund_details(
+    project_objectives, project_purposes, fund_type,
+    amount, equity, interest_rate, period, grace_period, bplan_id
+):
+    print("DEBUG ─ function called")
+    print("DEBUG ─ period:", period, "type:", type(period))
+    print("DEBUG ─ grace_period:", grace_period, "type:", type(grace_period))
+    print("DEBUG ─ fund_type:", fund_type)
+
     conn = None
-    try:   
-        db_params = config()   
+    try:
+        db_params = config()
         conn = psycopg2.connect(**db_params)
         cur = conn.cursor()
 
-        sql = "UPDATE public.buz_fund_details SET project_objectives='{}', project_purposes='{}', fund_type = '{}', amount = {}, equity = {}, interest_rate = {}, period = {}, grace_period = {}  \
-             WHERE bplan_id={} ;".format(project_objectives, project_purposes, fund_type, amount, equity, interest_rate, period, grace_period, bplan_id )
-        cur.execute(sql)
-        
+        update_sql = """
+            UPDATE public.buz_fund_details
+            SET project_objectives = %s,
+                project_purposes = %s,
+                fund_type = %s,
+                amount = %s,
+                equity = %s,
+                interest_rate = %s,
+                period = %s,
+                grace_period = %s
+            WHERE bplan_id = %s;
+        """
+
+        cur.execute(update_sql, (
+            project_objectives,
+            project_purposes,
+            fund_type,
+            amount,
+            equity,
+            interest_rate,
+            period,
+            grace_period,
+            bplan_id
+        ))
+
+        conn.commit()
+        print("DEBUG ─ buz_fund_details updated successfully")
+
         cur.close()
-        print('we re in the function and type is',fund_type)
-        if fund_type == 'loan':
-            print('we re in the loan thing')
 
-            # Safely convert inputs to numeric types
-            try:
-                r = float(interest_rate) / 100
-                P = float(amount)
-                N = int(period)
-                G = int(grace_period)
-            except ValueError as e:
-                print("Error converting input types:", e)
-                return ("*", "Invalid numeric value for loan parameters")
+        if fund_type != "loan":
+            print("DEBUG ─ fund_type is not loan, exiting")
+            return
 
-            # Compute yearly value
-            if r > 0:
-                yearly_payment = P * (r * (1 + r) ** (N - G)) / ((1 + r) ** (N - G) - 1)
-            else:
-                yearly_payment = P / (N - G)
+        print("DEBUG ─ entering loan calculation")
 
-            yearly_value = (G * (P * r) + (N - G) * yearly_payment) / N
+        try:
+            r = float(interest_rate) / 100
+            P = float(amount)
+            N = int(period)
+            G = int(grace_period)
 
-            db_params = config()
-            conn = psycopg2.connect(**db_params)
-            cur = conn.cursor()
+            print("DEBUG ─ converted values:",
+                  "r =", r, "P =", P, "N =", N, "G =", G)
 
-            # Check if a record already exists for this loan
+            if N <= G:
+                raise ValueError("period must be greater than grace_period")
+
+        except (ValueError, TypeError) as e:
+            print("ERROR ─ invalid loan parameters:", e)
+            return ("*", "Invalid loan parameters")
+
+        if r > 0:
+            yearly_payment = P * (r * (1 + r) ** (N - G)) / ((1 + r) ** (N - G) - 1)
+        else:
+            yearly_payment = P / (N - G)
+
+        yearly_value = (G * (P * r) + (N - G) * yearly_payment) / N
+        print("DEBUG ─ yearly_value:", yearly_value)
+
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT price
+            FROM public.buz_feasibility_operating_expenses
+            WHERE bplan_id = %s AND type = %s
+        """, (bplan_id, "Potential Loan Repayment"))
+
+        result = cur.fetchone()
+        print("DEBUG ─ existing loan entry:", result)
+
+        if result:
             cur.execute("""
-                SELECT price FROM public.buz_feasibility_operating_expenses
+                UPDATE public.buz_feasibility_operating_expenses
+                SET price = %s
                 WHERE bplan_id = %s AND type = %s
-            """, (bplan_id, "Potential Loan Repayment"))
-            result = cur.fetchone()
-            print(result)
+            """, (yearly_value, bplan_id, "Potential Loan Repayment"))
+            print("DEBUG ─ loan entry updated")
+        else:
+            cur.execute("""
+                INSERT INTO public.buz_feasibility_operating_expenses
+                (bplan_id, type, unit_quantity, price)
+                VALUES (%s, %s, %s, %s)
+            """, (bplan_id, "Potential Loan Repayment", 1, yearly_value))
+            print("DEBUG ─ loan entry inserted")
 
-            if result:
-                existing_price = result[0]
-                if abs(existing_price - yearly_value) < 1e-6:  # small tolerance for float
-                    print("Loan entry already exists with same yearly_value — no update needed.")
-                else:
-                    cur.execute("""
-                        UPDATE public.buz_feasibility_operating_expenses
-                        SET price = %s
-                        WHERE bplan_id = %s AND type = %s
-                    """, (yearly_value, bplan_id, "Potential Loan Repayment"))
-                    print("Loan entry updated with new yearly_value.")
-            else:
-                cur.execute("""
-                    INSERT INTO public.buz_feasibility_operating_expenses (bplan_id, type, unit_quantity, price)
-                    VALUES (%s, %s, %s, %s)
-                """, (bplan_id, "Potential Loan Repayment", 1, yearly_value))
-                print("New loan entry inserted.")
+        conn.commit()
+        cur.close()
 
-            cur.close()
-
-
-
-
-
-
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        return ("*", error )
+    except Exception as e:
+        print("ERROR ─ unexpected failure:", e)
+        if conn:
+            conn.rollback()
     finally:
-        if conn is not None:
-            conn.commit()
+        if conn:
             conn.close()
-    return
 
 def get_buz_fund_items(bplan_id, type_id):
     conn = None
@@ -7204,6 +7278,33 @@ def competitors(bplan_id):
 @login_required
 def operations_plan(bplan_id):
     if request.method == 'POST':
+
+        action = request.form.get('action')
+
+        # Handle pill auto-save
+        if action == 'save_pills':
+            pill_type = request.form.get('pill_type')
+            selected_values = request.form.getlist('selected_values[]')
+
+            # Convert list to comma-separated string (e.g., "1,2,3")
+            values_string = ','.join(selected_values) if selected_values else ''
+
+            if pill_type == 'enhance':
+                result, error = update_operations_enhance_production(bplan_id, values_string)
+                if error:
+                    return jsonify({'success': False, 'message': str(error)}), 500
+            elif pill_type == 'support':
+                result, error = update_operations_customer_support(bplan_id, values_string)
+                if error:
+                    return jsonify({'success': False, 'message': str(error)}), 500
+
+            return jsonify({
+                'success': True,
+                'message': 'Saved successfully',
+                'pill_type': pill_type,
+                'values': selected_values
+            })
+
         # Handle Supplier Addition
         if request.form.get('supplier_add') is not None:
             supplier_id, error = supplier_add(
@@ -7359,21 +7460,42 @@ def requested_fund(bplan_id):
     if request.method == 'POST':
         if request.form.get('buz_item_add') != None:
             print('in buzz add')
-            buz_item_add(   request.form.get('buz_item_add'),
-                                request.form.get('choice_item_type'),
-                                request.form.get('item_name'),
-                                request.form.get('choice_item_unit'),
-                                request.form.get('item_quantity'),
-                                request.form.get('item_cost'))
-            update_buz_fund_details(    str(request.form.getlist('choice_objectives')).replace("'", ""),
-                                        str(request.form.getlist('choice_purposes')).replace("'", ""),
-                                        request.form.get('choice_fund_type'),
-                                        request.form.get('fund_amount'),
-                                        request.form.get('fund_equity'),
-                                        request.form.get('interest_rate'),
-                                        request.form.get('fund_period'),
-                                        request.form.get('fund_grace_period'),
-                                        bplan_id)
+            buz_item_add(request.form.get('buz_item_add'),
+                         request.form.get('choice_item_type'),
+                         request.form.get('item_name'),
+                         request.form.get('choice_item_unit'),
+                         request.form.get('item_quantity'),
+                         request.form.get('item_cost'))
+            update_buz_fund_details(str(request.form.getlist('choice_objectives')).replace("'", ""),
+                                    str(request.form.getlist('choice_purposes')).replace("'", ""),
+                                    request.form.get('choice_fund_type'),
+                                    request.form.get('fund_amount'),
+                                    request.form.get('fund_equity'),
+                                    request.form.get('interest_rate'),
+                                    request.form.get('fund_period'),
+                                    request.form.get('fund_grace_period'),
+                                    bplan_id)
+
+            # ✅ ADD THIS AJAX DETECTION:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                data_completion, status_completion = get_completion(bplan_id)
+                status_fund_installation, data_fund_installation, data_fund_total = get_buz_fund_items(bplan_id, "1")
+                status_fund_machines, data_fund_machines, data_fund_total = get_buz_fund_items(bplan_id, "2")
+                status_fund_materials, data_fund_materials, data_fund_total = get_buz_fund_items(bplan_id, "3")
+                status_fund_salaries, data_fund_salaries, data_fund_total = get_buz_fund_items(bplan_id, "4")
+                status_fund_ocosts, data_fund_ocosts, data_fund_total = get_buz_fund_items(bplan_id, "5")
+                data_fund_items, status_fund_items = get_buz_fund_details(bplan_id)
+
+                return render_template('home/requestfund.html', segment='requestfund',
+                                       data_comp=data_completion,
+                                       data_installation=data_fund_installation,
+                                       data_machines=data_fund_machines,
+                                       data_materials=data_fund_materials,
+                                       data_salaries=data_fund_salaries,
+                                       data_ocosts=data_fund_ocosts,
+                                       data_fund_total=data_fund_total,
+                                       data_fd=data_fund_items,
+                                       bplan_id=bplan_id)
 
         if request.form.get('buz_item_delete') != None:
             buz_item_delete(request.form.get('buz_item_delete'))
@@ -7442,6 +7564,27 @@ def requested_fund(bplan_id):
                            data_fund_total = data_fund_total,
                            data_fd = data_fund_items,
                            bplan_id = bplan_id)
+
+@blueprint.route('/requested_fund/<bplan_id>/autosave', methods=['POST'])
+@login_required
+def requested_fund_autosave(bplan_id):
+    """Auto-save fund details without page reload"""
+    try:
+        update_buz_fund_details(
+            str(request.form.getlist('choice_objectives')).replace("'", ""),
+            str(request.form.getlist('choice_purposes')).replace("'", ""),
+            request.form.get('choice_fund_type'),
+            request.form.get('fund_amount') or 0,
+            request.form.get('fund_equity') or 0,
+            request.form.get('interest_rate') or 0,
+            request.form.get('fund_period') or 0,
+            request.form.get('fund_grace_period') or 0,
+            bplan_id
+        )
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @blueprint.route('/feasibility/<bplan_id>', methods=['GET', 'POST'])
 @login_required
