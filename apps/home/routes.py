@@ -7717,6 +7717,37 @@ def _handle_expense_add(bplan_id, form_data):
     )
 
 
+@blueprint.route('/feasibility/<bplan_id>/projections', methods=['GET'])
+@login_required
+def get_projections_api(bplan_id):
+    """API endpoint to get updated projections data"""
+    # Get inflation rate from query param or database
+    inflation_rate = request.args.get('inflation_rate', None)
+
+    if inflation_rate is not None:
+        inflation_rate = float(inflation_rate)
+    else:
+        inflation_data, _ = get_buz_inflation_rate(bplan_id)
+        inflation_rate = float(inflation_data[0]['inflation_rate']) if inflation_data else 3.0
+
+    # Get current data
+    data_buz_product = get_buz_product(bplan_id)[0] or []
+    data_buz_expenses = get_buz_expenses(bplan_id)[0] or []
+
+    # Calculate projections
+    data_projections, data_total_projections = calculate_projections(
+        data_buz_product,
+        data_buz_expenses,
+        inflation_rate=inflation_rate
+    )
+
+    return jsonify({
+        'success': True,
+        'projections': data_projections,
+        'totals': data_total_projections,
+        'inflation_rate': inflation_rate
+    })
+
 
 
 @blueprint.route('/profit_loss', methods=['GET', 'POST'])
