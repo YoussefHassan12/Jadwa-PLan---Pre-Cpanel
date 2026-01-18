@@ -1802,9 +1802,9 @@ def financial_delete(financial_id):
             conn.close()
     return
 
-def financial_update(financial_id, financial_sales, financial_profit, growth_reason):
+def financial_update(financial_id, financial_sales, financial_profit, reason_category, growth_reason):
     """
-    NEW: Update financial record (for inline editing).
+    Update financial record (for inline editing) with category and reason.
     """
     conn = None
     try:
@@ -1819,10 +1819,10 @@ def financial_update(financial_id, financial_sales, financial_profit, growth_rea
 
         sql = """
             UPDATE public.buz_financial_history 
-            SET financial_sales = %s, financial_profit = %s, growth_reason = %s
+            SET financial_sales = %s, financial_profit = %s, reason_category = %s, growth_reason = %s
             WHERE financial_id = %s;
         """
-        cur.execute(sql, (int(financial_sales), int(financial_profit), growth_reason, financial_id))
+        cur.execute(sql, (int(financial_sales), int(financial_profit), reason_category or '', growth_reason or '', financial_id))
 
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -6231,7 +6231,8 @@ def business_profile(bplan_id):
                 request.form.get('financial_update'),
                 request.form.get('financial_sales'),
                 request.form.get('financial_profit'),
-                request.form.get('growth_reason')  # NEW FIELD
+                request.form.get('reason_category'),
+                request.form.get('growth_reason')
             )
 
         # NEW: Generate financial years from establishment date
@@ -6326,6 +6327,22 @@ def business_profile(bplan_id):
                            data_bps=data_buz_product_services,
                            bplan_id=bplan_id)
 
+@blueprint.route('/business_profile/<bplan_id>/autosave', methods=['POST'])
+@login_required
+def business_profile_autosave(bplan_id):
+    """Auto-save business info without page reload"""
+    try:
+        update_buz_info(
+            request.form.get('buz_address') or '',
+            request.form.get('buz_est_date') or None,
+            request.form.get('choice_legal_status') or 0,
+            str(request.form.getlist('choice_business_model')).replace("'", ""),
+            request.form.get('product_services') or '',
+            bplan_id
+        )
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 def allowed_doc(filename):

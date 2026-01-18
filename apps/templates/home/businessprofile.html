@@ -319,16 +319,16 @@ html[dir="rtl"] .btn-modern {
                   <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}العنوان{% else %}Address{% endif %}</label>
                   <div class="address-input-wrapper">
                     <i class="material-icons address-icon">location_on</i>
-                    <input class="form-control-modern" type="text" name="buz_address" id="buz_address" value="{{ data_bi[0].buz_address if data_bi[0].buz_address else '' }}" placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل العنوان{% else %}Enter address{% endif %}" onchange="markUnsaved()" autocomplete="off"/>
+                    <input class="form-control-modern" type="text" name="buz_address" id="buz_address" value="{{ data_bi[0].buz_address if data_bi[0].buz_address else '' }}" placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل العنوان{% else %}Enter address{% endif %}" onchange="autoSaveBusinessInfo()" autocomplete="off"/>
                   </div>
                 </div>
                 <div class="form-group-modern">
                   <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}تاريخ التأسيس{% else %}Establishment Date{% endif %}</label>
-                  <input class="form-control-modern" type="date" name="buz_est_date" id="buz_est_date" value="{{ data_bi[0].buz_est_date.strftime('%Y-%m-%d') if data_bi[0].buz_est_date else '' }}" onchange="markUnsaved(); generateFinancialYears();"/>
+                  <input class="form-control-modern" type="date" name="buz_est_date" id="buz_est_date" value="{{ data_bi[0].buz_est_date.strftime('%Y-%m-%d') if data_bi[0].buz_est_date else '' }}" onchange="autoSaveBusinessInfo(); generateFinancialYears();"/>
                 </div>
                 <div class="form-group-modern">
                   <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الوضع القانوني{% else %}Legal Status{% endif %}</label>
-                  <select class="form-control-modern" name="choice_legal_status" onchange="markUnsaved()">
+                  <select class="form-control-modern" name="choice_legal_status" onchange="autoSaveBusinessInfo()">
                     <option value="1" {% if data_bi[0].buz_legal_status == 1 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}ملكية فردية{% else %}Sole Proprietorship{% endif %}</option>
                     <option value="2" {% if data_bi[0].buz_legal_status == 2 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}شركة ذات مسؤولية محدودة{% else %}LLC{% endif %}</option>
                     <option value="3" {% if data_bi[0].buz_legal_status == 3 %}selected{% endif %}>{% if session.get('lang', 'en') == 'ar' %}شركة مساهمة{% else %}Joint Stock{% endif %}</option>
@@ -343,11 +343,11 @@ html[dir="rtl"] .btn-modern {
                 <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}نموذج العمل{% else %}Business Model{% endif %}</label>
                 <div class="multi-select-container">
                   <label class="multi-select-pill {% if data_bi[0].buz_model and '1' in data_bi[0].buz_model %}active{% endif %}">
-                    <input type="checkbox" name="choice_business_model" value="1" {% if data_bi[0].buz_model and '1' in data_bi[0].buz_model %}checked{% endif %} style="display:none;" onchange="markUnsaved()">
+                    <input type="checkbox" name="choice_business_model" value="1" {% if data_bi[0].buz_model and '1' in data_bi[0].buz_model %}checked{% endif %} style="display:none;" onchange="autoSaveBusinessInfo()">
                     <i class="material-icons">person</i>B2C
                   </label>
                   <label class="multi-select-pill {% if data_bi[0].buz_model and '2' in data_bi[0].buz_model %}active{% endif %}">
-                    <input type="checkbox" name="choice_business_model" value="2" {% if data_bi[0].buz_model and '2' in data_bi[0].buz_model %}checked{% endif %} style="display:none;" onchange="markUnsaved()">
+                    <input type="checkbox" name="choice_business_model" value="2" {% if data_bi[0].buz_model and '2' in data_bi[0].buz_model %}checked{% endif %} style="display:none;" onchange="autoSaveBusinessInfo()">
                     <i class="material-icons">business</i>B2B
                   </label>
                 </div>
@@ -370,23 +370,17 @@ html[dir="rtl"] .btn-modern {
                     <input class="form-control-modern" type="text" name="product_service_name" id="product_service_name" placeholder="{% if session.get('lang', 'en') == 'ar' %}أدخل الاسم{% else %}Enter name{% endif %}" autocomplete="off"/>
                   </div>
                   <div class="form-group-modern" style="margin-bottom: 0;">
-                    <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المميز{% else %}Differentiator{% endif %}</label>
-                    <select class="form-control-modern" name="product_service_differentiator" id="product_service_differentiator" onchange="toggleOtherDifferentiator()">
-                      <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
-                      <option value="Price">{% if session.get('lang', 'en') == 'ar' %}السعر{% else %}Price{% endif %}</option>
-                      <option value="Quality">{% if session.get('lang', 'en') == 'ar' %}الجودة{% else %}Quality{% endif %}</option>
-                      <option value="Innovation">{% if session.get('lang', 'en') == 'ar' %}الابتكار{% else %}Innovation{% endif %}</option>
-                      <option value="Customer Service">{% if session.get('lang', 'en') == 'ar' %}خدمة العملاء{% else %}Customer Service{% endif %}</option>
-                      <option value="Speed">{% if session.get('lang', 'en') == 'ar' %}السرعة{% else %}Speed{% endif %}</option>
-                      <option value="Customization">{% if session.get('lang', 'en') == 'ar' %}التخصيص{% else %}Customization{% endif %}</option>
-                      <option value="Brand">{% if session.get('lang', 'en') == 'ar' %}العلامة التجارية{% else %}Brand{% endif %}</option>
-                      <option value="Location">{% if session.get('lang', 'en') == 'ar' %}الموقع{% else %}Location{% endif %}</option>
-                      <option value="Other">{% if session.get('lang', 'en') == 'ar' %}أخرى{% else %}Other{% endif %}</option>
-                    </select>
-                    <div class="other-input-container" id="other-differentiator-container">
-                      <input class="form-control-modern" type="text" name="product_service_differentiator_other" id="product_service_differentiator_other" placeholder="{% if session.get('lang', 'en') == 'ar' %}حدد{% else %}Specify{% endif %}" autocomplete="off"/>
+  <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}الفئة{% else %}Category{% endif %}</label>
+  <select class="form-control-modern" name="differentiator_category" id="differentiator_category" onchange="populateDifferentiators()">
+    <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
+  </select>
+</div>
+                    <div class="form-group-modern" style="margin-bottom: 0;">
+                      <label class="form-label-modern">{% if session.get('lang', 'en') == 'ar' %}المميز{% else %}Differentiator{% endif %}</label>
+                      <select class="form-control-modern" name="product_service_differentiator" id="product_service_differentiator">
+                        <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر الفئة أولاً --{% else %}-- Select Category First --{% endif %}</option>
+                      </select>
                     </div>
-                  </div>
                 </div>
               </div>
               <div class="data-table-container" id="products-services-table-container">
@@ -515,34 +509,42 @@ html[dir="rtl"] .btn-modern {
                       <th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}المبيعات{% else %}Sales{% endif %}</th>
                       <th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}الربح{% else %}Profit{% endif %}</th>
                       <th style="text-align:center;">{% if session.get('lang', 'en') == 'ar' %}النمو{% else %}Growth{% endif %}</th>
+                      <th>{% if session.get('lang', 'en') == 'ar' %}الفئة{% else %}Category{% endif %}</th>
                       <th>{% if session.get('lang', 'en') == 'ar' %}السبب{% else %}Reason{% endif %}</th>
                     </tr>
                   </thead>
                   <tbody id="financial-history-tbody">
                     {% for row in data_fin %}
                     <tr data-financial-id="{{ row.financial_id }}" data-year="{{ row.financial_year }}" data-index="{{ loop.index0 }}">
-                      <td><span class="year-badge"><i class="material-icons">calendar_today</i>{{ row.financial_year }}</span></td>
-                      <td style="text-align:center;">
-                        <input type="number" class="editable-input financial-sales"
-                               data-financial-id="{{ row.financial_id }}"
-                               value="{{ row.financial_sales or 0 }}"/>
-                      </td>
-                      <td style="text-align:center;">
-                        <input type="number" class="editable-input financial-profit"
-                               data-financial-id="{{ row.financial_id }}"
-                               value="{{ row.financial_profit or 0 }}"/>
-                      </td>
-                      <td class="growth-cell" style="text-align:center;">
-                        <span class="growth-indicator neutral">--</span>
-                      </td>
-                      <td>
-                        <select class="editable-select growth-reason"
-                                data-financial-id="{{ row.financial_id }}"
-                                data-current-value="{{ row.growth_reason or '' }}">
-                          <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر --{% else %}-- Select --{% endif %}</option>
-                        </select>
-                      </td>
-                    </tr>
+  <td><span class="year-badge"><i class="material-icons">calendar_today</i>{{ row.financial_year }}</span></td>
+  <td style="text-align:center;">
+    <input type="number" class="editable-input financial-sales"
+           data-financial-id="{{ row.financial_id }}"
+           value="{{ row.financial_sales or 0 }}"/>
+  </td>
+  <td style="text-align:center;">
+    <input type="number" class="editable-input financial-profit"
+           data-financial-id="{{ row.financial_id }}"
+           value="{{ row.financial_profit or 0 }}"/>
+  </td>
+  <td class="growth-cell" style="text-align:center;">
+    <span class="growth-indicator neutral">--</span>
+  </td>
+  <td>
+    <select class="editable-select reason-category"
+            data-financial-id="{{ row.financial_id }}"
+            data-current-category="{{ row.reason_category or '' }}">
+      <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر الفئة --{% else %}-- Select Category --{% endif %}</option>
+    </select>
+  </td>
+  <td>
+    <select class="editable-select growth-reason"
+            data-financial-id="{{ row.financial_id }}"
+            data-current-value="{{ row.growth_reason or '' }}">
+      <option value="">{% if session.get('lang', 'en') == 'ar' %}-- اختر الفئة أولاً --{% else %}-- Select Category First --{% endif %}</option>
+    </select>
+  </td>
+</tr>
                     {% endfor %}
                   </tbody>
                 </table>
@@ -733,22 +735,282 @@ let hasUnsavedChanges = false;
 let isSaving = false;
 let financialChart = null;
 
-// Growth/Decline reason options
-const GROWTH_REASONS = {
-  growth: [
-    { value: 'market_expansion', en: 'Market Expansion', ar: 'توسع السوق' },
-    { value: 'new_products', en: 'New Products', ar: 'منتجات جديدة' },
-    { value: 'price_increase', en: 'Price Increase', ar: 'زيادة الأسعار' },
-    { value: 'marketing', en: 'Improved Marketing', ar: 'تحسين التسويق' },
-    { value: 'efficiency', en: 'Operational Efficiency', ar: 'كفاءة تشغيلية' }
-  ],
-  decline: [
-    { value: 'competition', en: 'Increased Competition', ar: 'زيادة المنافسة' },
-    { value: 'economic', en: 'Economic Conditions', ar: 'ظروف اقتصادية' },
-    { value: 'cost_increase', en: 'Cost Increase', ar: 'زيادة التكاليف' },
-    { value: 'market_saturation', en: 'Market Saturation', ar: 'تشبع السوق' },
-    { value: 'supply_issues', en: 'Supply Chain Issues', ar: 'مشاكل التوريد' }
-  ]
+// ============================================================================
+// DIFFERENTIATOR CATEGORIES DATA
+// ============================================================================
+const DIFFERENTIATOR_DATA = {
+  'Quality & Features': {
+    en: 'Quality & Features',
+    ar: 'الجودة والميزات',
+    options: [
+      { value: 'Higher quality materials', en: 'Higher quality materials', ar: 'مواد ذات جودة أعلى' },
+      { value: 'Better durability or performance', en: 'Better durability or performance', ar: 'متانة أو أداء أفضل' },
+      { value: 'Unique features or specifications', en: 'Unique features or specifications', ar: 'ميزات أو مواصفات فريدة' },
+      { value: 'Better consistency or reliability', en: 'Better consistency or reliability', ar: 'اتساق أو موثوقية أفضل' }
+    ]
+  },
+  'Price & Value': {
+    en: 'Price & Value',
+    ar: 'السعر والقيمة',
+    options: [
+      { value: 'More affordable than alternatives', en: 'More affordable than alternatives', ar: 'أسعار معقولة أكثر' },
+      { value: 'Better value for money', en: 'Better value for money', ar: 'قيمة أفضل مقابل المال' },
+      { value: 'Flexible pricing or packages', en: 'Flexible pricing or packages', ar: 'تسعير أو باقات مرنة' },
+      { value: 'Transparent pricing', en: 'Transparent pricing', ar: 'تسعير شفاف' }
+    ]
+  },
+  'Convenience & Accessibility': {
+    en: 'Convenience & Accessibility',
+    ar: 'الراحة وسهولة الوصول',
+    options: [
+      { value: 'Faster delivery or execution', en: 'Faster delivery or execution', ar: 'توصيل أو تنفيذ أسرع' },
+      { value: 'Easier to use or access', en: 'Easier to use or access', ar: 'أسهل في الاستخدام أو الوصول' },
+      { value: 'Available where competitors are not', en: 'Available where competitors are not', ar: 'متوفر حيث لا يوجد منافسون' },
+      { value: 'Online or remote availability', en: 'Online or remote availability', ar: 'توفر عبر الإنترنت أو عن بُعد' }
+    ]
+  },
+  'Customization': {
+    en: 'Customization',
+    ar: 'التخصيص',
+    options: [
+      { value: 'Made-to-order or personalized', en: 'Made-to-order or personalized', ar: 'حسب الطلب أو مخصص' },
+      { value: 'Flexible options based on customer needs', en: 'Flexible options based on customer needs', ar: 'خيارات مرنة حسب احتياجات العميل' },
+      { value: 'Adapted to local preferences', en: 'Adapted to local preferences', ar: 'متكيف مع التفضيلات المحلية' }
+    ]
+  },
+  'Customer Experience': {
+    en: 'Customer Experience',
+    ar: 'تجربة العميل',
+    options: [
+      { value: 'Better customer support', en: 'Better customer support', ar: 'دعم عملاء أفضل' },
+      { value: 'Faster response time', en: 'Faster response time', ar: 'وقت استجابة أسرع' },
+      { value: 'After-sales service', en: 'After-sales service', ar: 'خدمة ما بعد البيع' },
+      { value: 'Trust-based relationships', en: 'Trust-based relationships', ar: 'علاقات مبنية على الثقة' }
+    ]
+  },
+  'Brand & Trust': {
+    en: 'Brand & Trust',
+    ar: 'العلامة التجارية والثقة',
+    options: [
+      { value: 'Strong local reputation', en: 'Strong local reputation', ar: 'سمعة محلية قوية' },
+      { value: 'Years of experience', en: 'Years of experience', ar: 'سنوات من الخبرة' },
+      { value: 'Certifications or standards', en: 'Certifications or standards', ar: 'شهادات أو معايير' },
+      { value: 'Social or environmental impact', en: 'Social or environmental impact', ar: 'تأثير اجتماعي أو بيئي' }
+    ]
+  },
+  'Distribution & Reach': {
+    en: 'Distribution & Reach',
+    ar: 'التوزيع والوصول',
+    options: [
+      { value: 'Exclusive locations or channels', en: 'Exclusive locations or channels', ar: 'مواقع أو قنوات حصرية' },
+      { value: 'Direct-to-customer model', en: 'Direct-to-customer model', ar: 'نموذج البيع المباشر للعميل' },
+      { value: 'Strong reseller or partner network', en: 'Strong reseller or partner network', ar: 'شبكة موزعين أو شركاء قوية' }
+    ]
+  },
+  'Innovation & Technology': {
+    en: 'Innovation & Technology',
+    ar: 'الابتكار والتكنولوجيا',
+    options: [
+      { value: 'Use of technology or automation', en: 'Use of technology or automation', ar: 'استخدام التكنولوجيا أو الأتمتة' },
+      { value: 'Digital tools or platforms', en: 'Digital tools or platforms', ar: 'أدوات أو منصات رقمية' },
+      { value: 'Continuous improvement or R&D', en: 'Continuous improvement or R&D', ar: 'تحسين مستمر أو بحث وتطوير' }
+    ]
+  },
+  'Speed & Reliability': {
+    en: 'Speed & Reliability',
+    ar: 'السرعة والموثوقية',
+    options: [
+      { value: 'Faster turnaround time', en: 'Faster turnaround time', ar: 'وقت إنجاز أسرع' },
+      { value: 'On-time delivery track record', en: 'On-time delivery track record', ar: 'سجل تسليم في الوقت المحدد' },
+      { value: 'Reliable supply', en: 'Reliable supply', ar: 'إمداد موثوق' }
+    ]
+  }
+};
+
+
+// ============================================================================
+// SALES GROWTH/DECLINE REASONS DATA
+// ============================================================================
+const REASON_CATEGORIES = {
+  'Market': {
+    en: 'Market',
+    ar: 'السوق',
+    growth: [
+      { value: 'market_growth', en: 'Market growth or rising demand', ar: 'نمو السوق أو زيادة الطلب' },
+      { value: 'new_geographic_markets', en: 'Entry into new geographic markets', ar: 'التوسع في أسواق جغرافية جديدة' },
+      { value: 'new_customer_segments', en: 'Expansion into new customer segments', ar: 'التوسع في شرائح عملاء جديدة' },
+      { value: 'seasonal_demand_increase', en: 'Seasonal or cyclical demand increase', ar: 'زيادة موسمية أو دورية في الطلب' },
+      { value: 'demographic_shifts', en: 'Favorable demographic shifts', ar: 'تحولات ديموغرافية إيجابية' }
+    ],
+    decline: [
+      { value: 'market_shrinking', en: 'Overall market size is shrinking', ar: 'تقلص حجم السوق بشكل عام' },
+      { value: 'customers_buying_less', en: 'Customers are buying less than before', ar: 'انخفاض معدل شراء العملاء' },
+      { value: 'location_restrictions', en: 'Business can no longer sell in certain locations', ar: 'عدم القدرة على البيع في مواقع معينة' },
+      { value: 'shrinking_segments', en: 'Target customer groups are getting smaller', ar: 'تقلص شرائح العملاء المستهدفة' },
+      { value: 'seasonal_decline', en: 'Sales drop due to seasonal patterns', ar: 'انخفاض المبيعات بسبب الموسمية' }
+    ]
+  },
+  'Customer': {
+    en: 'Customer',
+    ar: 'العملاء',
+    growth: [
+      { value: 'increased_acquisition', en: 'Increased customer acquisition', ar: 'زيادة اكتساب العملاء الجدد' },
+      { value: 'higher_retention', en: 'Higher retention rates', ar: 'ارتفاع معدلات الاحتفاظ بالعملاء' },
+      { value: 'increased_frequency', en: 'Increased purchase frequency', ar: 'زيادة تكرار الشراء' },
+      { value: 'higher_ltv', en: 'Higher lifetime value (LTV)', ar: 'ارتفاع القيمة الدائمة للعميل' },
+      { value: 'word_of_mouth', en: 'Stronger word-of-mouth referrals', ar: 'زيادة التوصيات والإحالات' }
+    ],
+    decline: [
+      { value: 'customer_churn', en: 'More customers are leaving than before', ar: 'زيادة معدل فقدان العملاء' },
+      { value: 'fewer_new_customers', en: 'Fewer new customers are joining', ar: 'انخفاض عدد العملاء الجدد' },
+      { value: 'reduced_frequency', en: 'Customers buy less often', ar: 'انخفاض تكرار الشراء' },
+      { value: 'lower_spend', en: 'Customers spend less over time', ar: 'انخفاض إنفاق العملاء' },
+      { value: 'major_customers_lost', en: 'Major customers stopped buying', ar: 'فقدان عملاء رئيسيين' }
+    ]
+  },
+  'Product_Service': {
+    en: 'Product / Service',
+    ar: 'المنتج / الخدمة',
+    growth: [
+      { value: 'new_product_launch', en: 'New product or service launch', ar: 'إطلاق منتج أو خدمة جديدة' },
+      { value: 'quality_improvement', en: 'Product improvement or quality enhancement', ar: 'تحسين المنتج أو جودته' },
+      { value: 'better_product_market_fit', en: 'Better product–market fit', ar: 'توافق أفضل بين المنتج والسوق' },
+      { value: 'expanded_range', en: 'Expanded product range', ar: 'توسيع نطاق المنتجات' },
+      { value: 'customization_bundling', en: 'Customization or bundling', ar: 'التخصيص أو تجميع المنتجات' }
+    ],
+    decline: [
+      { value: 'outdated_product', en: 'Product became outdated or irrelevant', ar: 'أصبح المنتج قديماً أو غير ملائم' },
+      { value: 'quality_declined', en: 'Product or service quality declined', ar: 'انخفاض جودة المنتج أو الخدمة' },
+      { value: 'poor_market_fit', en: 'Offering no longer matches customer needs', ar: 'عدم توافق العرض مع احتياجات العملاء' },
+      { value: 'limited_variety', en: 'Limited product variety', ar: 'محدودية تنوع المنتجات' },
+      { value: 'no_innovation', en: 'No improvements or new offerings introduced', ar: 'غياب التحسينات أو العروض الجديدة' }
+    ]
+  },
+  'Pricing_Revenue': {
+    en: 'Pricing & Revenue',
+    ar: 'التسعير والإيرادات',
+    growth: [
+      { value: 'price_optimization', en: 'Price optimization', ar: 'تحسين استراتيجية التسعير' },
+      { value: 'better_discounting', en: 'Improved discounting strategy', ar: 'تحسين استراتيجية الخصومات' },
+      { value: 'premium_offerings', en: 'Introduction of premium offerings', ar: 'تقديم منتجات أو خدمات متميزة' },
+      { value: 'increased_aov', en: 'Increased average order value (AOV)', ar: 'زيادة متوسط قيمة الطلب' },
+      { value: 'upselling_crossselling', en: 'Upselling and cross-selling', ar: 'البيع الإضافي والبيع المتقاطع' }
+    ],
+    decline: [
+      { value: 'unjustified_price_increase', en: 'Price increases without value justification', ar: 'زيادة الأسعار دون مبرر قيمي' },
+      { value: 'poor_discounting', en: 'Poor discounting strategy', ar: 'ضعف استراتيجية الخصومات' },
+      { value: 'affordability_issues', en: 'Customers can no longer afford the product', ar: 'عدم قدرة العملاء على تحمل السعر' },
+      { value: 'uncompetitive_pricing', en: 'High costs force uncompetitive pricing', ar: 'ارتفاع التكاليف يؤدي لأسعار غير تنافسية' },
+      { value: 'confusing_pricing', en: 'Customers don\'t understand pricing or packages', ar: 'عدم وضوح التسعير أو الباقات للعملاء' }
+    ]
+  },
+  'Marketing_Brand': {
+    en: 'Marketing & Brand',
+    ar: 'التسويق والعلامة التجارية',
+    growth: [
+      { value: 'stronger_brand', en: 'Stronger brand awareness', ar: 'زيادة الوعي بالعلامة التجارية' },
+      { value: 'effective_campaigns', en: 'More effective marketing campaigns', ar: 'حملات تسويقية أكثر فعالية' },
+      { value: 'better_positioning', en: 'Improved positioning and messaging', ar: 'تحسين التموضع والرسائل التسويقية' },
+      { value: 'better_targeting', en: 'Better targeting and segmentation', ar: 'تحسين الاستهداف وتقسيم السوق' },
+      { value: 'digital_presence', en: 'Increased digital presence', ar: 'تعزيز التواجد الرقمي' }
+    ],
+    decline: [
+      { value: 'low_brand_recognition', en: 'Fewer people recognize the brand', ar: 'انخفاض التعرف على العلامة التجارية' },
+      { value: 'ineffective_marketing', en: 'Marketing does not drive sales', ar: 'التسويق لا يحقق المبيعات' },
+      { value: 'unclear_value_proposition', en: 'Value proposition is unclear or weak', ar: 'عرض القيمة غير واضح أو ضعيف' },
+      { value: 'reduced_marketing_spend', en: 'Reduced marketing spend', ar: 'انخفاض الإنفاق التسويقي' },
+      { value: 'reputation_decline', en: 'Trust or reputation has declined', ar: 'تراجع الثقة أو السمعة' }
+    ]
+  },
+  'Sales_Distribution': {
+    en: 'Sales & Distribution',
+    ar: 'المبيعات والتوزيع',
+    growth: [
+      { value: 'new_sales_channels', en: 'New sales channels', ar: 'قنوات بيع جديدة' },
+      { value: 'expanded_distribution', en: 'Expanded distribution network', ar: 'توسيع شبكة التوزيع' },
+      { value: 'better_sales_team', en: 'Improved sales team performance', ar: 'تحسن أداء فريق المبيعات' },
+      { value: 'shorter_sales_cycle', en: 'Shorter sales cycle', ar: 'تقصير دورة البيع' },
+      { value: 'better_lead_qualification', en: 'Better lead qualification', ar: 'تحسين تأهيل العملاء المحتملين' }
+    ],
+    decline: [
+      { value: 'outlets_stopped', en: 'Some sales outlets stopped working', ar: 'توقف بعض منافذ البيع' },
+      { value: 'weak_distributors', en: 'Weaker distributor performance', ar: 'ضعف أداء الموزعين' },
+      { value: 'sales_team_underperformance', en: 'Sales team underperformance', ar: 'ضعف أداء فريق المبيعات' },
+      { value: 'longer_sales_cycle', en: 'Deals take more time to close', ar: 'طول دورة إتمام الصفقات' },
+      { value: 'poor_conversion', en: 'Fewer leads turn into customers', ar: 'انخفاض معدل تحويل العملاء المحتملين' }
+    ]
+  },
+  'Operations_Delivery': {
+    en: 'Operations & Delivery',
+    ar: 'العمليات والتسليم',
+    growth: [
+      { value: 'better_availability', en: 'Improved product availability', ar: 'تحسن توفر المنتجات' },
+      { value: 'faster_delivery', en: 'Faster delivery or fulfillment', ar: 'تسريع التسليم والتنفيذ' },
+      { value: 'reliable_service', en: 'Improved service reliability', ar: 'تحسن موثوقية الخدمة' },
+      { value: 'better_support', en: 'Better after-sales support', ar: 'تحسن دعم ما بعد البيع' },
+      { value: 'reduced_bottlenecks', en: 'Reduced operational bottlenecks', ar: 'تقليل الاختناقات التشغيلية' }
+    ],
+    decline: [
+      { value: 'stock_issues', en: 'Products are often unavailable', ar: 'عدم توفر المنتجات بشكل متكرر' },
+      { value: 'delivery_delays', en: 'Delivery delays', ar: 'تأخر في التسليم' },
+      { value: 'unreliable_service', en: 'Services stop or become unreliable', ar: 'توقف الخدمات أو عدم موثوقيتها' },
+      { value: 'poor_customer_service', en: 'Decline in customer service quality', ar: 'تراجع جودة خدمة العملاء' },
+      { value: 'slow_processes', en: 'Internal processes slow down delivery', ar: 'بطء العمليات الداخلية' }
+    ]
+  },
+  'Partnerships_Ecosystem': {
+    en: 'Partnerships & Ecosystem',
+    ar: 'الشراكات والمنظومة',
+    growth: [
+      { value: 'strategic_partnerships', en: 'Strategic partnerships', ar: 'شراكات استراتيجية' },
+      { value: 'reseller_programs', en: 'Reseller or affiliate programs', ar: 'برامج الموزعين والتسويق بالعمولة' },
+      { value: 'platform_exposure', en: 'Platform or marketplace exposure', ar: 'التواجد على المنصات والأسواق الإلكترونية' },
+      { value: 'institutional_clients', en: 'Institutional or corporate clients', ar: 'عملاء مؤسسيون أو شركات' }
+    ],
+    decline: [
+      { value: 'partners_left', en: 'Key partners stopped collaborating', ar: 'توقف الشركاء الرئيسيين عن التعاون' },
+      { value: 'fewer_referrals', en: 'Fewer customers come through recommendations', ar: 'انخفاض العملاء القادمين عبر التوصيات' },
+      { value: 'partners_underperform', en: 'Partners fail to generate expected sales', ar: 'فشل الشركاء في تحقيق المبيعات المتوقعة' },
+      { value: 'agreements_ended', en: 'Agreements ended or were canceled', ar: 'انتهاء أو إلغاء الاتفاقيات' }
+    ]
+  },
+  'Competitive_Landscape': {
+    en: 'Competitive Landscape',
+    ar: 'المشهد التنافسي',
+    growth: [
+      { value: 'reduced_competition', en: 'Reduced competition', ar: 'انخفاض حدة المنافسة' },
+      { value: 'competitor_exit', en: 'Competitor exit or decline', ar: 'خروج أو تراجع المنافسين' },
+      { value: 'superior_differentiation', en: 'Superior differentiation', ar: 'تميز تنافسي متفوق' },
+      { value: 'switching_incentives', en: 'Better customer switching incentives', ar: 'حوافز أفضل لجذب عملاء المنافسين' }
+    ],
+    decline: [
+      { value: 'stronger_competitors', en: 'Stronger or new competitors', ar: 'ظهور منافسين جدد أو أقوى' },
+      { value: 'competitor_lower_prices', en: 'Competitors offer lower prices', ar: 'أسعار أقل من المنافسين' },
+      { value: 'competitor_better_value', en: 'Competitors provide better value', ar: 'قيمة أفضل من المنافسين' },
+      { value: 'customers_switching', en: 'Customers move to alternatives', ar: 'انتقال العملاء للبدائل' }
+    ]
+  },
+  'External_Macro': {
+    en: 'External / Macro Factors',
+    ar: 'العوامل الخارجية والكلية',
+    growth: [
+      { value: 'favorable_regulations', en: 'Regulatory or policy changes', ar: 'تغييرات تنظيمية أو سياسية مواتية' },
+      { value: 'currency_positive', en: 'Currency effects', ar: 'تأثيرات إيجابية لسعر الصرف' },
+      { value: 'economic_recovery', en: 'Economic recovery or stimulus', ar: 'انتعاش اقتصادي أو حوافز حكومية' },
+      { value: 'tech_adoption', en: 'Technological adoption shifts', ar: 'تحولات في تبني التكنولوجيا' },
+      { value: 'cultural_changes', en: 'Cultural or behavioral changes', ar: 'تغيرات ثقافية أو سلوكية' }
+    ],
+    decline: [
+      { value: 'restrictive_laws', en: 'Laws or rules limit sales', ar: 'قوانين أو أنظمة تحد من المبيعات' },
+      { value: 'economic_downturn', en: 'Overall economy reduces spending', ar: 'تراجع الاقتصاد يقلل الإنفاق' },
+      { value: 'inflation', en: 'Inflation reducing purchasing power', ar: 'التضخم يقلل القوة الشرائية' },
+      { value: 'currency_depreciation', en: 'Currency depreciation', ar: 'انخفاض قيمة العملة' },
+      { value: 'war_instability', en: 'War or instability disrupts business', ar: 'الحروب أو عدم الاستقرار' },
+      { value: 'border_restrictions', en: 'Borders were closed or restricted', ar: 'إغلاق أو تقييد الحدود' },
+      { value: 'government_bans', en: 'Government imposed bans or heavy regulations', ar: 'حظر حكومي أو لوائح صارمة' },
+      { value: 'banking_issues', en: 'Banking systems or payment channels stopped', ar: 'توقف الأنظمة المصرفية أو قنوات الدفع' }
+    ]
+  }
 };
 
 // ============================================================================
@@ -767,9 +1029,11 @@ function markSaved() {
 function updateAutoSaveStatus(status) {
   const el = document.getElementById('auto-save-status');
   if (!el) return;
+
   const icon = el.querySelector('i');
   const text = el.querySelector('span');
-  el.classList.remove('saving', 'saved');
+
+  el.classList.remove('saving', 'saved', 'error');
 
   if (status === 'saving') {
     el.classList.add('saving');
@@ -779,6 +1043,10 @@ function updateAutoSaveStatus(status) {
     el.classList.add('saved');
     icon.textContent = 'cloud_done';
     text.textContent = CONFIG.isArabic ? 'تم الحفظ' : 'Saved';
+  } else if (status === 'error') {
+    el.classList.add('error');
+    icon.textContent = 'cloud_off';
+    text.textContent = CONFIG.isArabic ? 'فشل الحفظ' : 'Save failed';
   } else {
     icon.textContent = 'cloud_off';
     text.textContent = CONFIG.isArabic ? 'غير محفوظ' : 'Unsaved';
@@ -822,16 +1090,101 @@ function toggleSection(section) {
     }
   }
 }
+// ============================================================================
+// AUTO-SAVE BUSINESS INFO
+// ============================================================================
+let autoSaveTimeout = null;
 
-function toggleOtherDifferentiator() {
-  const select = document.getElementById('product_service_differentiator');
-  const container = document.getElementById('other-differentiator-container');
-  if (select && container) {
-    if (select.value === 'Other') {
-      container.classList.add('show');
-    } else {
-      container.classList.remove('show');
+function autoSaveBusinessInfo() {
+  // Clear any pending auto-save
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout);
+  }
+
+  // Update status to show pending save
+  updateAutoSaveStatus('unsaved');
+
+  // Debounce: wait 500ms after last change before saving
+  autoSaveTimeout = setTimeout(async () => {
+    updateAutoSaveStatus('saving');
+
+    const formData = new FormData();
+    formData.append('buz_address', document.getElementById('buz_address')?.value || '');
+    formData.append('buz_est_date', document.getElementById('buz_est_date')?.value || '');
+    formData.append('choice_legal_status', document.querySelector('[name="choice_legal_status"]')?.value || '');
+
+    // Get all checked business model values
+    document.querySelectorAll('[name="choice_business_model"]:checked').forEach(cb => {
+      formData.append('choice_business_model', cb.value);
+    });
+
+    try {
+      const response = await fetch('/business_profile/' + CONFIG.bplanId + '/autosave', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('✅ Business info auto-saved');
+        markSaved();
+      } else {
+        console.error('❌ Auto-save failed:', data.error);
+        updateAutoSaveStatus('error');
+      }
+    } catch (error) {
+      console.error('❌ Auto-save error:', error);
+      updateAutoSaveStatus('error');
     }
+  }, 500);
+}
+// ============================================================================
+// DIFFERENTIATOR CASCADING DROPDOWNS
+// ============================================================================
+function initDifferentiatorCategories() {
+  const categorySelect = document.getElementById('differentiator_category');
+  if (!categorySelect) return;
+
+  // Clear and add default option
+  categorySelect.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر --' : '-- Select --') + '</option>';
+
+  // Populate categories
+  Object.keys(DIFFERENTIATOR_DATA).forEach(key => {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = CONFIG.isArabic ? DIFFERENTIATOR_DATA[key].ar : DIFFERENTIATOR_DATA[key].en;
+    categorySelect.appendChild(option);
+  });
+}
+
+function populateDifferentiators() {
+  const categorySelect = document.getElementById('differentiator_category');
+  const diffSelect = document.getElementById('product_service_differentiator');
+  if (!categorySelect || !diffSelect) return;
+
+  const category = categorySelect.value;
+
+  // Clear differentiator dropdown
+  diffSelect.innerHTML = '';
+
+  if (!category) {
+    diffSelect.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر الفئة أولاً --' : '-- Select Category First --') + '</option>';
+    return;
+  }
+
+  // Add default option
+  diffSelect.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر --' : '-- Select --') + '</option>';
+
+  // Populate differentiators for selected category
+  const data = DIFFERENTIATOR_DATA[category];
+  if (data && data.options) {
+    data.options.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = CONFIG.isArabic ? opt.ar : opt.en;
+      diffSelect.appendChild(option);
+    });
   }
 }
 
@@ -854,38 +1207,38 @@ function populateSubtype() {
   let options = [];
   if (type === 'Assets') {
     options = [
-      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
-      {value:'Land', label: CONFIG.isArabic ? 'أرض' : 'Land'},
-      {value:'Building', label: CONFIG.isArabic ? 'مبنى' : 'Building'},
-      {value:'Machinery', label: CONFIG.isArabic ? 'آلات' : 'Machinery'},
-      {value:'Equipment', label: CONFIG.isArabic ? 'معدات' : 'Equipment'},
-      {value:'Vehicles', label: CONFIG.isArabic ? 'مركبات' : 'Vehicles'},
-      {value:'Inventory', label: CONFIG.isArabic ? 'مخزون' : 'Inventory'},
-      {value:'Furniture', label: CONFIG.isArabic ? 'أثاث' : 'Furniture'}
+      { value: '', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --' },
+      { value: 'Land', label: CONFIG.isArabic ? 'أرض' : 'Land' },
+      { value: 'Building', label: CONFIG.isArabic ? 'مبنى' : 'Building' },
+      { value: 'Machinery', label: CONFIG.isArabic ? 'آلات' : 'Machinery' },
+      { value: 'Equipment', label: CONFIG.isArabic ? 'معدات' : 'Equipment' },
+      { value: 'Vehicles', label: CONFIG.isArabic ? 'مركبات' : 'Vehicles' },
+      { value: 'Inventory', label: CONFIG.isArabic ? 'مخزون' : 'Inventory' },
+      { value: 'Furniture', label: CONFIG.isArabic ? 'أثاث' : 'Furniture' }
     ];
   } else if (type === 'Financial Resources') {
     options = [
-      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
-      {value:'Cash', label: CONFIG.isArabic ? 'نقد' : 'Cash'},
-      {value:'Bank Account', label: CONFIG.isArabic ? 'حساب بنكي' : 'Bank Account'},
-      {value:'Investment', label: CONFIG.isArabic ? 'استثمار' : 'Investment'}
+      { value: '', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --' },
+      { value: 'Cash', label: CONFIG.isArabic ? 'نقد' : 'Cash' },
+      { value: 'Bank Account', label: CONFIG.isArabic ? 'حساب بنكي' : 'Bank Account' },
+      { value: 'Investment', label: CONFIG.isArabic ? 'استثمار' : 'Investment' }
     ];
   } else if (type === 'Intellectual Property') {
     options = [
-      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
-      {value:'Patent', label: CONFIG.isArabic ? 'براءة اختراع' : 'Patent'},
-      {value:'Trademark', label: CONFIG.isArabic ? 'علامة تجارية' : 'Trademark'},
-      {value:'Copyright', label: CONFIG.isArabic ? 'حقوق نشر' : 'Copyright'},
-      {value:'Trade Secret', label: CONFIG.isArabic ? 'سر تجاري' : 'Trade Secret'},
-      {value:'License', label: CONFIG.isArabic ? 'ترخيص' : 'License'}
+      { value: '', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --' },
+      { value: 'Patent', label: CONFIG.isArabic ? 'براءة اختراع' : 'Patent' },
+      { value: 'Trademark', label: CONFIG.isArabic ? 'علامة تجارية' : 'Trademark' },
+      { value: 'Copyright', label: CONFIG.isArabic ? 'حقوق نشر' : 'Copyright' },
+      { value: 'Trade Secret', label: CONFIG.isArabic ? 'سر تجاري' : 'Trade Secret' },
+      { value: 'License', label: CONFIG.isArabic ? 'ترخيص' : 'License' }
     ];
   } else if (type === 'Information Technology') {
     options = [
-      {value:'', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --'},
-      {value:'Software', label: CONFIG.isArabic ? 'برمجيات' : 'Software'},
-      {value:'Computers', label: CONFIG.isArabic ? 'حواسيب' : 'Computers'},
-      {value:'Technology Infrastructure', label: CONFIG.isArabic ? 'بنية تحتية' : 'Tech Infrastructure'},
-      {value:'Servers', label: CONFIG.isArabic ? 'خوادم' : 'Servers'}
+      { value: '', label: CONFIG.isArabic ? '-- اختر --' : '-- Select --' },
+      { value: 'Software', label: CONFIG.isArabic ? 'برمجيات' : 'Software' },
+      { value: 'Computers', label: CONFIG.isArabic ? 'حواسيب' : 'Computers' },
+      { value: 'Technology Infrastructure', label: CONFIG.isArabic ? 'بنية تحتية' : 'Tech Infrastructure' },
+      { value: 'Servers', label: CONFIG.isArabic ? 'خوادم' : 'Servers' }
     ];
   }
 
@@ -917,7 +1270,7 @@ function generateFinancialYears() {
   const formData = new FormData();
   formData.append('generate_financial_years', CONFIG.bplanId);
   formData.append('start_year', startYear);
-  formData.append('end_year', currentYear - 1); // Up to last year (not current year)
+  formData.append('end_year', currentYear - 1);
 
   fetch(window.location.href, {
     method: 'POST',
@@ -927,7 +1280,6 @@ function generateFinancialYears() {
   .then(response => {
     if (response.ok) {
       showToast(CONFIG.isArabic ? 'تم إنشاء السنوات المالية' : 'Financial years generated');
-      // Reload page to show new years
       window.location.reload();
     }
   })
@@ -937,7 +1289,7 @@ function generateFinancialYears() {
 }
 
 // ============================================================================
-// FINANCIAL HISTORY - GROWTH CALCULATION & REASON DROPDOWN
+// FINANCIAL HISTORY - GROWTH CALCULATION & CASCADING DROPDOWNS
 // ============================================================================
 function calculateGrowthAndUpdateReasons() {
   const rows = document.querySelectorAll('#financial-history-tbody tr[data-financial-id]');
@@ -948,12 +1300,14 @@ function calculateGrowthAndUpdateReasons() {
   rows.forEach((row, index) => {
     const salesInput = row.querySelector('.financial-sales');
     const growthCell = row.querySelector('.growth-cell');
+    const categorySelect = row.querySelector('.reason-category');
     const reasonSelect = row.querySelector('.growth-reason');
 
-    if (!salesInput || !growthCell || !reasonSelect) return;
+    if (!salesInput || !growthCell || !categorySelect || !reasonSelect) return;
 
     const currentSales = parseFloat(salesInput.value) || 0;
-    const currentValue = reasonSelect.dataset.currentValue || '';
+    const currentCategory = categorySelect.dataset.currentCategory || '';
+    const currentReason = reasonSelect.dataset.currentValue || '';
 
     let growthType = 'neutral';
     let growthPercent = 0;
@@ -976,29 +1330,66 @@ function calculateGrowthAndUpdateReasons() {
       }
     }
 
-    // Update dropdown options based on growth type
-    updateReasonDropdown(reasonSelect, growthType, currentValue);
+    // Store growth type on row for category population
+    row.dataset.growthType = growthType;
+
+    // Populate category dropdown based on growth type
+    populateCategoryDropdown(categorySelect, growthType, currentCategory);
+
+    // If category is already selected, populate reasons
+    if (currentCategory) {
+      populateReasonDropdown(reasonSelect, growthType, currentCategory, currentReason);
+    }
 
     previousSales = currentSales;
   });
 }
 
-function updateReasonDropdown(selectElement, growthType, currentValue) {
+function populateCategoryDropdown(selectElement, growthType, currentCategory) {
   if (!selectElement) return;
 
-  // Clear existing options
-  selectElement.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر --' : '-- Select --') + '</option>';
+  selectElement.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر الفئة --' : '-- Select Category --') + '</option>';
 
-  let reasons = [];
-
-  if (growthType === 'growth') {
-    reasons = GROWTH_REASONS.growth;
-  } else if (growthType === 'decline') {
-    reasons = GROWTH_REASONS.decline;
-  } else {
-    // For neutral (first year or 0% change), show all options
-    reasons = [...GROWTH_REASONS.growth, ...GROWTH_REASONS.decline];
+  // For neutral (first year or 0% change), don't show categories
+  if (growthType === 'neutral') {
+    selectElement.disabled = true;
+    return;
   }
+
+  selectElement.disabled = false;
+
+  // Populate categories
+  Object.keys(REASON_CATEGORIES).forEach(key => {
+    const category = REASON_CATEGORIES[key];
+    // Only add category if it has reasons for this growth type
+    if (category[growthType] && category[growthType].length > 0) {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = CONFIG.isArabic ? category.ar : category.en;
+      if (key === currentCategory) option.selected = true;
+      selectElement.appendChild(option);
+    }
+  });
+}
+
+function populateReasonDropdown(selectElement, growthType, category, currentValue) {
+  if (!selectElement) return;
+
+  selectElement.innerHTML = '';
+
+  if (!category || growthType === 'neutral') {
+    selectElement.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر الفئة أولاً --' : '-- Select Category First --') + '</option>';
+    selectElement.disabled = true;
+    return;
+  }
+
+  selectElement.disabled = false;
+  selectElement.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر السبب --' : '-- Select Reason --') + '</option>';
+
+  const categoryData = REASON_CATEGORIES[category];
+  if (!categoryData) return;
+
+  const reasons = categoryData[growthType] || [];
 
   reasons.forEach(reason => {
     const option = document.createElement('option');
@@ -1009,6 +1400,31 @@ function updateReasonDropdown(selectElement, growthType, currentValue) {
   });
 }
 
+function onCategoryChange(categorySelect) {
+  const row = categorySelect.closest('tr');
+  const growthType = row.dataset.growthType || 'neutral';
+  const reasonSelect = row.querySelector('.growth-reason');
+  const financialId = categorySelect.dataset.financialId;
+  const category = categorySelect.value;
+
+  // Update current category
+  categorySelect.dataset.currentCategory = category;
+
+  // Populate reason dropdown
+  populateReasonDropdown(reasonSelect, growthType, category, '');
+
+  // Clear reason value and save
+  reasonSelect.dataset.currentValue = '';
+
+  // Save category to database
+  saveFinancialRecord(
+    financialId,
+    row.querySelector('.financial-sales').value,
+    row.querySelector('.financial-profit').value,
+    category,
+    ''
+  );
+}
 // ============================================================================
 // FINANCIAL CHART - LINE CHART
 // ============================================================================
@@ -1039,7 +1455,6 @@ function initFinancialChart() {
     profits.push(parseFloat(profitInput?.value) || 0);
   });
 
-  // Destroy existing chart
   if (financialChart) {
     financialChart.destroy();
     financialChart = null;
@@ -1136,11 +1551,12 @@ function initFinancialChart() {
 // ============================================================================
 // SAVE FINANCIAL RECORD
 // ============================================================================
-function saveFinancialRecord(financialId, sales, profit, reason) {
+function saveFinancialRecord(financialId, sales, profit, category, reason) {
   const formData = new FormData();
   formData.append('financial_update', financialId);
   formData.append('financial_sales', sales || 0);
   formData.append('financial_profit', profit || 0);
+  formData.append('reason_category', category || '');
   formData.append('growth_reason', reason || '');
 
   fetch(window.location.href, {
@@ -1173,6 +1589,7 @@ function attachFinancialListeners() {
       const row = this.closest('tr');
       const financialId = this.dataset.financialId;
       const profitInput = row.querySelector('.financial-profit');
+      const categorySelect = row.querySelector('.reason-category');
       const reasonSelect = row.querySelector('.growth-reason');
 
       // Recalculate growth for all rows
@@ -1182,7 +1599,13 @@ function attachFinancialListeners() {
       initFinancialChart();
 
       // Save to database
-      saveFinancialRecord(financialId, this.value, profitInput.value, reasonSelect.value);
+      saveFinancialRecord(
+        financialId,
+        this.value,
+        profitInput.value,
+        categorySelect.value,
+        reasonSelect.value
+      );
     });
   });
 
@@ -1192,13 +1615,27 @@ function attachFinancialListeners() {
       const row = this.closest('tr');
       const financialId = this.dataset.financialId;
       const salesInput = row.querySelector('.financial-sales');
+      const categorySelect = row.querySelector('.reason-category');
       const reasonSelect = row.querySelector('.growth-reason');
 
       // Update chart
       initFinancialChart();
 
       // Save to database
-      saveFinancialRecord(financialId, salesInput.value, this.value, reasonSelect.value);
+      saveFinancialRecord(
+        financialId,
+        salesInput.value,
+        this.value,
+        categorySelect.value,
+        reasonSelect.value
+      );
+    });
+  });
+
+  // Category selects
+  document.querySelectorAll('.reason-category').forEach(select => {
+    select.addEventListener('change', function() {
+      onCategoryChange(this);
     });
   });
 
@@ -1209,12 +1646,19 @@ function attachFinancialListeners() {
       const financialId = this.dataset.financialId;
       const salesInput = row.querySelector('.financial-sales');
       const profitInput = row.querySelector('.financial-profit');
+      const categorySelect = row.querySelector('.reason-category');
 
       // Update current value for tracking
       this.dataset.currentValue = this.value;
 
       // Save to database
-      saveFinancialRecord(financialId, salesInput.value, profitInput.value, this.value);
+      saveFinancialRecord(
+        financialId,
+        salesInput.value,
+        profitInput.value,
+        categorySelect.value,
+        this.value
+      );
     });
   });
 }
@@ -1235,19 +1679,15 @@ function updateContributionProgress() {
   const messageEl = document.getElementById('contribution-message');
   const totalDisplay = document.getElementById('total-contribution-display');
 
-  // Update progress bar
   if (valueEl) valueEl.textContent = total.toFixed(1) + '%';
   if (totalDisplay) totalDisplay.textContent = total.toFixed(1) + '%';
   if (barFill) barFill.style.width = Math.min(total, 100) + '%';
 
-  // Remove all classes
   if (valueEl) valueEl.classList.remove('valid', 'invalid');
   if (totalDisplay) totalDisplay.classList.remove('valid', 'invalid', 'warning');
   if (barFill) barFill.classList.remove('valid', 'invalid', 'warning');
 
-  // Update styling and message based on total
   if (total === 100) {
-    // Perfect - exactly 100%
     if (valueEl) valueEl.classList.add('valid');
     if (totalDisplay) {
       totalDisplay.classList.add('valid');
@@ -1258,7 +1698,6 @@ function updateContributionProgress() {
       messageEl.innerHTML = '<span style="color: var(--success-color);"><i class="material-icons" style="font-size:16px;vertical-align:middle;">check_circle</i> ' + (CONFIG.isArabic ? 'مثالي! المجموع 100%' : 'Perfect! Total is 100%') + '</span>';
     }
   } else if (total > 100) {
-    // Over 100% - error
     if (valueEl) valueEl.classList.add('invalid');
     if (totalDisplay) {
       totalDisplay.classList.add('invalid');
@@ -1270,7 +1709,6 @@ function updateContributionProgress() {
       messageEl.innerHTML = '<span style="color: var(--danger-color);"><i class="material-icons" style="font-size:16px;vertical-align:middle;">error</i> ' + (CONFIG.isArabic ? 'تجاوز بـ ' + excess + '% - يرجى التعديل' : 'Exceeds by ' + excess + '% - please adjust') + '</span>';
     }
   } else {
-    // Under 100% - warning
     if (valueEl) valueEl.classList.add('invalid');
     if (totalDisplay) {
       totalDisplay.classList.add('warning');
@@ -1301,59 +1739,6 @@ function validateContribution(newContribution) {
     return false;
   }
   return true;
-}
-
-async function addFund() {
-  const fund = document.getElementById('choice_fund')?.value;
-  const contribution = document.getElementById('fund_contribution')?.value;
-
-  if (!fund) {
-    showToast(CONFIG.isArabic ? 'يرجى اختيار مصدر التمويل' : 'Please select funding source', 'error');
-    return;
-  }
-
-  if (!contribution || parseFloat(contribution) <= 0) {
-    showToast(CONFIG.isArabic ? 'يرجى إدخال نسبة مساهمة صحيحة' : 'Please enter valid contribution percentage', 'error');
-    return;
-  }
-
-  if (parseFloat(contribution) > 100) {
-    showToast(CONFIG.isArabic ? 'النسبة لا يمكن أن تتجاوز 100%' : 'Percentage cannot exceed 100%', 'error');
-    return;
-  }
-
-  // Validate that adding this won't exceed 100%
-  if (!validateContribution(contribution)) {
-    return;
-  }
-
-  if (hasUnsavedChanges) {
-    await saveBusinessInfoSilently();
-  }
-
-  const formData = new FormData();
-  formData.append('fund_add', CONFIG.bplanId);
-  formData.append('choice_fund', fund);
-  formData.append('fund_contribution', contribution);
-
-  try {
-    const response = await fetch(window.location.href, {
-      method: 'POST',
-      body: formData,
-      headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    });
-
-    if (response.ok) {
-      showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
-      document.getElementById('choice_fund').value = '';
-      document.getElementById('fund_contribution').value = '';
-      markSaved();
-      await refreshTable('funding-sources-table-container');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    window.location.reload();
-  }
 }
 
 // ============================================================================
@@ -1407,9 +1792,8 @@ async function saveBusinessInfoSilently() {
 
   const formData = new FormData(form);
 
-  // Remove table-specific fields
   const fieldsToRemove = [
-    'product_service_name', 'product_service_differentiator', 'product_service_differentiator_other',
+    'product_service_name', 'differentiator_category', 'product_service_differentiator',
     'staff_position', 'number_of_staff', 'choice_work_time', 'staff_salary',
     'choice_type', 'choice_subtype', 'resource_value',
     'choice_fund', 'fund_contribution'
@@ -1440,15 +1824,11 @@ async function saveBusinessInfoSilently() {
 // ============================================================================
 async function addProductService() {
   const nameInput = document.getElementById('product_service_name');
+  const categorySelect = document.getElementById('differentiator_category');
   const diffSelect = document.getElementById('product_service_differentiator');
-  const diffOther = document.getElementById('product_service_differentiator_other');
 
   const name = nameInput?.value;
-  let differentiator = diffSelect?.value;
-
-  if (differentiator === 'Other') {
-    differentiator = diffOther?.value;
-  }
+  const differentiator = diffSelect?.value;
 
   if (!name) {
     showToast(CONFIG.isArabic ? 'يرجى إدخال اسم المنتج/الخدمة' : 'Please enter product/service name', 'error');
@@ -1474,9 +1854,8 @@ async function addProductService() {
     if (response.ok) {
       showToast(CONFIG.isArabic ? 'تمت الإضافة' : 'Added successfully');
       nameInput.value = '';
-      diffSelect.value = '';
-      if (diffOther) diffOther.value = '';
-      document.getElementById('other-differentiator-container')?.classList.remove('show');
+      categorySelect.value = '';
+      diffSelect.innerHTML = '<option value="">' + (CONFIG.isArabic ? '-- اختر الفئة أولاً --' : '-- Select Category First --') + '</option>';
       markSaved();
       await refreshTable('products-services-table-container');
     }
@@ -1584,8 +1963,13 @@ async function addFund() {
     return;
   }
 
-  if (!contribution || contribution <= 0) {
+  if (!contribution || parseFloat(contribution) <= 0) {
     showToast(CONFIG.isArabic ? 'يرجى إدخال نسبة مساهمة صحيحة' : 'Please enter valid contribution percentage', 'error');
+    return;
+  }
+
+  if (parseFloat(contribution) > 100) {
+    showToast(CONFIG.isArabic ? 'النسبة لا يمكن أن تتجاوز 100%' : 'Percentage cannot exceed 100%', 'error');
     return;
   }
 
@@ -1685,7 +2069,28 @@ function attachDeleteListeners() {
 // ============================================================================
 async function saveAndContinue() {
   if (isSaving) return;
+
+  const fundingToggle = document.getElementById('toggle_funds');
+  if (fundingToggle && fundingToggle.checked) {
+    const total = updateContributionProgress();
+    if (total !== 100) {
+      showToast(
+        CONFIG.isArabic
+          ? 'يجب أن يكون مجموع مصادر التمويل 100%'
+          : 'Funding sources must total 100%',
+        'error'
+      );
+      return;
+    }
+  }
+
   isSaving = true;
+
+  const saveBtn = document.getElementById('btn-save-continue');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="material-icons">sync</i> ' + (CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...');
+  }
 
   window.onbeforeunload = null;
   updateAutoSaveStatus('saving');
@@ -1705,17 +2110,29 @@ async function saveAndContinue() {
     } else if (response.ok) {
       markSaved();
       showToast(CONFIG.isArabic ? 'تم الحفظ بنجاح' : 'Saved successfully');
-      window.location.href = '/business_premises/' + CONFIG.bplanId;
+
+      setTimeout(() => {
+        window.location.href = '/business_premises/' + CONFIG.bplanId;
+      }, 500);
+    } else {
+      throw new Error('Save failed');
     }
   } catch (error) {
     console.error('Error:', error);
-    showToast(CONFIG.isArabic ? 'حدث خطأ' : 'Error occurred', 'error');
+    showToast(CONFIG.isArabic ? 'حدث خطأ أثناء الحفظ' : 'Error while saving', 'error');
+    updateAutoSaveStatus('error');
+
     window.onbeforeunload = function(e) {
       if (hasUnsavedChanges) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
+
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="material-icons">check</i> ' + (CONFIG.isArabic ? 'حفظ ومتابعة' : 'Save & Continue');
+    }
   } finally {
     isSaving = false;
   }
@@ -1740,13 +2157,16 @@ function hideLeaveModal() {
 // INITIALIZATION
 // ============================================================================
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize differentiator categories
+  initDifferentiatorCategories();
+
   // Multi-select pills
   document.querySelectorAll('.multi-select-pill').forEach(pill => {
     pill.addEventListener('click', function() {
       const checkbox = this.querySelector('input[type="checkbox"]');
       checkbox.checked = !checkbox.checked;
       this.classList.toggle('active', checkbox.checked);
-      markUnsaved();
+      autoSaveBusinessInfo();
     });
   });
 
@@ -1817,116 +2237,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
   console.log('✅ Business Profile page initialized');
 });
-
-
-// ============================================================================
-// SAVE & CONTINUE
-// ============================================================================
-async function saveAndContinue() {
-  if (isSaving) return;
-
-  // Check if funding sources total is 100% (if funding section is enabled)
-  const fundingToggle = document.getElementById('toggle_funds');
-  if (fundingToggle && fundingToggle.checked) {
-    const total = updateContributionProgress();
-    if (total !== 100) {
-      showToast(
-        CONFIG.isArabic
-          ? 'يجب أن يكون مجموع مصادر التمويل 100%'
-          : 'Funding sources must total 100%',
-        'error'
-      );
-      return;
-    }
-  }
-
-  isSaving = true;
-
-  // Disable button while saving
-  const saveBtn = document.getElementById('btn-save-continue');
-  if (saveBtn) {
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="material-icons">sync</i> ' + (CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...');
-  }
-
-  // Remove beforeunload warning during save
-  window.onbeforeunload = null;
-  updateAutoSaveStatus('saving');
-
-  const form = document.getElementById('business-profile-form');
-  const formData = new FormData(form);
-  formData.set('action', 'save');
-
-  try {
-    const response = await fetch(window.location.href, {
-      method: 'POST',
-      body: formData
-    });
-
-    if (response.redirected) {
-      window.location.href = response.url;
-    } else if (response.ok) {
-      markSaved();
-      showToast(CONFIG.isArabic ? 'تم الحفظ بنجاح' : 'Saved successfully');
-
-      // Redirect to next page
-      setTimeout(() => {
-        window.location.href = '/business_premises/' + CONFIG.bplanId;
-      }, 500);
-    } else {
-      throw new Error('Save failed');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    showToast(CONFIG.isArabic ? 'حدث خطأ أثناء الحفظ' : 'Error while saving', 'error');
-    updateAutoSaveStatus('error');
-
-    // Re-enable beforeunload warning
-    window.onbeforeunload = function(e) {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    // Re-enable button
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = '<i class="material-icons">check</i> ' + (CONFIG.isArabic ? 'حفظ ومتابعة' : 'Save & Continue');
-    }
-  } finally {
-    isSaving = false;
-  }
-}
-
-// ============================================================================
-// AUTO-SAVE STATUS UPDATE
-// ============================================================================
-function updateAutoSaveStatus(status) {
-  const el = document.getElementById('auto-save-status');
-  if (!el) return;
-
-  const icon = el.querySelector('i');
-  const text = el.querySelector('span');
-
-  el.classList.remove('saving', 'saved', 'error');
-
-  if (status === 'saving') {
-    el.classList.add('saving');
-    icon.textContent = 'sync';
-    text.textContent = CONFIG.isArabic ? 'جاري الحفظ...' : 'Saving...';
-  } else if (status === 'saved') {
-    el.classList.add('saved');
-    icon.textContent = 'cloud_done';
-    text.textContent = CONFIG.isArabic ? 'تم الحفظ' : 'Saved';
-  } else if (status === 'error') {
-    el.classList.add('error');
-    icon.textContent = 'cloud_off';
-    text.textContent = CONFIG.isArabic ? 'فشل الحفظ' : 'Save failed';
-  } else {
-    icon.textContent = 'cloud_off';
-    text.textContent = CONFIG.isArabic ? 'غير محفوظ' : 'Unsaved';
-  }
-}
 </script>
 {% endblock javascripts %}
